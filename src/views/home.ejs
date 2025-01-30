@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>UniBoard</title>
+    <%- include('shared/includes/meta') %> <%- include('shared/includes/styles')
+    %>
+  </head>
+  <body class="bg-background">
+    <header class="flex items-center justify-between px-40 py-4">
+      <h1 class="text-xl text-black">UniBoard</h1>
+      <div class="space-x-4">
+        <a
+          href="/auth/login"
+          class="bg-primary cursor-pointer rounded-xl px-4 py-2 text-black transition-colors duration-300 ease-in-out hover:bg-black hover:text-white">
+          Login
+        </a>
+        <a
+          href="/auth/signup"
+          class="bg-primary cursor-pointer rounded-xl px-4 py-2 text-black transition-colors duration-300 ease-in-out hover:bg-black hover:text-white">
+          Sign Up
+        </a>
+      </div>
+    </header>
+    <%- include('shared/includes/scripts') %>
+  </body>
+</html>

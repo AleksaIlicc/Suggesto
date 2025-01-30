@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #f2ebe4;
+  --color-black: #09050d;
+  --color-white: #ffffff;
+  --color-accent-red: #f3c5c5;
+  --color-accent-yellow: #f9e1c0;
+  --color-accent-green: #c0f1dc;
+  --color-accent-blue: #d5d3fe;
+  --color-background: #faf9f7;
+}
+
+input {
+  -webkit-box-shadow: 0 0 0 30px #f2ebe4 inset !important;
+  box-shadow: 0 0 0 30px #f2ebe4 inset !important;
+  -webkit-text-fill-color: inherit !important;
+}
