@@ -1,23 +1,25 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>UniBoard</title>
+    <title>Suggesto</title>
     <%- include('shared/includes/meta') %> <%- include('shared/includes/styles')
     %>
   </head>
   <body class="bg-background">
     <header class="flex items-center justify-between px-40 py-4">
-      <h1 class="text-xl text-black">UniBoard</h1>
+      <h1 class="text-xl font-medium">Suggesto</h1>
       <div class="space-x-4">
         <a
           href="/auth/login"
-          class="bg-primary cursor-pointer rounded-xl px-4 py-2 text-black transition-colors duration-300 ease-in-out hover:bg-black hover:text-white">
+          class="rounded-xl cursor-pointer px-3 py-2 text-black transition-colors"
+        >
           Login
         </a>
         <a
           href="/auth/signup"
-          class="bg-primary cursor-pointer rounded-xl px-4 py-2 text-black transition-colors duration-300 ease-in-out hover:bg-black hover:text-white">
-          Sign Up
+          class="bg-gray-dark text-white cursor-pointer rounded-xl px-4 py-2 text-black transition-colors duration-300 ease-in-out hover:bg-gray-light hover:text-white"
+        >
+          Get Started
         </a>
       </div>
     </header>
