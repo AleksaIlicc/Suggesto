@@ -1,10 +1,25 @@
-import express from 'express';
-import authController from '../controllers/authController';
+import express from "express";
+import authController from "../controllers/authController";
+import { validateDto } from "../middlewares/validateDto";
+import { CreateUserDto } from "../dtos/auth/create-user.dto";
+import { LoginUserDto } from "../dtos/auth/login-user.dto";
 
 const router = express.Router();
 
 // Get methods
-router.get('/signup', authController.getSignup);
-router.get('/login', authController.getLogin);
+router.get("/register", authController.getRegister);
+router.get("/login", authController.getLogin);
+
+// Post methods
+router.post(
+  "/login",
+  [validateDto(LoginUserDto, "body")],
+  authController.postRegister
+);
+router.post(
+  "/register",
+  [validateDto(CreateUserDto, "body")],
+  authController.postRegister
+);
 
 export default router;

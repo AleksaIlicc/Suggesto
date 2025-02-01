@@ -7,7 +7,11 @@
   </head>
   <body class="bg-background">
     <main class="flex min-h-screen items-center justify-center">
-      <form class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10">
+      <form
+        action="/auth/register"
+        method="post"
+        class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10"
+      >
         <h1 class="text-center text-3xl">
           <a
             href="/"
@@ -18,16 +22,48 @@
         <h2 class="text-center text-2xl">Create your account</h2>
         <div class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700"
-              >Full Name</label
+            <label
+              for="firstName"
+              class="block text-sm font-medium text-gray-700"
+              >First Name</label
             >
             <input
               type="text"
-              id="name"
-              name="name"
+              id="firstName"
+              name="firstName"
               required
               class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
-              autocomplete="name"
+              autocomplete="false"
+            />
+          </div>
+          <div>
+            <label
+              for="lastName"
+              class="block text-sm font-medium text-gray-700"
+              >Last Name</label
+            >
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              required
+              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+              autocomplete="false"
+            />
+          </div>
+          <div>
+            <label
+              for="username"
+              class="block text-sm font-medium text-gray-700"
+              >Username</label
+            >
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+              autocomplete="false"
             />
           </div>
           <div>

@@ -7,7 +7,7 @@ import hpp from "hpp";
 import helmet from "helmet";
 import flash from "express-flash";
 import expressSession from "express-session";
-// import initPassport from "./config/passport";
+import initPassport from "./config/passport";
 import passport from "passport";
 import moment from "moment-timezone";
 import compression from "compression";
@@ -66,7 +66,7 @@ const main = async (): Promise<void> => {
     );
 
     // Initialization of Passport
-    // initPassport(passport);
+    initPassport(passport);
     app.use(passport.initialize());
     app.use(passport.session());
 
