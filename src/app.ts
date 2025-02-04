@@ -1,19 +1,19 @@
-import "dotenv/config";
-import express, { Request, Response, NextFunction } from "express";
-import { join } from "path";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import hpp from "hpp";
-import helmet from "helmet";
-import flash from "express-flash";
-import expressSession from "express-session";
-import initPassport from "./config/passport";
-import passport from "passport";
-import moment from "moment-timezone";
-import compression from "compression";
-import homeRoutes from "./routes/homeRoutes";
-import authRoutes from "./routes/authRoutes";
-import connectToDatabase from "./config/datasource";
+import 'dotenv/config';
+import express, { Request, Response, NextFunction } from 'express';
+import { join } from 'path';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import hpp from 'hpp';
+import helmet from 'helmet';
+import flash from 'express-flash';
+import expressSession from 'express-session';
+import initPassport from './config/passport';
+import passport from 'passport';
+import moment from 'moment-timezone';
+import compression from 'compression';
+import homeRoutes from './routes/homeRoutes';
+import authRoutes from './routes/authRoutes';
+import connectToDatabase from './config/datasource';
 
 const main = async (): Promise<void> => {
   try {
@@ -31,22 +31,22 @@ const main = async (): Promise<void> => {
     helmet({
       contentSecurityPolicy: {},
       crossOriginEmbedderPolicy: false,
-      crossOriginResourcePolicy: { policy: "cross-origin" },
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
     });
     app.use(hpp());
     app.use(
       cors({
-        origin: ["http://localhost:3000"],
+        origin: ['http://localhost:3000'],
         credentials: true,
       })
     );
     app.use(cookieParser());
 
     // Template Engine & Assets Settings
-    app.set("view engine", "ejs");
-    app.set("trust proxy", 1);
-    app.set("views", join(__dirname, "views"));
-    app.use(express.static(join(__dirname, "/public")));
+    app.set('view engine', 'ejs');
+    app.set('trust proxy', 1);
+    app.set('views', join(__dirname, 'views'));
+    app.use(express.static(join(__dirname, '/public')));
 
     // Body settings & flush messages & sessions
     app.use(express.json());
@@ -58,8 +58,8 @@ const main = async (): Promise<void> => {
         saveUninitialized: false,
         resave: true,
         cookie: {
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
           httpOnly: true,
         },
       })
@@ -86,8 +86,8 @@ const main = async (): Promise<void> => {
     );
 
     // Initialization of Routes
-    app.use("/", homeRoutes);
-    app.use("/auth", authRoutes);
+    app.use('/', homeRoutes);
+    app.use('/auth', authRoutes);
 
     // Run the application
 
@@ -95,7 +95,7 @@ const main = async (): Promise<void> => {
       console.log(`App listening on port ${port}`);
     });
   } catch (error: unknown) {
-    console.error("Database connection error:", error);
+    console.error('Database connection error:', error);
     process.exit();
   }
 };

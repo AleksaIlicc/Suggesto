@@ -1,16 +1,16 @@
-import { NextFunction, Request, Response } from "express";
-import { CreateUserDto } from "../dtos/auth/create-user.dto";
-import User from "../models/User";
-import bcrypt from "bcrypt";
-import { LoginUserDto } from "../dtos/auth/login-user.dto";
-import passport from "passport";
+import { NextFunction, Request, Response } from 'express';
+import { CreateUserDto } from '../dtos/auth/create-user.dto';
+import User from '../models/User';
+import bcrypt from 'bcrypt';
+import { LoginUserDto } from '../dtos/auth/login-user.dto';
+import passport from 'passport';
 
 const getRegister = async (_req: Request, res: Response): Promise<void> => {
-  res.render("pages/auth/register");
+  res.render('pages/auth/register');
 };
 
 const getLogin = async (_req: Request, res: Response): Promise<void> => {
-  res.render("pages/auth/login");
+  res.render('pages/auth/login');
 };
 
 const postLogin = async (
@@ -24,53 +24,53 @@ const postLogin = async (
     });
 
     if (!user) {
-      req.flash("error", "Invalid email or password.");
-      return res.status(403).redirect("/auth/login");
+      req.flash('error', 'Invalid email or password.');
+      return res.status(403).redirect('/auth/login');
     }
 
     const isMatched = await bcrypt.compare(req.body.password, user.password);
 
     if (!isMatched) {
-      req.flash("error", "Invalid email or password.");
-      return res.status(403).redirect("/auth/login");
+      req.flash('error', 'Invalid email or password.');
+      return res.status(403).redirect('/auth/login');
     }
 
     passport.authenticate(
-      "local",
+      'local',
       (
         err: Error | null,
         user: Express.User | null,
         info: { message: string }
       ) => {
         if (err) {
-          req.flash("error", info?.message || "An error occurred.");
-          return res.status(500).redirect("/auth/login");
+          req.flash('error', info?.message || 'An error occurred.');
+          return res.status(500).redirect('/auth/login');
         }
 
         if (!user) {
-          req.flash("error", info?.message || "Invalid email or password.");
-          return res.status(403).redirect("/auth/login");
+          req.flash('error', info?.message || 'Invalid email or password.');
+          return res.status(403).redirect('/auth/login');
         }
 
         req.logIn(user, (loginErr: unknown) => {
           if (loginErr) {
-            req.flash("error", info?.message || "Login failed.");
+            req.flash('error', info?.message || 'Login failed.');
             return next(loginErr);
           }
 
           req.flash(
-            "success",
-            info?.message || "You have successfully logged in."
+            'success',
+            info?.message || 'You have successfully logged in.'
           );
 
-          return res.status(200).redirect("/");
+          return res.status(200).redirect('/');
         });
       }
     )(req, res, next);
   } catch (error: unknown) {
     console.error(error);
-    req.flash("error", "Login failed. Please try again.");
-    return res.status(500).redirect("/auth/login");
+    req.flash('error', 'Login failed. Please try again.');
+    return res.status(500).redirect('/auth/login');
   }
 };
 
@@ -84,13 +84,13 @@ const postRegister = async (
     });
 
     if (existingUser?.email === req.body.email) {
-      req.flash("error", "A user with this email address already exists.");
-      return res.status(409).redirect("/auth/register");
+      req.flash('error', 'A user with this email address already exists.');
+      return res.status(409).redirect('/auth/register');
     }
 
     if (existingUser?.username === req.body.username) {
-      req.flash("error", "A user with this username already exists.");
-      return res.status(409).redirect("/auth/register");
+      req.flash('error', 'A user with this username already exists.');
+      return res.status(409).redirect('/auth/register');
     }
 
     const newUser = new User({
@@ -106,11 +106,11 @@ const postRegister = async (
 
     await newUser.save();
 
-    req.flash("success", "You have successfully registered.");
-    return res.status(201).redirect("/auth/login");
+    req.flash('success', 'You have successfully registered.');
+    return res.status(201).redirect('/auth/login');
   } catch (error: unknown) {
-    req.flash("error", "An error occurred during registration.");
-    return res.status(500).redirect("/auth/register");
+    req.flash('error', 'An error occurred during registration.');
+    return res.status(500).redirect('/auth/register');
   }
 };
 

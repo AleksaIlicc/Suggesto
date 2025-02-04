@@ -1,12 +1,12 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import bcrypt from "bcrypt";
-import User, { IUser } from "../models/User";
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import User, { IUser } from '../models/User';
 
 const init = (passport: passport.PassportStatic) => {
   passport.use(
     new LocalStrategy(
-      { usernameField: "email" },
+      { usernameField: 'email' },
       async (
         email: string,
         password: string,
@@ -20,13 +20,13 @@ const init = (passport: passport.PassportStatic) => {
           const user = await User.findOne({ email, isDeleted: false });
 
           if (!user) {
-            return done(null, null, { message: "User not found!" });
+            return done(null, null, { message: 'User not found!' });
           }
 
           const isMatch = await bcrypt.compare(password, user.password);
           if (!isMatch) {
             return done(null, null, {
-              message: "Email or password is incorrect!",
+              message: 'Email or password is incorrect!',
             });
           }
 
@@ -34,10 +34,10 @@ const init = (passport: passport.PassportStatic) => {
           delete userWithoutPassword.password;
 
           return done(null, userWithoutPassword, {
-            message: "You have successfully logged in.",
+            message: 'You have successfully logged in.',
           });
         } catch (err: unknown) {
-          return done(null, null, { message: "Database Error. Try Again!" });
+          return done(null, null, { message: 'Database Error. Try Again!' });
         }
       }
     )
