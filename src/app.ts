@@ -13,6 +13,7 @@ import moment from 'moment-timezone';
 import compression from 'compression';
 import homeRoutes from './routes/homeRoutes';
 import authRoutes from './routes/authRoutes';
+import appRoutes from './routes/appRoutes';
 import connectToDatabase from './config/datasource';
 
 const main = async (): Promise<void> => {
@@ -88,6 +89,7 @@ const main = async (): Promise<void> => {
     // Initialization of Routes
     app.use('/', homeRoutes);
     app.use('/auth', authRoutes);
+    app.use('/app', appRoutes);
 
     // Run the application
 

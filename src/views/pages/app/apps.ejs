@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>My APPs</title>
+    <%- include('../../shared/includes/meta') %> <%-
+    include('../../shared/includes/styles') %>
+  </head>
+  <body class="bg-background">
+    <main class="mx-auto flex justify-center px-4 py-4 sm:px-28 sm:py-8">
+      <% apps.forEach(app => { %> <%= app.name %> <%= app.description %> <% })
+      %>
+    </main>
+
+    <%- include('../../shared/includes/scripts') %>
+  </body>
+</html>

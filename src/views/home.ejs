@@ -16,11 +16,15 @@
         </a>
         <a
           href="/auth/register"
-          class="bg-gray-dark hover:bg-gray-light cursor-pointer rounded-xl px-4 py-2 text-black text-white transition-colors duration-300 ease-in-out hover:text-white">
+          class="bg-gray-dark hover:bg-gray-light cursor-pointer rounded-xl px-4 py-2 text-white transition-colors duration-300 ease-in-out hover:text-white">
           Get Started
         </a>
       </div>
     </header>
+
+    <section>
+      User: <%= user?.firstName %> <%= user?.lastName %> - <%= user?._id %>
+    </section>
     <%- include('shared/includes/scripts') %>
   </body>
 </html>

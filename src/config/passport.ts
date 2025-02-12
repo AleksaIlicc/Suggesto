@@ -17,7 +17,7 @@ const init = (passport: passport.PassportStatic) => {
         ) => void
       ) => {
         try {
-          const user = await User.findOne({ email, isDeleted: false });
+          const user = await User.findOne({ email });
 
           if (!user) {
             return done(null, null, { message: 'User not found!' });
@@ -31,6 +31,7 @@ const init = (passport: passport.PassportStatic) => {
           }
 
           const userWithoutPassword = user.toObject();
+
           delete userWithoutPassword.password;
 
           return done(null, userWithoutPassword, {
@@ -45,14 +46,14 @@ const init = (passport: passport.PassportStatic) => {
 
   passport.serializeUser(
     (user: IUser, done: (err: unknown, id?: string) => void) => {
-      done(null, user.id);
+      done(null, user._id);
     }
   );
 
   passport.deserializeUser(
     async (id: string, done: (err: unknown, user?: IUser | null) => void) => {
       try {
-        const user = await User.findOne({ id, isDeleted: false });
+        const user = await User.findOne({ _id: id });
 
         if (user) {
           const userWithoutPassword = user.toObject();
