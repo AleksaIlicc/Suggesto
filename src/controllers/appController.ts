@@ -4,7 +4,7 @@ import User, { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 
 const getApp = async (_req: Request, res: Response): Promise<void> => {
-  res.render('pages/app/app');
+  res.render('pages/apps/app');
 };
 
 const getApps = async (req: Request, res: Response): Promise<void> => {
@@ -17,18 +17,21 @@ const getApps = async (req: Request, res: Response): Promise<void> => {
 
     console.log(apps);
 
-    res.render('pages/app/apps', { apps });
+    res.render('pages/apps/my-apps', { apps });
   } catch (err: unknown) {
-    req.flash('error', 'Error.');
+    req.flash('error', 'Failed to fetch your applications. Please try again.');
     return res.status(500).redirect('/');
   }
 };
 
 const getAddApp = async (req: Request, res: Response): Promise<void> => {
   try {
-    res.render('pages/app/add-app');
+    res.render('pages/apps/add-app');
   } catch (err: unknown) {
-    req.flash('error', 'Error.');
+    req.flash(
+      'error',
+      'Unable to load application creation form. Please try again.'
+    );
     return res.status(500).redirect('/');
   }
 };
@@ -57,10 +60,10 @@ const postAddApp = async (
 
     await newApp.save();
 
-    req.flash('success', 'You have successfully added app.');
+    req.flash('success', 'Application has been created successfully.');
     return res.status(201).redirect('/app/add');
   } catch (error: unknown) {
-    req.flash('error', 'An error occurred during adding app.');
+    req.flash('error', 'Failed to create application. Please try again.');
     return res.status(500).redirect('/app/add');
   }
 };

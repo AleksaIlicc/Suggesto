@@ -89,7 +89,7 @@ const main = async (): Promise<void> => {
     // Initialization of Routes
     app.use('/', homeRoutes);
     app.use('/auth', authRoutes);
-    app.use('/app', appRoutes);
+    app.use('/apps', appRoutes);
 
     // Run the application
 

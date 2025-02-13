@@ -5,9 +5,15 @@ export interface IApplication extends Document {
   _id: string;
   name: string;
   description: string;
-  suggestions?: { title: string; description: string }[];
-  headerColor?: string;
-  buttonColor?: string;
+  suggestions?: {
+    _id: string;
+    title: string;
+    description: string;
+  }[];
+  design?: {
+    headerColor?: string;
+    buttonColor?: string;
+  };
   userId: IUser;
 }
 
@@ -16,12 +22,15 @@ const ApplicationSchema: Schema = new Schema({
   description: { type: String, required: true },
   suggestions: [
     {
+      _id: { type: Schema.Types.ObjectId, ref: 'Suggestion' },
       title: { type: String },
       description: { type: String },
     },
   ],
-  headerColor: { type: String },
-  buttonColor: { type: String },
+  design: {
+    headerColor: { type: String },
+    buttonColor: { type: String },
+  },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 });
 

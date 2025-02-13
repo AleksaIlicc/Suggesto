@@ -7,8 +7,8 @@ const router = express.Router();
 
 // Get methods
 router.get('/', appController.getApps);
-router.get('/app/:id', appController.getApp);
 router.get('/add', appController.getAddApp);
+router.get('/:id', appController.getApp);
 
 // Post methods
 router.post('/add', [validateDto(AddAppDto, 'body')], appController.postAddApp);
