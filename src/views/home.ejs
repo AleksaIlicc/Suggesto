@@ -6,35 +6,7 @@
     %>
   </head>
   <body class="bg-background">
-    <header class="flex items-center justify-between px-40 py-4">
-      <h1 class="text-xl font-medium">Suggesto</h1>
-      <div class="space-x-4">
-        <% if (!user) { %>
-        <a
-          href="/auth/login"
-          class="cursor-pointer rounded-xl px-3 py-2 text-black transition-colors hover:opacity-70">
-          Login
-        </a>
-        <% } else { %>
-        <a
-          href="/apps"
-          class="cursor-pointer rounded-xl px-3 py-2 text-black transition-colors hover:opacity-70">
-          My Apps
-        </a>
-        <a
-          href="/auth/logout"
-          class="cursor-pointer rounded-xl px-3 py-2 text-black transition-colors hover:opacity-70">
-          Logout
-        </a>
-        <% } %> <% if (!user) { %>
-        <a
-          href="/auth/register"
-          class="bg-gray-dark hover:bg-gray-light cursor-pointer rounded-xl px-4 py-2 text-white transition-colors duration-300 ease-in-out hover:text-white">
-          Get Started
-        </a>
-        <% } %>
-      </div>
-    </header>
+    <%- include('shared/partials/header') %>
 
     <section>
       User: <%= user?.firstName %> <%= user?.lastName %> - <%= user?._id %>
