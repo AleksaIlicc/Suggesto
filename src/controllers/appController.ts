@@ -3,8 +3,24 @@ import Application from '../models/Application';
 import User, { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 
-const getApp = async (_req: Request, res: Response): Promise<void> => {
-  res.render('pages/apps/app');
+const getApp = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const _id = req.params.id;
+
+    const app = await Application.findOne({
+      _id,
+    });
+
+    if (!app) {
+      req.flash('error', 'Application not found.');
+      return res.status(404).redirect('/');
+    }
+
+    res.render('pages/apps/app', { app });
+  } catch (err: unknown) {
+    req.flash('error', 'Failed to fetch application. Please try again.');
+    return res.status(500).redirect('/');
+  }
 };
 
 const getApps = async (req: Request, res: Response): Promise<void> => {

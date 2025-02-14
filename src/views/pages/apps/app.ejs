@@ -1,51 +1,61 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>App Name - Suggesto</title>
+    <title><%= app.name %> - Suggesto</title>
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
   <body class="bg-background">
     <div
-      class="flex justify-center bg-gray-500 px-4 py-4 shadow-sm sm:px-28 sm:py-14">
+      id="appHeader"
+      class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
       <div class="flex w-full max-w-xl flex-col justify-center space-y-3">
-        <div class="flex items-center space-x-4 border-gray-400">
-          <img class="h-8 w-8 rounded-full bg-white shadow-sm" />
-          <h1 class="text-lg font-medium sm:text-base">Interval Timer Pro</h1>
+        <div class="flex items-center space-x-4">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+            <span class="text-lg font-medium text-black"
+              ><%= app.name.charAt(0) %></span
+            >
+          </div>
+          <h1 class="text-lg font-medium text-white sm:text-xl">
+            <%= app.name %>
+          </h1>
         </div>
 
-        <p class="max-w-2xl text-sm text-gray-900 sm:text-base">
-          Have an idea to make the app even better? We'd love to hear it!
+        <p class="max-w-2xl text-sm text-gray-100 sm:text-base">
+          <%= app.description %>
         </p>
       </div>
     </div>
 
-    <main class="mx-auto flex justify-center px-4 py-4 sm:px-28 sm:py-8">
+    <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
       <div class="w-full max-w-xl">
         <div class="mb-4 w-full sm:mb-8">
           <button
-            class="bg-gray-dark hover:bg-gray-light rounded-xl px-6 py-3 text-base text-white transition-colors duration-300">
+            id="addSuggestionBtn"
+            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
             Add Suggestion
           </button>
         </div>
 
         <div class="w-full space-y-4">
+          <% if (app.suggestions && app.suggestions.length > 0) { %> <%
+          app.suggestions.forEach(suggestion => { %>
           <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
             <div
               class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-2">
               <div>
                 <h3 class="text-base font-medium sm:text-base">
-                  Add dark mode support
+                  <%= suggestion.title %>
                 </h3>
                 <p class="mt-2 text-sm text-gray-600 sm:text-base">
-                  It would be great to have a dark mode option for better
-                  visibility at night.
+                  <%= suggestion.description %>
                 </p>
               </div>
               <div class="flex items-center justify-end">
                 <div class="flex items-center space-x-3">
                   <button
-                    class="flex space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95">
+                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5 sm:h-6 sm:w-6"
@@ -58,51 +68,36 @@
                         stroke-width="2"
                         d="M5 15l7-7 7 7" />
                     </svg>
-                    <p class="text-sm font-medium sm:text-base">92</p>
+                    <p class="text-sm font-medium sm:text-base">0</p>
                   </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Second card with same responsive styling -->
-          <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
-            <div
-              class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-              <div>
-                <h3 class="text-base font-medium sm:text-base">
-                  Implement push notifications
-                </h3>
-                <p class="mt-2 text-sm text-gray-600 sm:text-base">
-                  Would love to receive notifications for important updates.
-                </p>
-              </div>
-              <div class="flex items-center justify-end">
-                <div class="flex items-center space-x-3">
-                  <button
-                    class="flex space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 sm:h-6 sm:w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 15l7-7 7 7" />
-                    </svg>
-                    <p class="text-sm font-medium sm:text-base">28</p>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <% }) %> <% } else { %>
+          <div class="text-center text-gray-500">
+            No suggestions yet. Be the first to suggest something!
           </div>
+          <% } %>
         </div>
       </div>
     </main>
 
     <%- include('../../shared/includes/scripts') %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const header = document.getElementById('appHeader');
+        header.style.backgroundColor = headerColor;
+
+        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const addButton = document.getElementById('addSuggestionBtn');
+        addButton.style.backgroundColor = buttonColor;
+
+        const backgroundColor =
+          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        document.body.style.backgroundColor = backgroundColor;
+      });
+    </script>
   </body>
 </html>

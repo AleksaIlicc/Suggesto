@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import 'dotenv/config';
+
+const mongoUri = process.env.MONGODB_URI;
 
 const connectToDatabase = async (): Promise<void> => {
   try {
-    await mongoose.connect(
-      'mongodb+srv://cofyye:ngWb7QphatsAXhKF@cluster0.qep1e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
-    );
+    await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB successfully!');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
