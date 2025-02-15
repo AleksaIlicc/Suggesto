@@ -12,7 +12,4 @@ export class AddAppDto {
 
   @IsNotEmpty()
   public readonly buttonColor: string;
-
-  @IsNotEmpty()
-  public readonly userId: string;
 }

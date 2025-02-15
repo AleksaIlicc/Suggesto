@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { CreateUserDto } from '../dtos/auth/create-user.dto';
-import User from '../models/User';
+import User, { IUser } from '../models/User';
 import bcrypt from 'bcrypt';
 import { LoginUserDto } from '../dtos/auth/login-user.dto';
 import passport from 'passport';
@@ -114,9 +114,22 @@ const postRegister = async (
   }
 };
 
+const getLogout = async (req: Request, res: Response): Promise<void> => {
+  req.logOut(async err => {
+    if (err) {
+      req.flash('error', 'An error occurred during logout.');
+      return res.status(500).redirect('/');
+    }
+  });
+
+  req.flash('success', 'You have successfully logged out.');
+  return res.status(201).redirect('/');
+};
+
 export default {
   getLogin,
   getRegister,
+  getLogout,
   postRegister,
   postLogin,
 };

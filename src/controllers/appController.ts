@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Application from '../models/Application';
 import User, { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
+import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
+import Suggestion from '../models/Suggestion';
 
 const getApp = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -31,8 +33,6 @@ const getApps = async (req: Request, res: Response): Promise<void> => {
       userId: user._id,
     });
 
-    console.log(apps);
-
     res.render('pages/apps/my-apps', { apps });
   } catch (err: unknown) {
     req.flash('error', 'Failed to fetch your applications. Please try again.');
@@ -57,30 +57,94 @@ const postAddApp = async (
   res: Response
 ): Promise<void> => {
   try {
-    const existingUser = await User.findOne({
-      _id: req.body.userId,
-    });
-
-    if (!existingUser) {
-      req.flash('error', 'User not found.');
-      return res.status(404).redirect('/app/add');
-    }
+    const user = req.user as IUser;
 
     const newApp = new Application({
       name: req.body.name,
       description: req.body.description,
       headerColor: req.body.headerColor,
       buttonColor: req.body.buttonColor,
-      userId: req.body.userId,
+      userId: user._id,
     });
 
     await newApp.save();
 
     req.flash('success', 'Application has been created successfully.');
-    return res.status(201).redirect('/app/add');
+    return res.status(201).redirect('/apps/add-app');
   } catch (error: unknown) {
     req.flash('error', 'Failed to create application. Please try again.');
-    return res.status(500).redirect('/app/add');
+    return res.status(500).redirect('/apps/add-app');
+  }
+};
+
+const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user as IUser;
+    const _id = req.params.id;
+
+    const app = await Application.findOne({
+      _id: _id,
+      userId: user._id,
+    });
+
+    if (!app) {
+      req.flash('error', 'Application not found.');
+      return res.status(404).redirect('/');
+    }
+
+    res.render('pages/apps/add-suggestion', { appId: _id });
+  } catch (err: unknown) {
+    req.flash('error', 'Failed to fetch application. Please try again.');
+    return res.status(500).redirect('/');
+  }
+};
+
+const postAddSuggestion = async (
+  req: Request<{ id: string }, {}, AddSuggestionDto>,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = req.user as IUser;
+
+    const app = await Application.findOne({
+      _id: req.params.id,
+    });
+
+    if (!app) {
+      req.flash('error', 'Application not found.');
+      return res.status(404).redirect('/apps/my-apps');
+    }
+
+    const newAppSuggestion = new Suggestion({
+      title: req.body.title,
+      description: req.body.description,
+      applicationId: req.params.id,
+      userId: user._id,
+    });
+
+    await newAppSuggestion.save();
+
+    app.suggestions.push({
+      _id: newAppSuggestion._id,
+      title: req.body.title,
+      description: req.body.description,
+      count: app.suggestions.length + 1,
+    });
+
+    await app.save();
+
+    req.flash(
+      'success',
+      'Application suggestion has been created successfully.'
+    );
+    return res.status(201).redirect(`/apps/${req.params.id}/add-suggestion`);
+  } catch (error: unknown) {
+    console.log(error);
+    req.flash(
+      'error',
+      'Failed to create application suggestion. Please try again.'
+    );
+    return res.status(500).redirect('/apps/add');
   }
 };
 
@@ -89,4 +153,6 @@ export default {
   getApps,
   getAddApp,
   postAddApp,
+  getAddSuggestion,
+  postAddSuggestion,
 };

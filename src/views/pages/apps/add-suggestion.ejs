@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Suggesto - Add Suggestion</title>
+    <%- include('../../shared/includes/meta') %> <%-
+    include('../../shared/includes/styles') %>
+  </head>
+  <body class="bg-background">
+    <main class="mx-auto flex justify-center px-4 py-4 sm:px-28 sm:py-8">
+      <form
+        action="/apps/<%= appId %>/add-suggestion"
+        method="post"
+        class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10">
+        <h2 class="text-center text-2xl">Add suggestion</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+              autocomplete="false" />
+          </div>
+          <div>
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-700"
+              >Description</label
+            >
+            <input
+              type="text"
+              id="description"
+              name="description"
+              required
+              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+              autocomplete="false" />
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="bg-gray-dark hover:bg-gray-light w-full cursor-pointer rounded-xl py-2 text-white transition-colors duration-300 ease-in-out hover:text-white focus:ring-2 focus:ring-black focus:outline-none">
+          Add Suggestion
+        </button>
+      </form>
+    </main>
+
+    <%- include('../../shared/includes/scripts') %>
+  </body>
+</html>

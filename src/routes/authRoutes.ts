@@ -9,6 +9,7 @@ const router = express.Router();
 // Get methods
 router.get('/register', authController.getRegister);
 router.get('/login', authController.getLogin);
+router.get('/logout', authController.getLogout);
 
 // Post methods
 router.post(
