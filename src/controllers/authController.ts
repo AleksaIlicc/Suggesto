@@ -123,7 +123,7 @@ const getLogout = async (req: Request, res: Response): Promise<void> => {
   });
 
   req.flash('success', 'You have successfully logged out.');
-  return res.status(201).redirect('/');
+  return res.status(200).redirect('/');
 };
 
 export default {

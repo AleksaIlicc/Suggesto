@@ -6,6 +6,15 @@
     include('../../shared/includes/styles') %>
   </head>
   <body class="bg-background">
+    <% if (isOwner) { %>
+    <div class="fixed right-8 bottom-8">
+      <a
+        href="/apps"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md">
+        <i class="fas fa-th text-gray-dark text-xl"></i>
+      </a>
+    </div>
+    <% } %>
     <div
       id="appHeader"
       class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">

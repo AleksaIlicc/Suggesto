@@ -1,24 +1,27 @@
 import { Request, Response } from 'express';
 import Application from '../models/Application';
-import User, { IUser } from '../models/User';
+import { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import Suggestion from '../models/Suggestion';
 
 const getApp = async (req: Request, res: Response): Promise<void> => {
   try {
-    const _id = req.params.id;
+    const user = req.user as IUser;
 
     const app = await Application.findOne({
-      _id,
-    });
+      _id: req.params.id,
+    }).populate('user');
 
     if (!app) {
       req.flash('error', 'Application not found.');
       return res.status(404).redirect('/');
     }
 
-    res.render('pages/apps/app', { app });
+    res.render('pages/apps/app', {
+      app,
+      isOwner: user && user._id.toString() === app.user._id.toString(),
+    });
   } catch (err: unknown) {
     req.flash('error', 'Failed to fetch application. Please try again.');
     return res.status(500).redirect('/');
@@ -30,7 +33,7 @@ const getApps = async (req: Request, res: Response): Promise<void> => {
     const user = req.user as IUser;
 
     const apps = await Application.find({
-      userId: user._id,
+      user: user._id,
     });
 
     res.render('pages/apps/my-apps', { apps });
@@ -41,15 +44,7 @@ const getApps = async (req: Request, res: Response): Promise<void> => {
 };
 
 const getAddApp = async (req: Request, res: Response): Promise<void> => {
-  try {
-    res.render('pages/apps/add-app');
-  } catch (err: unknown) {
-    req.flash(
-      'error',
-      'Unable to load application creation form. Please try again.'
-    );
-    return res.status(500).redirect('/');
-  }
+  return res.render('pages/apps/add-app');
 };
 
 const postAddApp = async (
@@ -64,7 +59,7 @@ const postAddApp = async (
       description: req.body.description,
       headerColor: req.body.headerColor,
       buttonColor: req.body.buttonColor,
-      userId: user._id,
+      user: user._id,
     });
 
     await newApp.save();
@@ -84,7 +79,7 @@ const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
 
     const app = await Application.findOne({
       _id: _id,
-      userId: user._id,
+      user: user._id,
     });
 
     if (!app) {
@@ -139,7 +134,6 @@ const postAddSuggestion = async (
     );
     return res.status(201).redirect(`/apps/${req.params.id}/add-suggestion`);
   } catch (error: unknown) {
-    console.log(error);
     req.flash(
       'error',
       'Failed to create application suggestion. Please try again.'

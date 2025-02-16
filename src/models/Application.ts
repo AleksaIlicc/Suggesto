@@ -16,7 +16,7 @@ export interface IApplication extends Document {
     buttonColor?: string;
     backgroundColor?: string;
   };
-  userId: IUser;
+  user: IUser;
 }
 
 const ApplicationSchema: Schema = new Schema({
@@ -35,7 +35,7 @@ const ApplicationSchema: Schema = new Schema({
     buttonColor: { type: String },
     backgroundColor: { type: String },
   },
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
 const Application = mongoose.model<IApplication>(
