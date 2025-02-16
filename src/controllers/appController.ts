@@ -101,6 +101,8 @@ const postAddSuggestion = async (
   try {
     const user = req.user as IUser;
 
+    console.log(req.body);
+
     const app = await Application.findOne({
       _id: req.params.id,
     });

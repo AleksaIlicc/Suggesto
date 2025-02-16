@@ -20,7 +20,7 @@ router.post(
 );
 router.post(
   '/:id/add-suggestion',
-  [validateDto(AddSuggestionDto, 'body')],
+  // [validateDto(AddSuggestionDto, 'body')],
   appController.postAddSuggestion
 );
 
