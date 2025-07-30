@@ -1,29 +1,28 @@
 <header
-  class="flex w-full items-center justify-between px-4 py-4 sm:px-20 md:px-30 lg:px-40">
-  <h1 class="text-xl font-medium"><a href="/">Suggesto</a></h1>
-  <div class="space-x-0 sm:space-x-4">
+  class="flex w-full items-center justify-between px-6 py-6 sm:px-12 md:px-20 lg:px-40">
+  <h1 class="text-2xl font-bold tracking-tight"><%- include('logo') %></h1>
+  <div class="flex items-center space-x-2 sm:space-x-4">
     <% if (!user) { %>
     <a
       href="/auth/login"
-      class="cursor-pointer rounded-xl px-1.5 py-1 text-black transition-colors hover:opacity-70 sm:px-3 sm:py-2">
+      class="text-gray-dark rounded-xl px-6 py-2 font-semibold hover:opacity-70">
       Login
+    </a>
+    <a
+      href="/auth/register"
+      class="bg-gray-dark hover:bg-gray-light rounded-xl px-6 py-2 font-semibold text-white">
+      Get Started
     </a>
     <% } else { %>
     <a
       href="/apps"
-      class="cursor-pointer rounded-xl px-1.5 py-1 text-black transition-colors hover:opacity-70 sm:px-3 sm:py-2">
+      class="text-gray-dark rounded-xl px-6 py-2 font-semibold hover:opacity-70">
       My Apps
     </a>
     <a
       href="/auth/logout"
-      class="cursor-pointer rounded-xl px-1.5 py-1 text-black transition-colors hover:opacity-70 sm:px-3 sm:py-2">
+      class="text-gray-dark rounded-xl px-6 py-2 font-semibold hover:opacity-70">
       Logout
-    </a>
-    <% } %> <% if (!user) { %>
-    <a
-      href="/auth/register"
-      class="bg-gray-dark hover:bg-gray-light cursor-pointer rounded-xl px-2 py-1 text-white transition-colors duration-300 ease-in-out hover:text-white sm:px-4 sm:py-2">
-      Get Started
     </a>
     <% } %>
   </div>

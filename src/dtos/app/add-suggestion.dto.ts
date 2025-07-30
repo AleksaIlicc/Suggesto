@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsIn } from 'class-validator';
 
 export class AddSuggestionDto {
   @IsNotEmpty()
@@ -6,4 +6,11 @@ export class AddSuggestionDto {
 
   @IsNotEmpty()
   public readonly description: string;
+
+  @IsOptional()
+  @IsIn(['pending', 'in-progress', 'completed', 'rejected'])
+  public readonly status?: string;
+
+  @IsOptional()
+  public readonly categories?: string[];
 }

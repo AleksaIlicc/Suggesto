@@ -7,6 +7,7 @@ import hpp from 'hpp';
 import helmet from 'helmet';
 import flash from 'express-flash';
 import expressSession from 'express-session';
+import methodOverride from 'method-override';
 import initPassport from './config/passport';
 import passport from 'passport';
 import moment from 'moment-timezone';
@@ -52,6 +53,8 @@ const main = async (): Promise<void> => {
     // Body settings & flush messages & sessions
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(methodOverride('_method')); // Enable PUT and DELETE via forms
+    app.use('/uploads', express.static(join(__dirname, 'uploads'))); // Serve uploaded files
     app.use(flash());
     app.use(
       expressSession({

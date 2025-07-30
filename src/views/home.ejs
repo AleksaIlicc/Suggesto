@@ -1,16 +1,264 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Suggesto</title>
+    <title>Suggesto - Feature Request Platform</title>
     <%- include('shared/includes/meta') %> <%- include('shared/includes/styles')
     %>
   </head>
   <body class="bg-background">
-    <%- include('shared/partials/header') %>
+    <div class="flex min-h-screen flex-col items-center">
+      <%- include('shared/partials/header') %>
 
-    <section>
-      User: <%= user?.firstName %> <%= user?.lastName %> - <%= user?._id %>
-    </section>
+      <!-- Hero Section -->
+      <section class="w-full max-w-7xl px-4 py-12 text-center sm:py-20">
+        <div class="mx-auto max-w-4xl">
+          <h1
+            class="text-gray-dark mb-8 text-5xl leading-tight font-bold sm:text-6xl lg:text-7xl">
+            Build better products with
+            <span
+              class="from-red1 to-red2 block bg-gradient-to-r bg-clip-text text-transparent sm:inline">
+              user feedback
+            </span>
+          </h1>
+          <p
+            class="mx-auto mb-12 max-w-3xl text-xl leading-relaxed font-light text-gray-600 sm:text-2xl">
+            Centralize feature requests, prioritize what matters, and keep your
+            community engaged with transparent product development.
+          </p>
+
+          <div
+            class="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <% if (!user) { %>
+            <a
+              href="/auth/register"
+              class="bg-gray-dark hover:bg-gray-light rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-lg">
+              Get started for free
+            </a>
+            <% } else { %>
+            <a
+              href="<%= hasApplications ? '/apps' : '/apps/add-app' %>"
+              class="bg-gray-dark hover:bg-gray-light rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-lg">
+              <%= hasApplications ? 'Go to my apps' : 'Create your first app' %>
+            </a>
+            <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Social Proof Section -->
+      <section class="mb-16 w-full max-w-6xl px-4 py-8">
+        <div class="mb-12 text-center">
+          <p
+            class="mb-6 text-sm font-medium tracking-wider text-gray-500 uppercase">
+            Trusted by product teams worldwide
+          </p>
+          <div class="mx-auto grid max-w-2xl grid-cols-3 gap-8">
+            <div class="text-center">
+              <div class="text-gray-dark mb-2 text-3xl font-bold">100+</div>
+              <div class="text-sm text-gray-600">Active Apps</div>
+            </div>
+            <div class="text-center">
+              <div class="text-gray-dark mb-2 text-3xl font-bold">50K+</div>
+              <div class="text-sm text-gray-600">Feature Requests</div>
+            </div>
+            <div class="text-center">
+              <div class="text-gray-dark mb-2 text-3xl font-bold">100K+</div>
+              <div class="text-sm text-gray-600">User Votes</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section id="features" class="mb-16 w-full max-w-7xl px-4 py-16">
+        <div class="mb-16 text-center">
+          <h2 class="text-gray-dark mb-6 text-4xl font-bold sm:text-5xl">
+            Your complete feedback platform
+          </h2>
+          <p class="mx-auto max-w-3xl text-xl leading-relaxed text-gray-600">
+            Collect, organize, and prioritize feature requests. Build what
+            matters most to your users.
+          </p>
+        </div>
+
+        <div class="mb-20 grid items-center gap-16 lg:grid-cols-2">
+          <!-- Collect Feedback -->
+          <div>
+            <div
+              class="from-red1 to-red2 mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br">
+              <i class="fa-solid fa-lightbulb text-4xl text-white"></i>
+            </div>
+            <h3 class="text-gray-dark mb-4 text-2xl font-bold">
+              Collect feedback everywhere
+            </h3>
+            <p class="mb-6 text-lg leading-relaxed text-gray-600">
+              Let users submit feature requests and ideas directly. No account
+              required - remove friction and capture more insights.
+            </p>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                Anonymous submissions supported
+              </li>
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                File uploads and screenshots
+              </li>
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                Custom branding and domains
+              </li>
+            </ul>
+          </div>
+
+          <div class="rounded-2xl bg-gray-50 p-8 shadow-sm">
+            <div class="mb-4 rounded-xl bg-white p-6 shadow-sm">
+              <div class="mb-3 flex items-center space-x-3">
+                <div class="h-8 w-8 rounded-full bg-gray-200"></div>
+                <div class="h-4 flex-1 rounded bg-gray-200"></div>
+              </div>
+              <div class="mb-2 h-3 rounded bg-gray-100"></div>
+              <div class="h-3 w-3/4 rounded bg-gray-100"></div>
+            </div>
+            <div class="rounded-xl bg-white p-6 shadow-sm">
+              <div class="mb-3 flex items-center space-x-3">
+                <div
+                  class="from-red1 to-red2 h-8 w-8 rounded-full bg-gradient-to-br"></div>
+                <div class="h-4 flex-1 rounded bg-gray-200"></div>
+              </div>
+              <div class="mb-2 h-3 rounded bg-gray-100"></div>
+              <div class="h-3 w-2/3 rounded bg-gray-100"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid items-center gap-16 lg:grid-cols-2">
+          <div class="order-2 rounded-2xl bg-gray-50 p-8 shadow-sm lg:order-1">
+            <div class="space-y-4">
+              <div
+                class="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
+                <div class="flex items-center space-x-3">
+                  <span class="font-medium">Add bot for customer support</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-500">352 votes</span>
+                  <button
+                    class="from-red1 to-red2 rounded-lg bg-gradient-to-r px-3 py-1 text-sm text-white">
+                    ↑
+                  </button>
+                </div>
+              </div>
+              <div
+                class="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
+                <div class="flex items-center space-x-3">
+                  <span class="font-medium">Add student plans</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-500">287 votes</span>
+                  <button
+                    class="rounded-lg bg-gray-200 px-3 py-1 text-sm text-gray-600">
+                    ↑
+                  </button>
+                </div>
+              </div>
+              <div
+                class="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
+                <div class="flex items-center space-x-3">
+                  <span class="font-medium">Add dark mode</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-500">198 votes</span>
+                  <button
+                    class="rounded-lg bg-gray-200 px-3 py-1 text-sm text-gray-600">
+                    ↑
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Prioritize -->
+          <div class="order-1 lg:order-2">
+            <div
+              class="from-red1 to-red2 mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br">
+              <i class="fa-solid fa-chart-line text-4xl text-white"></i>
+            </div>
+            <h3 class="text-gray-dark mb-4 text-2xl font-bold">
+              Prioritize with confidence
+            </h3>
+            <p class="mb-6 text-lg leading-relaxed text-gray-600">
+              Let your community vote on features they want most. Make
+              data-driven decisions about what to build next based on real user
+              demand.
+            </p>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                One-click voting system
+              </li>
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                Status updates and progress tracking
+              </li>
+              <li class="flex items-center">
+                <i class="fa-solid fa-check-circle text-gray-dark mr-3"></i>
+                Community discussion threads
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="w-full max-w-6xl px-4 py-20 text-center">
+        <div
+          class="from-red1 to-red2 relative overflow-hidden rounded-3xl bg-gradient-to-br p-12 text-white sm:p-16">
+          <!-- Background decoration -->
+          <div class="absolute top-0 left-0 h-full w-full opacity-10">
+            <div
+              class="absolute top-8 left-8 h-32 w-32 rounded-full bg-white"></div>
+            <div
+              class="absolute right-8 bottom-8 h-24 w-24 rounded-full bg-white"></div>
+            <div
+              class="absolute top-1/2 right-1/4 h-16 w-16 rounded-full bg-white"></div>
+          </div>
+
+          <div class="relative z-10">
+            <h2 class="mb-6 text-4xl font-bold sm:text-5xl">
+              Ready to build something amazing?
+            </h2>
+            <p
+              class="mx-auto mb-10 max-w-3xl text-xl leading-relaxed opacity-90">
+              Join thousands of product teams using Suggesto to collect
+              feedback, prioritize features, and build products users love.
+            </p>
+
+            <div
+              class="mb-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <% if (!user) { %>
+              <a
+                href="/auth/register"
+                class="text-gray-dark rounded-xl bg-white px-8 py-4 text-lg font-semibold shadow-lg hover:bg-gray-100">
+                Get started for free
+              </a>
+              <a
+                href="#features"
+                class="rounded-xl border-2 border-white px-8 py-4 text-lg font-medium text-white hover:opacity-80">
+                Learn more
+              </a>
+              <% } else { %>
+              <a
+                href="<%= hasApplications ? '/apps' : '/apps/add-app' %>"
+                class="text-gray-dark rounded-xl bg-white px-8 py-4 text-lg font-semibold shadow-lg">
+                <%= hasApplications ? 'Go to my apps' : 'Create your first app'
+                %>
+              </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <%- include('shared/includes/scripts') %>
   </body>
 </html>

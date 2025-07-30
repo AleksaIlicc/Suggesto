@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Create New App - Suggesto</title>
+    <title>Edit <%= app.name %> - Suggesto</title>
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
@@ -14,15 +14,15 @@
         <div class="mb-8 w-full">
           <div class="mb-2 flex items-center space-x-4">
             <a
-              href="/apps"
+              href="/apps/<%= app._id %>"
               class="flex items-center text-gray-600 transition-colors hover:text-gray-900">
               <i class="fas fa-arrow-left mr-2"></i>
-              Back to My Apps
+              Back to App
             </a>
           </div>
-          <h1 class="text-gray-dark mb-2 text-3xl font-bold">Create New App</h1>
+          <h1 class="text-gray-dark mb-2 text-3xl font-bold">Edit App</h1>
           <p class="text-base text-gray-600">
-            Design your feedback collection app and see how it looks in
+            Update your feedback collection app and see how it looks in
             real-time.
           </p>
         </div>
@@ -37,9 +37,19 @@
                 App Configuration
               </h2>
 
+              <% if (messages.error) { %>
+              <div class="mb-4 rounded-lg bg-red-50 p-4 text-red-800">
+                <p><%= messages.error %></p>
+              </div>
+              <% } %> <% if (messages.success) { %>
+              <div class="mb-4 rounded-lg bg-green-50 p-4 text-green-800">
+                <p><%= messages.success %></p>
+              </div>
+              <% } %>
+
               <form
                 id="appForm"
-                action="/apps/add-app"
+                action="/apps/<%= app._id %>?_method=PUT"
                 method="post"
                 class="space-y-6">
                 <!-- Basic Information -->
@@ -60,6 +70,7 @@
                       id="name"
                       name="name"
                       required
+                      value="<%= app.name %>"
                       placeholder="e.g., My Awesome App"
                       class="w-full rounded-xl border border-gray-300 px-4 py-3 transition-colors focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                       oninput="updatePreview()" />
@@ -81,7 +92,9 @@
                       rows="3"
                       placeholder="Brief description of what feedback you're collecting..."
                       class="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 transition-colors focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                      oninput="updatePreview()"></textarea>
+                      oninput="updatePreview()">
+<%= app.description %></textarea
+                    >
                     <p class="mt-1 text-xs text-gray-500">
                       Explain what kind of feedback or suggestions you want
                     </p>
@@ -106,11 +119,19 @@
                         <div
                           id="logoPreviewContainer"
                           class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100">
+                          <% if (app.design?.logo) { %>
+                          <img
+                            id="logoPreviewImg"
+                            src="/uploads/<%= app.design.logo %>"
+                            alt="Logo"
+                            class="h-full w-full object-cover" />
+                          <% } else { %>
                           <span
                             id="logoPreviewText"
                             class="text-xl font-medium text-gray-400"
-                            >M</span
+                            ><%= app.name.charAt(0).toUpperCase() %></span
                           >
+                          <% } %>
                         </div>
                       </div>
                       <div class="flex-1">
@@ -120,7 +141,11 @@
                           accept="image/*"
                           class="hidden"
                           onchange="handleLogoUpload()" />
-                        <input type="hidden" id="logo" name="logo" value="" />
+                        <input
+                          type="hidden"
+                          id="logo"
+                          name="logo"
+                          value="<%= app.design?.logo || '' %>" />
                         <button
                           type="button"
                           onclick="document.getElementById('logoUpload').click()"
@@ -138,14 +163,14 @@
                           </svg>
                           Choose Image
                         </button>
+                        <% if (app.design?.logo) { %>
                         <button
-                          id="removeLogo"
                           type="button"
                           onclick="removeLogo()"
-                          style="display: none"
                           class="ml-2 inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
                           Remove
                         </button>
+                        <% } %>
                       </div>
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
@@ -158,7 +183,7 @@
                 <div class="space-y-4">
                   <h3
                     class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
-                    Design & Branding
+                    Design & Colors
                   </h3>
 
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -173,13 +198,13 @@
                           type="color"
                           id="headerColor"
                           name="headerColor"
-                          value="#374151"
+                          value="<%= app.design?.headerColor || '#374151' %>"
                           class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
                           onchange="updatePreview()" />
                         <input
                           type="text"
                           id="headerColorText"
-                          value="#374151"
+                          value="<%= app.design?.headerColor || '#374151' %>"
                           class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                           oninput="updateColorFromText('header')" />
                       </div>
@@ -199,13 +224,13 @@
                           type="color"
                           id="buttonColor"
                           name="buttonColor"
-                          value="#111827"
+                          value="<%= app.design?.buttonColor || '#111827' %>"
                           class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
                           onchange="updatePreview()" />
                         <input
                           type="text"
                           id="buttonColorText"
-                          value="#111827"
+                          value="<%= app.design?.buttonColor || '#111827' %>"
                           class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                           oninput="updateColorFromText('button')" />
                       </div>
@@ -225,13 +250,13 @@
                           type="color"
                           id="backgroundColor"
                           name="backgroundColor"
-                          value="#F3F4F6"
+                          value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
                           class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
                           onchange="updatePreview()" />
                         <input
                           type="text"
                           id="backgroundColorText"
-                          value="#F3F4F6"
+                          value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
                           class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                           oninput="updateColorFromText('background')" />
                       </div>
@@ -281,13 +306,48 @@
 
                 <!-- Submit Button -->
                 <div class="border-t border-gray-200 pt-4">
-                  <button
-                    type="submit"
-                    class="bg-gray-dark hover:bg-gray-light w-full rounded-xl px-6 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl">
-                    Create App
-                  </button>
+                  <div class="flex space-x-4">
+                    <button
+                      type="submit"
+                      class="bg-gray-dark hover:bg-gray-light flex-1 rounded-xl px-6 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                      Save Changes
+                    </button>
+                    <a
+                      href="/apps/<%= app._id %>"
+                      class="hover:border-gray-dark text-gray-dark flex flex-1 items-center justify-center rounded-xl border-2 border-gray-300 px-6 py-3 text-center font-medium transition-all duration-200">
+                      Cancel
+                    </a>
+                  </div>
                 </div>
               </form>
+
+              <!-- Danger Zone -->
+              <div class="mt-8 border-t border-red-200 pt-8">
+                <h3 class="mb-4 text-lg font-medium text-red-600">
+                  Danger Zone
+                </h3>
+                <p class="mb-4 text-sm text-gray-600">
+                  Deleting this application will permanently remove all
+                  suggestions, votes, and related data. This action cannot be
+                  undone.
+                </p>
+                <button
+                  onclick="confirmDelete()"
+                  class="inline-flex items-center rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
+                  <svg
+                    class="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  Delete Application
+                </button>
+              </div>
             </div>
           </div>
 
@@ -314,25 +374,32 @@
                   <!-- Header Section -->
                   <div
                     id="previewHeader"
-                    class="flex w-full justify-center p-6 shadow-sm"
-                    style="background-color: #374151">
+                    class="flex w-full justify-center p-6 shadow-sm">
                     <div
                       class="flex w-full max-w-6xl flex-col justify-center space-y-3">
                       <div class="flex items-center space-x-4">
                         <div
                           id="previewLogoContainer"
                           class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white">
+                          <% if (app.design?.logo) { %>
+                          <img
+                            id="previewLogoImg"
+                            src="/uploads/<%= app.design.logo %>"
+                            alt="Logo"
+                            class="h-full w-full object-cover" />
+                          <% } else { %>
                           <span
                             id="previewIcon"
                             class="text-lg font-medium text-black"
-                            >M</span
+                            ><%= app.name.charAt(0).toUpperCase() %></span
                           >
+                          <% } %>
                         </div>
                         <div>
                           <h1
                             id="previewTitle"
                             class="text-xl font-medium text-white sm:text-2xl">
-                            My Awesome App
+                            <%= app.name %>
                           </h1>
                           <p class="text-sm text-gray-200">by You</p>
                         </div>
@@ -340,7 +407,7 @@
                       <p
                         id="previewDescription"
                         class="max-w-2xl text-sm text-gray-100 sm:text-base">
-                        Share your ideas and help us improve!
+                        <%= app.description %>
                       </p>
                     </div>
                   </div>
@@ -352,7 +419,6 @@
                         id="previewButton"
                         type="button"
                         class="inline-block cursor-pointer rounded-xl px-6 py-3 text-base font-medium text-white transition-colors"
-                        style="background-color: #111827"
                         disabled>
                         Submit Feature Request
                       </button>
@@ -360,7 +426,7 @@
                   </div>
 
                   <!-- Sample Suggestions -->
-                  <div class="bg-white px-6 py-8">
+                  <div class="px-6 py-8">
                     <h2 class="mb-4 text-xl font-semibold text-gray-900">
                       Recent Suggestions
                     </h2>
@@ -397,8 +463,7 @@
                               >
                               <button
                                 id="previewVoteButton1"
-                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-                                style="background-color: #111827">
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90">
                                 ↑
                               </button>
                             </div>
@@ -437,8 +502,7 @@
                               >
                               <button
                                 id="previewVoteButton2"
-                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-                                style="background-color: #111827">
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90">
                                 ↑
                               </button>
                             </div>
@@ -460,14 +524,38 @@
     <script>
       // Initialize preview on page load
       document.addEventListener('DOMContentLoaded', function () {
+        // Set initial colors from server-side values
+        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const backgroundColor =
+          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+
+        // Apply initial styles
+        document.getElementById('previewHeader').style.backgroundColor =
+          headerColor;
+        document.getElementById('previewButton').style.backgroundColor =
+          buttonColor;
+        document.getElementById('previewVoteButton1').style.backgroundColor =
+          buttonColor;
+        document.getElementById('previewVoteButton2').style.backgroundColor =
+          buttonColor;
+
+        // Update background colors (only in preview area)
+        const contentSections = document.querySelectorAll(
+          '#previewContent .bg-background'
+        );
+        contentSections.forEach(section => {
+          section.style.backgroundColor = backgroundColor;
+        });
+
         updatePreview();
       });
 
       function updatePreview() {
-        const name = document.getElementById('name').value || 'My Awesome App';
+        const name = document.getElementById('name').value || '<%= app.name %>';
         const description =
           document.getElementById('description').value ||
-          'Share your ideas and help us improve!';
+          '<%= app.description %>';
         const headerColor = document.getElementById('headerColor').value;
         const buttonColor = document.getElementById('buttonColor').value;
         const backgroundColor =
@@ -485,7 +573,7 @@
         document.getElementById('previewVoteButton2').style.backgroundColor =
           buttonColor;
 
-        // Update background colors - only in preview area
+        // Update background colors (only in preview area)
         const contentSections = document.querySelectorAll(
           '#previewContent .bg-background'
         );
@@ -496,12 +584,10 @@
         // Update icon if no logo
         const logoImg = document.getElementById('previewLogoImg');
         if (!logoImg) {
-          document.getElementById('previewIcon').textContent = name
-            .charAt(0)
-            .toUpperCase();
-          document.getElementById('logoPreviewText').textContent = name
-            .charAt(0)
-            .toUpperCase();
+          const previewIcon = document.getElementById('previewIcon');
+          if (previewIcon) {
+            previewIcon.textContent = name.charAt(0).toUpperCase();
+          }
         }
 
         // Update color text inputs
@@ -574,9 +660,6 @@
             logoPreviewContainer.innerHTML = '';
             logoPreviewContainer.appendChild(logoPreviewImg);
 
-            // Show remove button
-            document.getElementById('removeLogo').style.display = 'inline-flex';
-
             // Note: In a real implementation, you would upload the file to the server
             // For now, we'll just store the data URL (not recommended for production)
             document.getElementById('logo').value = e.target.result;
@@ -587,7 +670,7 @@
 
       function removeLogo() {
         // Reset to initial state
-        const name = document.getElementById('name').value || 'My Awesome App';
+        const name = document.getElementById('name').value || '<%= app.name %>';
         const initial = name.charAt(0).toUpperCase();
 
         // Update preview
@@ -602,14 +685,26 @@
         );
         logoPreviewContainer.innerHTML = `<span id="logoPreviewText" class="text-xl font-medium text-gray-400">${initial}</span>`;
 
-        // Hide remove button
-        document.getElementById('removeLogo').style.display = 'none';
-
         // Clear hidden input
         document.getElementById('logo').value = '';
 
         // Clear file input
         document.getElementById('logoUpload').value = '';
+      }
+
+      function confirmDelete() {
+        if (
+          confirm(
+            'Are you sure you want to delete this application? This action cannot be undone and will remove all suggestions and votes.'
+          )
+        ) {
+          // Create a form to submit DELETE request
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/apps/<%= app._id %>?_method=DELETE';
+          document.body.appendChild(form);
+          form.submit();
+        }
       }
 
       // Form validation

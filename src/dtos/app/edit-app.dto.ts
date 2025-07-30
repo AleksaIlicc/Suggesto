@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class AddAppDto {
+export class EditAppDto {
   @IsNotEmpty()
   public readonly name: string;
 

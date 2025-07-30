@@ -1,7 +1,23 @@
 import { Request, Response } from 'express';
+import Application from '../models/Application';
+import { IUser } from '../models/User';
 
-const getHome = async (_req: Request, res: Response): Promise<void> => {
-  res.render('home');
+const getHome = async (req: Request, res: Response): Promise<void> => {
+  try {
+    let hasApplications = false;
+    const user = req.user as IUser;
+
+    // Check if authenticated user has any applications
+    if (user) {
+      const appCount = await Application.countDocuments({ user: user._id });
+      hasApplications = appCount > 0;
+    }
+
+    res.render('home', { hasApplications });
+  } catch (err: unknown) {
+    console.error('Error rendering home page:', err);
+    res.render('home', { hasApplications: false });
+  }
 };
 
 export default {

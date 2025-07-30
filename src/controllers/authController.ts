@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { CreateUserDto } from '../dtos/auth/create-user.dto';
+import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
+import { ResetPasswordDto } from '../dtos/auth/reset-password.dto';
 import User, { IUser } from '../models/User';
 import bcrypt from 'bcrypt';
 import { LoginUserDto } from '../dtos/auth/login-user.dto';
 import passport from 'passport';
+import { generateResetToken, hashToken } from '../utils/crypto';
+import sendEmail from '../utils/sendEmail';
 
 const getRegister = async (_req: Request, res: Response): Promise<void> => {
   res.render('pages/auth/register');
@@ -126,10 +130,188 @@ const getLogout = async (req: Request, res: Response): Promise<void> => {
   return res.status(200).redirect('/');
 };
 
+const getForgotPassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  res.render('pages/auth/forgot-password');
+};
+
+const postForgotPassword = async (
+  req: Request<{}, {}, ForgotPasswordDto>,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      req.flash('error', 'No account found with that email address.');
+      return res.status(404).redirect('/auth/forgot-password');
+    }
+
+    // Generate reset token
+    const resetToken = generateResetToken();
+    const hashedToken = hashToken(resetToken);
+
+    // Set token and expiry (1 hour from now)
+    user.resetToken = hashedToken;
+    user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+    await user.save();
+
+    // Create reset URL
+    const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}&userId=${user._id}`;
+
+    // Email HTML template
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Password Reset Request</h2>
+        <p>Hello ${user.firstName},</p>
+        <p>You have requested to reset your password for your Suggesto account.</p>
+        <p>Click the button below to reset your password:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" 
+             style="background-color: #374151; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block;">
+            Reset Password
+          </a>
+        </div>
+        <p>If the button doesn't work, copy and paste this link into your browser:</p>
+        <p style="word-break: break-all; color: #666;">${resetUrl}</p>
+        <p><strong>This link will expire in 1 hour.</strong></p>
+        <p>If you did not request a password reset, please ignore this email.</p>
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+        <p style="color: #666; font-size: 12px;">This is an automated message from Suggesto.</p>
+      </div>
+    `;
+
+    // Send email
+    await sendEmail({
+      to: user.email,
+      subject: 'Reset Your Password - Suggesto',
+      html: emailHtml,
+    });
+
+    req.flash(
+      'success',
+      'Password reset instructions have been sent to your email.'
+    );
+    return res.status(200).redirect('/auth/login');
+  } catch (error: unknown) {
+    console.error('Forgot password error:', error);
+    req.flash('error', 'An error occurred. Please try again.');
+    return res.status(500).redirect('/auth/forgot-password');
+  }
+};
+
+const getResetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, userId } = req.query;
+
+  if (!token || !userId) {
+    req.flash('error', 'Invalid password reset link.');
+    return res.status(400).redirect('/auth/login');
+  }
+
+  try {
+    // Verify the token and user
+    const hashedToken = hashToken(token as string);
+    const user = await User.findOne({
+      _id: userId,
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: new Date() },
+    });
+
+    if (!user) {
+      req.flash('error', 'Password reset link is invalid or has expired.');
+      return res.status(400).redirect('/auth/login');
+    }
+
+    res.render('pages/auth/reset-password', { token, userId });
+  } catch (error: unknown) {
+    console.error('Reset password error:', error);
+    req.flash('error', 'An error occurred. Please try again.');
+    return res.status(500).redirect('/auth/login');
+  }
+};
+
+const postResetPassword = async (
+  req: Request<{}, {}, ResetPasswordDto>,
+  res: Response
+): Promise<void> => {
+  try {
+    const { token, userId, password } = req.body;
+
+    // Verify the token and user
+    const hashedToken = hashToken(token);
+    const user = await User.findOne({
+      _id: userId,
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: new Date() },
+    });
+
+    if (!user) {
+      req.flash('error', 'Password reset link is invalid or has expired.');
+      return res.status(400).redirect('/auth/login');
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Update user password and clear reset token
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    // Send confirmation email
+    const confirmationHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Password Reset Successful</h2>
+        <p>Hello ${user.firstName},</p>
+        <p>Your password has been successfully reset for your Suggesto account.</p>
+        <p>You can now log in with your new password.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.CLIENT_URL}/auth/login" 
+             style="background-color: #374151; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block;">
+            Login Now
+          </a>
+        </div>
+        <p>If you did not make this change, please contact support immediately.</p>
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+        <p style="color: #666; font-size: 12px;">This is an automated message from Suggesto.</p>
+      </div>
+    `;
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset Successful - Suggesto',
+      html: confirmationHtml,
+    });
+
+    req.flash(
+      'success',
+      'Your password has been reset successfully. You can now log in.'
+    );
+    return res.status(200).redirect('/auth/login');
+  } catch (error: unknown) {
+    console.error('Reset password error:', error);
+    req.flash(
+      'error',
+      'An error occurred while resetting your password. Please try again.'
+    );
+    return res.status(500).redirect('/auth/reset-password');
+  }
+};
+
 export default {
   getLogin,
   getRegister,
   getLogout,
+  getForgotPassword,
+  getResetPassword,
   postRegister,
   postLogin,
+  postForgotPassword,
+  postResetPassword,
 };

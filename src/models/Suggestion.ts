@@ -15,11 +15,19 @@ export interface ISuggestion extends Document {
     text: string;
     createdAt: Date;
   }[];
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'in-progress' | 'completed' | 'rejected';
+  voteCount: number;
+  files?: {
+    originalName: string;
+    filename: string;
+    path: string;
+    mimetype: string;
+    size: number;
+  }[];
   createdAt: Date;
   updatedAt: Date;
   applicationId: IApplication;
-  userId: IUser;
+  userId: IUser | null; // Allow anonymous submissions
 }
 
 const SuggestionSchema: Schema = new Schema(
@@ -45,15 +53,25 @@ const SuggestionSchema: Schema = new Schema(
     ],
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
+      enum: ['pending', 'in-progress', 'completed', 'rejected'],
       default: 'pending',
     },
+    voteCount: { type: Number, default: 0 },
+    files: [
+      {
+        originalName: { type: String },
+        filename: { type: String },
+        path: { type: String },
+        mimetype: { type: String },
+        size: { type: Number },
+      },
+    ],
     applicationId: {
       type: Schema.Types.ObjectId,
       ref: 'Application',
       required: true,
     },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: false }, // Allow anonymous submissions
   },
   { timestamps: true }
 );

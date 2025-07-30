@@ -49,27 +49,101 @@
         </div>
 
         <div class="w-full space-y-4">
-          <% if (app.suggestions && app.suggestions.length > 0) { %> <%
-          app.suggestions.forEach(suggestion => { %>
+          <% if (suggestions && suggestions.length > 0) { %> <%
+          suggestions.forEach(suggestion => { %>
           <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
+            <div class="mb-3 flex flex-wrap items-center gap-2">
+              <% if (suggestion.status) { %>
+                <% 
+                let statusColor = 'bg-gray-100 text-gray-800';
+                let statusText = suggestion.status;
+                switch(suggestion.status) {
+                  case 'pending': 
+                    statusColor = 'bg-yellow-100 text-yellow-800';
+                    statusText = 'Pending';
+                    break;
+                  case 'in-progress': 
+                    statusColor = 'bg-blue-100 text-blue-800';
+                    statusText = 'In Progress';
+                    break;
+                  case 'completed': 
+                    statusColor = 'bg-green-100 text-green-800';
+                    statusText = 'Completed';
+                    break;
+                  case 'rejected': 
+                    statusColor = 'bg-red-100 text-red-800';
+                    statusText = 'Rejected';
+                    break;
+                }
+                %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= statusColor %>">
+                  <%= statusText %>
+                </span>
+              <% } %>
+              <span class="text-xs text-gray-500">
+                by <%= suggestion.userId.firstName %> <%= suggestion.userId.lastName %> • 
+                <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>
+              </span>
+            </div>
+            
             <div
-              class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:space-x-2">
-              <div>
-                <h3 class="text-base font-medium sm:text-base">
+              class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
+              <div class="flex-1">
+                <h3 class="text-base font-medium sm:text-lg mb-2">
                   <%= suggestion.title %>
                 </h3>
-                <p class="mt-2 text-sm text-gray-600 sm:text-base">
+                <p class="text-sm text-gray-600 sm:text-base mb-3">
                   <%= suggestion.description %>
                 </p>
+                
+                <!-- Files Display -->
+                <% if (suggestion.files && suggestion.files.length > 0) { %>
+                  <div class="mb-3">
+                    <h4 class="text-sm font-medium text-gray-700 mb-2">Attachments:</h4>
+                    <div class="flex flex-wrap gap-2">
+                      <% suggestion.files.forEach(file => { %>
+                        <a href="/uploads/<%= file.filename %>" target="_blank" 
+                           class="inline-flex items-center px-3 py-1 rounded-md bg-gray-100 text-sm text-gray-700 hover:bg-gray-200">
+                          <% if (file.mimetype.startsWith('image/')) { %>
+                            <i class="fas fa-image mr-1"></i>
+                          <% } else if (file.mimetype === 'application/pdf') { %>
+                            <i class="fas fa-file-pdf mr-1"></i>
+                          <% } else { %>
+                            <i class="fas fa-file mr-1"></i>
+                          <% } %>
+                          <%= file.originalName %>
+                        </a>
+                      <% }); %>
+                    </div>
+                  </div>
+                <% } %>
               </div>
-              <div class="flex items-center justify-end">
-                <div class="flex items-center space-x-3">
+              
+              <div class="flex items-center justify-end space-x-3">
+                <!-- Status Update (Only for app owner) -->
+                <% if (isOwner) { %>
+                  <div class="relative">
+                    <select 
+                      onchange="updateStatus('<%= suggestion._id %>', this.value)"
+                      class="text-sm border rounded-md px-2 py-1">
+                      <option value="pending" <%= suggestion.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                      <option value="in-progress" <%= suggestion.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+                      <option value="completed" <%= suggestion.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                      <option value="rejected" <%= suggestion.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                    </select>
+                  </div>
+                <% } %>
+                
+                <!-- Vote Button -->
+                <div class="flex items-center space-x-2">
                   <button
-                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95">
+                    onclick="toggleVote('<%= suggestion._id %>')"
+                    id="vote-btn-<%= suggestion._id %>"
+                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95 <%= suggestion.hasUserVoted ? 'bg-blue-100 text-blue-600' : '' %>">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5 sm:h-6 sm:w-6"
-                      fill="none"
+                      fill="<%= suggestion.hasUserVoted ? 'currentColor' : 'none' %>"
                       viewBox="0 0 24 24"
                       stroke="currentColor">
                       <path
@@ -78,15 +152,18 @@
                         stroke-width="2"
                         d="M5 15l7-7 7 7" />
                     </svg>
-                    <p class="text-sm font-medium sm:text-base">0</p>
+                    <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>">
+                      <%= suggestion.voteCount || 0 %>
+                    </p>
                   </button>
                 </div>
               </div>
             </div>
           </div>
           <% }) %> <% } else { %>
-          <div class="text-center text-gray-500">
-            No suggestions yet. Be the first to suggest something!
+          <div class="text-center text-gray-500 py-8">
+            <p class="text-lg mb-2">No suggestions yet</p>
+            <p class="text-sm">Be the first to suggest something!</p>
           </div>
           <% } %>
         </div>
@@ -108,6 +185,65 @@
           '<%= app.design?.backgroundColor || "#F3F4F6" %>';
         document.body.style.backgroundColor = backgroundColor;
       });
+
+      // Voting functionality
+      async function toggleVote(suggestionId) {
+        try {
+          const response = await fetch(`/apps/api/suggestions/${suggestionId}/vote`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            const voteBtn = document.getElementById(`vote-btn-${suggestionId}`);
+            const voteCount = document.getElementById(`vote-count-${suggestionId}`);
+            
+            // Update vote count
+            voteCount.textContent = data.voteCount;
+            
+            // Update button appearance
+            if (data.voted) {
+              voteBtn.classList.add('bg-blue-100', 'text-blue-600');
+              voteBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+            } else {
+              voteBtn.classList.remove('bg-blue-100', 'text-blue-600');
+              voteBtn.querySelector('svg').setAttribute('fill', 'none');
+            }
+          } else {
+            alert(data.message || 'Failed to process vote');
+          }
+        } catch (error) {
+          console.error('Error voting:', error);
+          alert('Failed to process vote. Please try again.');
+        }
+      }
+
+      // Status update functionality (for app owners)
+      async function updateStatus(suggestionId, newStatus) {
+        try {
+          const response = await fetch(`/apps/api/suggestions/${suggestionId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+          });
+
+          if (response.ok) {
+            // Reload the page to show updated status
+            window.location.reload();
+          } else {
+            alert('Failed to update status. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error updating status:', error);
+          alert('Failed to update status. Please try again.');
+        }
+      }
     </script>
   </body>
 </html>

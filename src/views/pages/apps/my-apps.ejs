@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Suggesto - My Apps</title>
+    <title>My Apps - Suggesto</title>
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
@@ -10,70 +10,269 @@
       <%- include('../../shared/partials/header') %>
 
       <main
-        class="flex w-full max-w-6xl grow flex-col justify-stretch px-4 py-4 sm:py-8 lg:px-28">
-        <div>
-          <h3 class="text-gray-dark text-center text-3xl font-bold sm:text-6xl">
-            MY APPLICATIONS
-          </h3>
-          <p class="text-center text-gray-600 sm:text-lg">
-            Manage your feedback collection apps
+        class="flex w-full max-w-7xl grow flex-col px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+          <div class="mb-2 flex items-center justify-between">
+            <h1 class="text-gray-dark text-3xl font-bold sm:text-4xl">
+              My Apps
+            </h1>
+            <a
+              href="/apps/add-app"
+              class="bg-gray-dark hover:bg-gray-light flex items-center gap-2 rounded-xl px-6 py-3 font-medium text-white">
+              <i class="fas fa-plus"></i>
+              <span>Create New App</span>
+            </a>
+          </div>
+          <p class="max-w-2xl text-base text-gray-600">
+            Manage your feedback collection applications and track user
+            suggestions.
           </p>
         </div>
 
-        <div class="self-center sm:self-auto lg:px-16">
-          <div class="relative">
+        <!-- Apps Grid -->
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <% if (apps.length > 0) { %> <% apps.forEach(app => { %>
+          <div
+            class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+            <!-- App Preview Header -->
             <div
-              class="grid gap-6 py-6 sm:flex sm:snap-x sm:space-x-6 sm:overflow-x-auto">
-              <% apps.forEach(app => { %>
+              class="relative h-32 bg-gradient-to-br from-gray-600 to-gray-800 p-4">
+              <div class="flex items-start justify-between text-white">
+                <div class="flex-1">
+                  <h3 class="mb-1 truncate text-base font-semibold">
+                    <%= app.name %>
+                  </h3>
+                  <p class="text-sm opacity-90">
+                    <%= app.suggestions ? app.suggestions.length : 0 %>
+                    suggestions
+                  </p>
+                </div>
+                <div
+                  class="bg-opacity-20 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold">
+                  <% if (app.design && app.design.logo) { %>
+                  <img
+                    src="<%= app.design.logo %>"
+                    alt="<%= app.name %>"
+                    class="h-6 w-6 rounded-full object-cover" />
+                  <% } else { %> <%= app.name.charAt(0).toUpperCase() %> <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- App Content -->
+            <div class="p-5">
+              <p
+                class="mb-4 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                <%= app.description %>
+              </p>
+
+              <!-- App Stats -->
               <div
-                class="bg-primary bg-gray-dark h-96 w-80 shrink-0 snap-start rounded-xl p-6 text-white">
-                <div class="flex h-full flex-col">
-                  <div class="mb-4">
-                    <div class="flex items-center space-x-3">
-                      <div
-                        class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-                        <span class="text-lg font-medium text-black"
-                          ><%= app.name.charAt(0) %></span
-                        >
-                      </div>
-                      <h3 class="text-xl font-medium"><%= app.name %></h3>
+                class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
+                <div class="flex items-center space-x-1">
+                  <i class="fas fa-clock h-3 w-3"></i>
+                  <span
+                    >opened <%= app.lastOpened ? new
+                    Date(app.lastOpened).toLocaleDateString() : new
+                    Date(app.createdAt).toLocaleDateString() %></span
+                  >
+                </div>
+                <div class="flex items-center space-x-1">
+                  <i class="fas fa-check-circle h-3 w-3"></i>
+                  <span
+                    ><%= app.suggestions ? app.suggestions.filter(s => s.status
+                    !== 'pending').length : 0 %> resolved</span
+                  >
+                </div>
+              </div>
+
+              <!-- Primary Actions -->
+              <div class="mb-3 flex justify-center">
+                <a
+                  href="/apps/<%= app._id %>"
+                  class="bg-gray-dark hover:bg-gray-light w-full rounded-lg px-3 py-2.5 text-center text-sm font-medium text-white transition-colors">
+                  Public View
+                </a>
+              </div>
+
+              <!-- Secondary Actions -->
+              <div class="flex justify-center">
+                <div class="relative">
+                  <button
+                    onclick="toggleAppMenu('<%= app._id %>')"
+                    class="flex items-center space-x-1 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                    <span>More actions</span>
+                    <i class="fas fa-chevron-down h-4 w-4"></i>
+                  </button>
+
+                  <div
+                    id="app-menu-<%= app._id %>"
+                    class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-40 -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white shadow-xl">
+                    <div class="py-1">
+                      <a
+                        href="/apps/<%= app._id %>/edit"
+                        class="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-edit h-4 w-4"></i>
+                        <span>Edit App</span>
+                      </a>
+                      <button
+                        onclick="copyPublicLink('<%= app._id %>')"
+                        class="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-copy h-4 w-4"></i>
+                        <span>Copy Link</span>
+                      </button>
+                      <div class="my-1 border-t border-gray-100"></div>
+                      <button
+                        onclick="confirmDelete('<%= app._id %>', '<%= app.name %>')"
+                        class="flex w-full items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fas fa-trash h-4 w-4"></i>
+                        <span>Delete</span>
+                      </button>
                     </div>
-                  </div>
-
-                  <p class="mb-6 flex-grow text-sm"><%= app.description %></p>
-
-                  <div class="flex justify-end space-x-3">
-                    <a
-                      href="/apps/<%= app._id %>/edit"
-                      class="hover:bg-gray-light rounded-xl px-3 py-2 transition-colors">
-                      Edit
-                    </a>
-                    <a
-                      href="/apps/<%= app._id %>"
-                      class="hover:bg-gray-light rounded-xl px-4 py-2 text-white transition-colors duration-300 ease-in-out">
-                      Preview
-                    </a>
                   </div>
                 </div>
               </div>
-              <% }) %>
+            </div>
+          </div>
+          <% }) %>
 
+          <!-- Create New App Card -->
+          <a
+            href="/apps/add-app"
+            class="group flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all duration-300 hover:border-gray-400 hover:bg-gray-100">
+            <div class="text-center">
+              <div class="mb-4 flex justify-center">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 transition-colors group-hover:bg-gray-300">
+                  <i class="fas fa-plus text-gray-500"></i>
+                </div>
+              </div>
+              <h3 class="mb-2 text-base font-semibold text-gray-900">
+                Create New App
+              </h3>
+              <p class="max-w-xs text-sm text-gray-600">
+                Start collecting feedback and feature requests from your users
+              </p>
+            </div>
+          </a>
+          <% } else { %>
+          <!-- Empty State -->
+          <div class="col-span-full">
+            <div class="py-16 text-center">
+              <div
+                class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
+                <i class="fas fa-mobile-alt h-12 w-12 text-gray-400"></i>
+              </div>
+              <h3 class="mb-3 text-xl font-semibold text-gray-900">
+                No apps yet
+              </h3>
+              <p class="mx-auto mb-8 max-w-md text-base text-gray-600">
+                Create your first application to start collecting feature
+                requests and feedback from your users.
+              </p>
               <a
                 href="/apps/add-app"
-                class="bg-primary flex h-96 w-80 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-6 transition-colors duration-300 hover:border-gray-400">
-                <div class="text-center">
-                  <span class="mb-2 block text-3xl">+</span>
-                  <span class="text-gray-600">
-                    <% if (apps.length === 0) { %> Add Your First Application <%
-                    } else { %> Add New Application <% } %>
-                  </span>
-                </div>
+                class="bg-gray-dark hover:bg-gray-light inline-flex items-center space-x-2 rounded-xl px-8 py-4 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                <i class="fas fa-plus h-5 w-5"></i>
+                <span>Create Your First App</span>
               </a>
             </div>
           </div>
+          <% } %>
         </div>
       </main>
     </div>
+
+    <!-- Toast Notification -->
+    <div
+      id="toast"
+      class="fixed top-4 right-4 z-50 hidden rounded-lg bg-green-500 px-6 py-3 text-white shadow-lg">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-check-circle h-5 w-5"></i>
+        <span id="toast-message">Link copied to clipboard!</span>
+      </div>
+    </div>
+
     <%- include('../../shared/includes/scripts') %>
+    <script>
+      function toggleAppMenu(appId) {
+        const menu = document.getElementById(`app-menu-${appId}`);
+        const allMenus = document.querySelectorAll('[id^="app-menu-"]');
+
+        // Close all other menus
+        allMenus.forEach(m => {
+          if (m.id !== `app-menu-${appId}`) {
+            m.classList.add('hidden');
+          }
+        });
+
+        // Toggle the current menu
+        menu.classList.toggle('hidden');
+      }
+
+      // Close menus when clicking outside
+      document.addEventListener('click', function (event) {
+        if (
+          !event.target.closest('[onclick*="toggleAppMenu"]') &&
+          !event.target.closest('[id^="app-menu-"]')
+        ) {
+          document.querySelectorAll('[id^="app-menu-"]').forEach(menu => {
+            menu.classList.add('hidden');
+          });
+        }
+      });
+
+      function copyPublicLink(appId) {
+        const url = `${window.location.origin}/apps/${appId}`;
+        navigator.clipboard
+          .writeText(url)
+          .then(() => {
+            showToast('Public link copied to clipboard!');
+          })
+          .catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('Public link copied to clipboard!');
+          });
+
+        // Close the menu
+        document.getElementById(`app-menu-${appId}`).classList.add('hidden');
+      }
+
+      function confirmDelete(appId, appName) {
+        if (
+          confirm(
+            `Are you sure you want to delete "${appName}"?\n\nThis action cannot be undone and will remove all suggestions and votes associated with this app.`
+          )
+        ) {
+          // Create a form to submit DELETE request
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = `/apps/${appId}?_method=DELETE`;
+          document.body.appendChild(form);
+          form.submit();
+        }
+
+        // Close the menu
+        document.getElementById(`app-menu-${appId}`).classList.add('hidden');
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        toastMessage.textContent = message;
+        toast.classList.remove('hidden');
+
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      }
+    </script>
   </body>
 </html>

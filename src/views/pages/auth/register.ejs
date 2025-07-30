@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Sign Up - UniBoard</title>
+    <title>Sign Up - Suggesto</title>
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
@@ -11,12 +11,8 @@
         action="/auth/register"
         method="post"
         class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10">
-        <h1 class="text-center text-3xl">
-          <a
-            href="/"
-            class="rounded-sm font-medium focus:ring-2 focus:ring-black focus:outline-none"
-            >Suggesto</a
-          >
+        <h1 class="text-center text-3xl font-bold tracking-tight">
+          <%- include('../../shared/partials/logo-centered') %>
         </h1>
         <h2 class="text-center text-2xl">Create your account</h2>
         <div class="space-y-4">
