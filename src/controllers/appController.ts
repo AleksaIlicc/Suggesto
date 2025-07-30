@@ -12,6 +12,7 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user as IUser | undefined;
     const sessionId = req.sessionID;
+    const sortType = (req.query.sort as string) || 'new';
 
     const app = await Application.findOne({
       _id: req.params.id,
@@ -22,10 +23,71 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/');
     }
 
-    // Get detailed suggestions with vote counts and user vote status
-    const suggestions = await Suggestion.find({ applicationId: app._id })
-      .populate('userId', 'firstName lastName username')
-      .sort({ voteCount: -1, createdAt: -1 });
+    // Determine sorting criteria based on sortType
+    let suggestions;
+
+    if (sortType === 'trending') {
+      // Trending: most votes in last 2 weeks
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+      suggestions = await Suggestion.aggregate([
+        { $match: { applicationId: app._id } },
+        {
+          $lookup: {
+            from: 'votes',
+            let: { suggestionId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$suggestion', '$$suggestionId'] },
+                      { $gte: ['$createdAt', twoWeeksAgo] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'recentVotes',
+          },
+        },
+        {
+          $addFields: {
+            recentVoteCount: { $size: '$recentVotes' },
+          },
+        },
+        { $sort: { recentVoteCount: -1, createdAt: -1 } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userDetails',
+          },
+        },
+        {
+          $addFields: {
+            userId: { $arrayElemAt: ['$userDetails', 0] },
+          },
+        },
+        {
+          $project: {
+            userDetails: 0,
+          },
+        },
+      ]);
+    } else if (sortType === 'top') {
+      // Top: most votes overall
+      suggestions = await Suggestion.find({ applicationId: app._id })
+        .populate('userId', 'firstName lastName username')
+        .sort({ voteCount: -1, createdAt: -1 });
+    } else {
+      // New: most recent
+      suggestions = await Suggestion.find({ applicationId: app._id })
+        .populate('userId', 'firstName lastName username')
+        .sort({ createdAt: -1 });
+    }
 
     // Check which suggestions the current user/session has voted for
     let userVotes: string[] = [];
@@ -44,7 +106,7 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
     }
 
     const enhancedSuggestions = suggestions.map(suggestion => ({
-      ...suggestion.toObject(),
+      ...(suggestion.toObject ? suggestion.toObject() : suggestion),
       hasUserVoted: userVotes.includes(suggestion._id.toString()),
     }));
 
@@ -59,8 +121,10 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
       suggestions: enhancedSuggestions,
       isOwner,
       user,
+      currentSort: sortType,
     });
   } catch (err: unknown) {
+    console.error('Error fetching application:', err);
     req.flash('error', 'Failed to fetch application. Please try again.');
     return res.status(500).redirect('/');
   }
