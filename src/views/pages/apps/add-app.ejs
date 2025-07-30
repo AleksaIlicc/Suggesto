@@ -141,7 +141,7 @@
                         <button
                           id="removeLogo"
                           type="button"
-                          onclick="removeLogo()"
+                          onclick="removeeLogo()"
                           style="display: none"
                           class="ml-2 inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
                           Remove
@@ -585,7 +585,7 @@
         }
       }
 
-      function removeLogo() {
+      function removeeLogo() {
         // Reset to initial state
         const name = document.getElementById('name').value || 'My Awesome App';
         const initial = name.charAt(0).toUpperCase();

@@ -400,8 +400,11 @@ const updateSuggestionStatus = async (
 
     const suggestion = await Suggestion.findById(suggestionId);
     if (!suggestion) {
-      req.flash('error', 'Suggestion not found.');
-      return res.status(404).redirect('/apps');
+      res.status(404).json({
+        success: false,
+        message: 'Suggestion not found.',
+      });
+      return;
     }
 
     // Check if user is the owner of the application
@@ -411,18 +414,20 @@ const updateSuggestionStatus = async (
     });
 
     if (!app) {
-      req.flash(
-        'error',
-        'You do not have permission to update this suggestion status.'
-      );
-      return res.status(403).redirect(`/apps/${suggestion.applicationId}`);
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to update this suggestion status.',
+      });
+      return;
     }
 
     suggestion.status = req.body.status as any;
     await suggestion.save();
 
-    req.flash('success', 'Suggestion status has been updated successfully.');
-    return res.status(200).redirect(`/apps/${suggestion.applicationId}`);
+    res.status(200).json({
+      success: true,
+      message: 'Suggestion status has been updated successfully.',
+    });
   } catch (error: unknown) {
     req.flash('error', 'Failed to update suggestion status. Please try again.');
     return res.status(500).redirect('/apps');

@@ -81,7 +81,7 @@
                 </span>
               <% } %>
               <span class="text-xs text-gray-500">
-                by <%= suggestion.userId.firstName %> <%= suggestion.userId.lastName %> • 
+                by <%= suggestion.userId ? `${suggestion.userId.firstName} ${suggestion.userId.lastName}` : 'Anonymous User' %> • 
                 <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>
               </span>
             </div>
@@ -231,7 +231,11 @@
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ status: newStatus })
-          });
+          }); 
+
+          const aaa = await response.json();
+
+          console.log('Response:', aaa);
 
           if (response.ok) {
             // Reload the page to show updated status
