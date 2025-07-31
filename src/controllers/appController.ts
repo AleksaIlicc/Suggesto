@@ -173,6 +173,7 @@ const postAddApp = async (
     req.flash('success', 'Application has been created successfully.');
     return res.status(201).redirect('/apps');
   } catch (error: unknown) {
+    console.error('Error creating application:', error);
     req.flash('error', 'Failed to create application. Please try again.');
     return res.status(500).redirect('/apps/add-app');
   }
@@ -498,6 +499,231 @@ const updateSuggestionStatus = async (
   }
 };
 
+// Logo upload/remove methods
+const uploadLogo = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const logoFile = req.file;
+    const appId = req.body.appId; // Get app ID from request body
+    const user = req.user as IUser;
+
+    console.log('=== UPLOAD LOGO REQUEST START ===');
+    console.log('App ID from body:', appId);
+    console.log('User ID:', user?._id);
+
+    if (!logoFile) {
+      res.status(400).json({ success: false, message: 'No file uploaded' });
+      return;
+    }
+
+    // Return the relative path to the uploaded file
+    const logoPath = `/uploads/${logoFile.filename}`;
+    console.log('Logo uploaded successfully:', logoFile.originalname);
+    console.log('Logo path:', logoPath);
+
+    // If appId is provided, update the app's design in database
+    if (appId && appId !== 'temp') {
+      console.log('Updating app design with new logo...');
+
+      // Find the application and verify ownership
+      const app = await Application.findOne({
+        _id: appId,
+        user: user._id,
+      });
+
+      if (app) {
+        console.log('App found, updating logo in database...');
+        // Remove old logo file if it exists
+        if (
+          app.design?.logo &&
+          app.design.logo.startsWith('/uploads/') &&
+          app.design.logo !== logoPath
+        ) {
+          const fs = require('fs');
+          const path = require('path');
+          const oldLogoPath = path.join(
+            __dirname,
+            '../uploads',
+            path.basename(app.design.logo)
+          );
+
+          if (fs.existsSync(oldLogoPath)) {
+            try {
+              fs.unlinkSync(oldLogoPath);
+              console.log('✅ Old logo file deleted:', oldLogoPath);
+            } catch (deleteError) {
+              console.error('❌ Error deleting old logo:', deleteError);
+            }
+          }
+        }
+
+        // Update app design with new logo
+        app.design = {
+          ...app.design,
+          logo: logoPath,
+        };
+
+        await app.save();
+        console.log('✅ App design updated with new logo');
+      } else {
+        console.log('⚠️ App not found or permission denied');
+      }
+    } else {
+      console.log('No app ID provided - treating as temporary upload');
+    }
+
+    console.log('=== UPLOAD LOGO REQUEST END ===');
+    res.json({
+      success: true,
+      logoPath: logoPath,
+      message: 'Logo uploaded successfully',
+    });
+  } catch (error: unknown) {
+    console.error('Error uploading logo:', error);
+    res.status(500).json({ success: false, message: 'Failed to upload logo' });
+  }
+};
+
+const removeLogo = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('=== REMOVE LOGO REQUEST START ===');
+    const user = req.user as IUser;
+    const appId = req.params.appId;
+
+    console.log('User ID:', user?._id);
+    console.log('App ID from params:', appId);
+
+    // Handle temporary logo cleanup (from add-app.ejs)
+    if (appId === 'temp') {
+      console.log('Handling temporary logo cleanup...');
+      const { logoPath } = req.body;
+      console.log('Logo path to delete:', logoPath);
+
+      if (logoPath && logoPath.startsWith('/uploads/')) {
+        const fs = require('fs');
+        const path = require('path');
+
+        console.log('__dirname:', __dirname);
+
+        const filePath = path.join(
+          __dirname,
+          '../uploads',
+          path.basename(logoPath)
+        );
+
+        console.log('Constructed file path:', filePath);
+
+        const fileExists = fs.existsSync(filePath);
+        console.log('File exists on filesystem:', fileExists);
+
+        if (fileExists) {
+          try {
+            fs.unlinkSync(filePath);
+            console.log(
+              '✅ Temporary logo file deleted successfully:',
+              filePath
+            );
+          } catch (deleteError) {
+            console.error('❌ Error deleting temporary file:', deleteError);
+          }
+        } else {
+          console.log('⚠️ Temporary logo file not found at path:', filePath);
+        }
+      }
+
+      console.log('=== TEMPORARY LOGO CLEANUP END ===');
+      res.json({
+        success: true,
+        message: 'Temporary logo removed successfully',
+      });
+      return;
+    }
+
+    // Handle permanent logo removal (from edit-app.ejs)
+    console.log('Handling permanent logo removal...');
+
+    // Find the application and verify ownership
+    const app = await Application.findOne({
+      _id: appId,
+      user: user._id,
+    });
+
+    console.log('Found app:', !!app);
+    console.log('App design:', app?.design);
+    console.log('Current logo path in DB:', app?.design?.logo);
+
+    if (!app) {
+      console.log('App not found or permission denied');
+      res.status(404).json({
+        success: false,
+        message:
+          'Application not found or you do not have permission to modify it',
+      });
+      return;
+    }
+
+    // Remove logo from filesystem if it exists
+    if (app.design?.logo && app.design.logo.startsWith('/uploads/')) {
+      console.log('Logo exists in database, proceeding with file deletion...');
+      const fs = require('fs');
+      const path = require('path');
+
+      console.log('__dirname:', __dirname);
+
+      const logoPath = path.join(
+        __dirname,
+        '../uploads',
+        path.basename(app.design.logo)
+      );
+
+      console.log('Constructed file path:', logoPath);
+      console.log('Base filename:', path.basename(app.design.logo));
+
+      const fileExists = fs.existsSync(logoPath);
+      console.log('File exists on filesystem:', fileExists);
+
+      if (fileExists) {
+        try {
+          fs.unlinkSync(logoPath);
+          console.log('✅ Logo file deleted successfully:', logoPath);
+        } catch (deleteError) {
+          console.error('❌ Error deleting file:', deleteError);
+        }
+      } else {
+        console.log('⚠️ Logo file not found at path:', logoPath);
+        // List files in uploads directory for debugging
+        try {
+          const uploadsDir = path.join(__dirname, '../uploads');
+          const files = fs.readdirSync(uploadsDir);
+          console.log('Files in uploads directory:', files);
+        } catch (dirError) {
+          console.error('Error reading uploads directory:', dirError);
+        }
+      }
+    } else {
+      console.log('No logo to delete or logo path invalid:', app.design?.logo);
+    }
+
+    // Update application to remove logo
+    console.log('Updating database to remove logo path...');
+    app.design = {
+      ...app.design,
+      logo: '',
+    };
+
+    await app.save();
+    console.log('✅ Database updated successfully - logo path cleared');
+
+    console.log('=== REMOVE LOGO REQUEST END ===');
+    res.json({
+      success: true,
+      message: 'Logo removed successfully',
+    });
+  } catch (error: unknown) {
+    console.error('❌ Error in removeLogo function:', error);
+    res.status(500).json({ success: false, message: 'Failed to remove logo' });
+  }
+};
+
 export default {
   getApp,
   getApps,
@@ -510,4 +736,6 @@ export default {
   deleteApp,
   voteOnSuggestion,
   updateSuggestionStatus,
+  uploadLogo,
+  removeLogo,
 };

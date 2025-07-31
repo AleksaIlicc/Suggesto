@@ -22,9 +22,16 @@
         <div class="flex items-center space-x-4">
           <div
             class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+            <% if (app.design && app.design.logo) { %>
+            <img
+              src="<%= app.design.logo %>"
+              alt="<%= app.name %>"
+              class="h-full w-full rounded-full object-cover" />
+            <% } else { %>
             <span class="text-lg font-medium text-black"
               ><%= app.name.charAt(0) %></span
             >
+            <% } %>
           </div>
           <h1 class="text-lg font-medium text-white sm:text-xl">
             <%= app.name %>

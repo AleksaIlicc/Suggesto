@@ -37,6 +37,15 @@ router.post(
   appController.voteOnSuggestion
 );
 
+// API routes for logo upload/removal (authenticated)
+router.post(
+  '/api/upload-logo',
+  requireAuth,
+  upload.single('logo'),
+  appController.uploadLogo
+);
+router.delete('/api/remove-logo/:appId', requireAuth, appController.removeLogo);
+
 // Authenticated routes that need to come after /:id routes to avoid conflicts
 router.get('/:id/edit', requireAuth, appController.getEditApp);
 

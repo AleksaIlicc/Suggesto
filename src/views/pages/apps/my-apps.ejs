@@ -34,28 +34,37 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <% if (apps.length > 0) { %> <% apps.forEach(app => { %>
           <div
-            class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-gray-200 hover:shadow-xl">
+            class="group rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-gray-200 ">
             <!-- App Preview Header -->
             <div
-              class="relative h-32 bg-gradient-to-br from-gray-600 to-gray-800 p-4">
+              class="app-header relative h-28 overflow-hidden rounded-t-2xl p-4"
+              <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.headerColor %>">
               <div class="flex items-start justify-between text-white">
-                <div class="flex-1">
-                  <h3 class="mb-1 truncate text-base font-semibold">
+                <div class="min-w-0 flex-1 pr-3">
+                  <h3 class="mb-1 truncate text-lg font-semibold">
                     <%= app.name %>
                   </h3>
-                  <p class="text-sm opacity-90">
-                    <%= app.suggestions ? app.suggestions.length : 0 %>
-                    suggestions
+                  <p class="truncate text-sm opacity-75">
+                    <%= app.suggestions ? app.suggestions.length : 0 %> total suggestions
+                  </p>
+                  <p class="truncate text-sm opacity-75">
+                    last opened <%= app.lastOpened ? new
+                    Date(app.lastOpened).toLocaleDateString() : new
+                    Date(app.createdAt).toLocaleDateString() %>
                   </p>
                 </div>
                 <div
-                  class="bg-opacity-20 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold">
+                  class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold">
                   <% if (app.design && app.design.logo) { %>
                   <img
                     src="<%= app.design.logo %>"
                     alt="<%= app.name %>"
-                    class="h-6 w-6 rounded-full object-cover" />
-                  <% } else { %> <%= app.name.charAt(0).toUpperCase() %> <% } %>
+                    class="h-full w-full rounded-full object-cover" />
+                  <% } else { %>
+                  <span class="text-black"
+                    ><%= app.name.charAt(0).toUpperCase() %></span
+                  >
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -63,30 +72,9 @@
             <!-- App Content -->
             <div class="p-5">
               <p
-                class="mb-4 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                class="mb-4 h-10 line-clamp-2 overflow-hidden text-sm leading-5 text-gray-600">
                 <%= app.description %>
               </p>
-
-              <!-- App Stats -->
-              <div
-                class="mb-4 flex items-center space-x-4 text-xs text-gray-500">
-                <div class="flex items-center space-x-1">
-                  <i class="fas fa-clock h-3 w-3"></i>
-                  <span
-                    >opened <%= app.lastOpened ? new
-                    Date(app.lastOpened).toLocaleDateString() : new
-                    Date(app.createdAt).toLocaleDateString() %></span
-                  >
-                </div>
-                <div class="flex items-center space-x-1">
-                  <i class="fas fa-check-circle h-3 w-3"></i>
-                  <span
-                    ><%= app.suggestions ? app.suggestions.filter(s => s.status
-                    !== 'pending').length : 0 %> resolved</span
-                  >
-                </div>
-              </div>
-
               <!-- Primary Actions -->
               <div class="mb-3 flex justify-center">
                 <a
@@ -108,8 +96,8 @@
 
                   <div
                     id="app-menu-<%= app._id %>"
-                    class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-40 -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white shadow-xl">
-                    <div class="py-1">
+                    class="absolute top-full left-1/2 z-50 mt-2 hidden w-40 -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white shadow-xl">
+                    <div >
                       <a
                         href="/apps/<%= app._id %>/edit"
                         class="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -122,7 +110,7 @@
                         <i class="fas fa-copy h-4 w-4"></i>
                         <span>Copy Link</span>
                       </button>
-                      <div class="my-1 border-t border-gray-100"></div>
+                      <div class="border-t border-gray-100"></div>
                       <button
                         onclick="confirmDelete('<%= app._id %>', '<%= app.name %>')"
                         class="flex w-full items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
@@ -160,10 +148,6 @@
           <!-- Empty State -->
           <div class="col-span-full">
             <div class="py-16 text-center">
-              <div
-                class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-                <i class="fas fa-mobile-alt h-12 w-12 text-gray-400"></i>
-              </div>
               <h3 class="mb-3 text-xl font-semibold text-gray-900">
                 No apps yet
               </h3>
@@ -171,12 +155,6 @@
                 Create your first application to start collecting feature
                 requests and feedback from your users.
               </p>
-              <a
-                href="/apps/add-app"
-                class="bg-gray-dark hover:bg-gray-light inline-flex items-center space-x-2 rounded-xl px-8 py-4 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl">
-                <i class="fas fa-plus h-5 w-5"></i>
-                <span>Create Your First App</span>
-              </a>
             </div>
           </div>
           <% } %>
@@ -227,9 +205,6 @@
         const url = `${window.location.origin}/apps/${appId}`;
         navigator.clipboard
           .writeText(url)
-          .then(() => {
-            showToast('Public link copied to clipboard!');
-          })
           .catch(() => {
             // Fallback for older browsers
             const textArea = document.createElement('textarea');
@@ -238,7 +213,6 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            showToast('Public link copied to clipboard!');
           });
 
         // Close the menu

@@ -122,28 +122,18 @@
                           onchange="handleLogoUpload()" />
                         <input type="hidden" id="logo" name="logo" value="" />
                         <button
+                          id="chooseImageBtn"
                           type="button"
                           onclick="document.getElementById('logoUpload').click()"
                           class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:outline-none">
-                          <svg
-                            class="mr-2 h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                          </svg>
+                          <i class="fas fa-image mr-2"></i>
                           Choose Image
                         </button>
                         <button
                           id="removeLogo"
                           type="button"
-                          onclick="removeeLogo()"
-                          style="display: none"
-                          class="ml-2 inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
+                          onclick="removeAppLogo()"
+                          class="ml-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
                           Remove
                         </button>
                       </div>
@@ -496,12 +486,15 @@
         // Update icon if no logo
         const logoImg = document.getElementById('previewLogoImg');
         if (!logoImg) {
-          document.getElementById('previewIcon').textContent = name
-            .charAt(0)
-            .toUpperCase();
-          document.getElementById('logoPreviewText').textContent = name
-            .charAt(0)
-            .toUpperCase();
+          const previewIcon = document.getElementById('previewIcon');
+          const logoPreviewText = document.getElementById('logoPreviewText');
+
+          if (previewIcon) {
+            previewIcon.textContent = name.charAt(0).toUpperCase();
+          }
+          if (logoPreviewText) {
+            logoPreviewText.textContent = name.charAt(0).toUpperCase();
+          }
         }
 
         // Update color text inputs
@@ -546,47 +539,109 @@
             return;
           }
 
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            // Update preview
-            const previewContainer = document.getElementById(
-              'previewLogoContainer'
-            );
-            const logoPreviewContainer = document.getElementById(
-              'logoPreviewContainer'
-            );
+          // Show loading state
+          const button = document.getElementById('chooseImageBtn');
+          if (!button) {
+            console.error('Choose Image button not found');
+            alert('Upload button not found. Please try again.');
+            return;
+          }
+          const originalText = button.innerHTML;
+          button.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+          button.disabled = true;
 
-            // Create image elements for both previews
-            const previewImg = document.createElement('img');
-            previewImg.id = 'previewLogoImg';
-            previewImg.className = 'w-full h-full object-cover';
-            previewImg.src = e.target.result;
+          // Upload via AJAX
+          const formData = new FormData();
+          formData.append('logo', file);
+          formData.append('appId', 'temp'); // Mark as temporary upload for new apps
 
-            const logoPreviewImg = document.createElement('img');
-            logoPreviewImg.id = 'logoPreviewImg';
-            logoPreviewImg.className = 'w-full h-full object-cover';
-            logoPreviewImg.src = e.target.result;
+          fetch('/apps/api/upload-logo', {
+            method: 'POST',
+            body: formData,
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Store the logo path in hidden input
+                document.getElementById('logo').value = data.logoPath;
 
-            // Replace existing content
-            previewContainer.innerHTML = '';
-            previewContainer.appendChild(previewImg);
+                // Update preview
+                const previewContainer = document.getElementById(
+                  'previewLogoContainer'
+                );
+                const logoPreviewContainer = document.getElementById(
+                  'logoPreviewContainer'
+                );
 
-            logoPreviewContainer.innerHTML = '';
-            logoPreviewContainer.appendChild(logoPreviewImg);
+                // Create image elements for both previews
+                const previewImg = document.createElement('img');
+                previewImg.id = 'previewLogoImg';
+                previewImg.className = 'w-full h-full object-cover';
+                previewImg.src = data.logoPath;
 
-            // Show remove button
-            document.getElementById('removeLogo').style.display = 'inline-flex';
+                const logoPreviewImg = document.createElement('img');
+                logoPreviewImg.id = 'logoPreviewImg';
+                logoPreviewImg.className = 'w-full h-full object-cover';
+                logoPreviewImg.src = data.logoPath;
 
-            // Note: In a real implementation, you would upload the file to the server
-            // For now, we'll just store the data URL (not recommended for production)
-            document.getElementById('logo').value = e.target.result;
-          };
-          reader.readAsDataURL(file);
+                // Replace existing content
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(previewImg);
+
+                logoPreviewContainer.innerHTML = '';
+                logoPreviewContainer.appendChild(logoPreviewImg);
+
+                // Show remove button
+                document.getElementById('removeLogo').style.display =
+                  'inline-flex';
+              } else {
+                alert(data.message || 'Failed to upload logo');
+              }
+            })
+            .catch(error => {
+              console.error('Upload error:', error);
+              alert('Failed to upload logo. Please try again.');
+            })
+            .finally(() => {
+              // Restore button state
+              button.innerHTML = originalText;
+              button.disabled = false;
+            });
         }
       }
 
-      function removeeLogo() {
-        // Reset to initial state
+      function removeAppLogo() {
+        console.log('🔥 removeAppLogo() called in add-app.ejs');
+
+        const logoPath = document.getElementById('logo').value;
+        console.log('Current logo path:', logoPath);
+
+        // If there's a logo path, make API call to clean up the file
+        if (logoPath && logoPath.startsWith('/uploads/')) {
+          console.log('Making API call to clean up temporary logo file...');
+
+          // Clean up the temporarily uploaded file via API
+          fetch('/apps/api/remove-logo/temp', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ logoPath: logoPath }),
+          })
+            .then(response => {
+              console.log('Cleanup response status:', response.status);
+              return response.json();
+            })
+            .then(data => {
+              console.log('Cleanup response:', data);
+            })
+            .catch(error => {
+              console.error('Cleanup error (non-critical):', error);
+            });
+        }
+
+        // Reset to initial state (always do this regardless of API call)
         const name = document.getElementById('name').value || 'My Awesome App';
         const initial = name.charAt(0).toUpperCase();
 
@@ -605,10 +660,8 @@
         // Hide remove button
         document.getElementById('removeLogo').style.display = 'none';
 
-        // Clear hidden input
+        // Clear hidden input and file input
         document.getElementById('logo').value = '';
-
-        // Clear file input
         document.getElementById('logoUpload').value = '';
       }
 
