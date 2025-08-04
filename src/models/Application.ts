@@ -20,6 +20,10 @@ export interface IApplication extends Document {
   };
   customCategories: { name: string; color: string }[];
   defaultCategoriesEnabled: boolean;
+  // Privacy and access control settings
+  isPublic: boolean;
+  allowAnonymousVotes: boolean;
+  allowPublicSubmissions: boolean;
   user: IUser;
   lastOpened?: Date;
   createdAt: Date;
@@ -52,6 +56,10 @@ const ApplicationSchema: Schema = new Schema(
       },
     ],
     defaultCategoriesEnabled: { type: Boolean, default: true },
+    // Privacy and access control settings
+    isPublic: { type: Boolean, default: true },
+    allowAnonymousVotes: { type: Boolean, default: true },
+    allowPublicSubmissions: { type: Boolean, default: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     lastOpened: { type: Date, default: Date.now },
   },

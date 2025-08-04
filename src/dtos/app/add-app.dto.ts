@@ -25,4 +25,13 @@ export class AddAppDto {
 
   @IsOptional()
   public readonly defaultCategoriesEnabled?: string;
+
+  @IsOptional()
+  public readonly isPublic?: string;
+
+  @IsOptional()
+  public readonly allowAnonymousVotes?: string;
+
+  @IsOptional()
+  public readonly allowPublicSubmissions?: string;
 }

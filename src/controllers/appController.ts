@@ -27,6 +27,13 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/');
     }
 
+    // Check if app is private and user has permission to view
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      req.flash('error', 'This application is private.');
+      return res.status(403).redirect('/');
+    }
+
     // Determine sorting criteria based on sortType
     let suggestions;
 
@@ -157,6 +164,10 @@ const postAddApp = async (
       },
       customCategories: req.body.customCategories || [],
       defaultCategoriesEnabled: req.body.defaultCategoriesEnabled === 'true',
+      // Privacy settings (default to public and allow all)
+      isPublic: req.body.isPublic !== 'false', // Default true unless explicitly set to false
+      allowAnonymousVotes: req.body.allowAnonymousVotes !== 'false',
+      allowPublicSubmissions: req.body.allowPublicSubmissions !== 'false',
       user: user._id,
     });
 
@@ -181,6 +192,19 @@ const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
     if (!app) {
       req.flash('error', 'Application not found.');
       return res.status(404).redirect('/');
+    }
+
+    // Check if app is private and user has permission to view
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      req.flash('error', 'This application is private.');
+      return res.status(403).redirect('/');
+    }
+
+    // Check if public submissions are allowed
+    if (!user && !app.allowPublicSubmissions) {
+      req.flash('error', 'Please sign in to submit suggestions.');
+      return res.status(403).redirect('/auth/login');
     }
 
     // Get available categories based on app settings
@@ -213,6 +237,19 @@ const postAddSuggestion = async (
     if (!app) {
       req.flash('error', 'Application not found.');
       return res.status(404).redirect('/apps');
+    }
+
+    // Check if app is private and user has permission to view
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      req.flash('error', 'This application is private.');
+      return res.status(403).redirect('/');
+    }
+
+    // Check if public submissions are allowed
+    if (!user && !app.allowPublicSubmissions) {
+      req.flash('error', 'Please sign in to submit suggestions.');
+      return res.status(403).redirect('/auth/login');
     }
 
     // Process uploaded files
@@ -338,6 +375,12 @@ const putEditApp = async (
 
     // Handle checkbox: if not present in request body, it means unchecked (false)
     app.defaultCategoriesEnabled = req.body.defaultCategoriesEnabled === 'true';
+
+    // Handle privacy settings
+    app.isPublic = req.body.isPublic === 'true';
+    app.allowAnonymousVotes = req.body.allowAnonymousVotes === 'true';
+    app.allowPublicSubmissions = req.body.allowPublicSubmissions === 'true';
+
     await app.save();
 
     req.flash('success', 'Application has been updated successfully.');
@@ -398,6 +441,32 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
     const suggestion = await Suggestion.findById(suggestionId);
     if (!suggestion) {
       res.status(404).json({ success: false, message: 'Suggestion not found' });
+      return;
+    }
+
+    // Get the application to check permissions
+    const app = await Application.findById(suggestion.applicationId);
+    if (!app) {
+      res
+        .status(404)
+        .json({ success: false, message: 'Application not found' });
+      return;
+    }
+
+    // Check if app is private and user has permission to view/vote
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      res
+        .status(403)
+        .json({ success: false, message: 'This application is private' });
+      return;
+    }
+
+    // Check if anonymous votes are allowed
+    if (!user && !app.allowAnonymousVotes) {
+      res
+        .status(403)
+        .json({ success: false, message: 'Please sign in to vote' });
       return;
     }
 
