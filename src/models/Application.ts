@@ -24,6 +24,8 @@ export interface IApplication extends Document {
   isPublic: boolean;
   allowAnonymousVotes: boolean;
   allowPublicSubmissions: boolean;
+  // Roadmap settings
+  enablePublicRoadmap: boolean;
   user: IUser;
   lastOpened?: Date;
   createdAt: Date;
@@ -60,6 +62,8 @@ const ApplicationSchema: Schema = new Schema(
     isPublic: { type: Boolean, default: true },
     allowAnonymousVotes: { type: Boolean, default: true },
     allowPublicSubmissions: { type: Boolean, default: true },
+    // Roadmap settings
+    enablePublicRoadmap: { type: Boolean, default: false },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     lastOpened: { type: Date, default: Date.now },
   },

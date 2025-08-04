@@ -1,0 +1,137 @@
+<div
+  class="rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4">
+  <!-- Item Header -->
+  <div class="mb-2 sm:mb-3">
+    <div class="flex items-start justify-between">
+      <div class="flex-1">
+        <h3
+          class="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base">
+          <%= item.title %>
+        </h3>
+        <div class="mb-2 flex flex-wrap items-center gap-1 sm:gap-2">
+          <!-- Simple Type Badge -->
+          <span
+            class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 sm:px-2.5">
+            <%= item.type.charAt(0).toUpperCase() +
+            item.type.slice(1).replace('-', ' ') %>
+          </span>
+
+          <!-- Simple Priority Text -->
+          <span class="text-xs text-gray-500">
+            <%= item.priority.charAt(0).toUpperCase() + item.priority.slice(1)
+            %> priority
+          </span>
+        </div>
+      </div>
+
+      <% if (isOwner) { %>
+      <div class="ml-2 flex flex-shrink-0 space-x-1">
+        <a
+          href="/apps/<%= item.applicationId %>/roadmap/<%= item._id %>/edit"
+          class="p-1 text-gray-400 hover:text-gray-600">
+          <i class="fas fa-edit text-xs sm:text-sm"></i>
+        </a>
+        <button
+          onclick="deleteRoadmapItem('<%= item._id %>')"
+          class="p-1 text-gray-400 hover:text-red-600">
+          <i class="fas fa-trash text-xs sm:text-sm"></i>
+        </button>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <p
+    class="mb-2 line-clamp-2 text-xs text-gray-600 sm:mb-3 sm:line-clamp-3 sm:text-sm">
+    <%= item.description %>
+  </p>
+
+  <!-- Progress Bar (for in-progress items) -->
+  <% if (item.status === 'in-progress' && item.progress !== undefined &&
+  item.progress > 0) { %>
+  <div class="mb-3">
+    <div class="mb-1 flex items-center justify-between">
+      <span class="text-xs font-medium text-gray-700">Progress</span>
+      <span class="text-xs text-gray-700"><%= item.progress %>%</span>
+    </div>
+    <div class="h-1.5 w-full rounded-full bg-gray-200">
+      <div
+        class="h-1.5 rounded-full bg-gray-600 transition-all duration-300"
+        <% /* eslint-disable css-propertyvalueexpected */ %> style="width: <%= item.progress || 0 %>%"></div>
+    </div>
+  </div>
+  <% } %> <% if (item.tags && item.tags.length > 0) { %>
+  <div class="mb-3">
+    <div class="flex flex-wrap gap-1">
+      <% item.tags.slice(0, 3).forEach(tag => { %>
+      <span
+        class="inline-flex items-center rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">
+        #<%= tag %>
+      </span>
+      <% }) %> <% if (item.tags.length > 3) { %>
+      <span class="text-xs text-gray-500"
+        >+<%= item.tags.length - 3 %> more</span
+      >
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-between text-xs text-gray-500">
+    <div class="flex items-center space-x-2">
+      <!-- Created By -->
+      <span>
+        by <%= item.createdBy ? item.createdBy.username : 'Unknown' %> • <%=
+        moment(item.createdAt).format('MMM DD, YYYY') %>
+      </span>
+    </div>
+
+    <!-- Dates -->
+    <div class="text-right">
+      <% if (item.actualReleaseDate) { %>
+      <div class="text-gray-600">
+        Released <%= moment(item.actualReleaseDate).format('MMM DD') %>
+      </div>
+      <% } else if (item.estimatedReleaseDate) { %>
+      <div>Est. <%= moment(item.estimatedReleaseDate).format('MMM DD') %></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% if (isOwner) { %>
+<script>
+  function deleteRoadmapItem(itemId) {
+    if (confirm('Are you sure you want to delete this roadmap item?')) {
+      fetch(`/apps/<%= item.applicationId %>/roadmap/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            return response.json().then(data => Promise.reject(data));
+          }
+        })
+        .then(data => {
+          // Show success message (optional)
+          if (data.message) {
+            alert(data.message);
+          }
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          const errorMessage = error.error || 'Failed to delete roadmap item. Please try again.';
+          alert(errorMessage);
+        });
+    }
+  }
+</script>
+<% } %>

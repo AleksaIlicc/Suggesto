@@ -15,6 +15,7 @@ import compression from 'compression';
 import homeRoutes from './routes/homeRoutes';
 import authRoutes from './routes/authRoutes';
 import appRoutes from './routes/appRoutes';
+import roadmapRoutes from './routes/roadmapRoutes';
 import connectToDatabase from './config/datasource';
 
 const main = async (): Promise<void> => {
@@ -36,12 +37,7 @@ const main = async (): Promise<void> => {
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     });
     app.use(hpp());
-    app.use(
-      cors({
-        origin: ['http://localhost:3000'],
-        credentials: true,
-      })
-    );
+    app.use(cors({ origin: ['http://localhost:3000'], credentials: true }));
     app.use(cookieParser());
 
     // Template Engine & Assets Settings
@@ -93,6 +89,7 @@ const main = async (): Promise<void> => {
     app.use('/', homeRoutes);
     app.use('/auth', authRoutes);
     app.use('/apps', appRoutes);
+    app.use('/apps', roadmapRoutes);
 
     // Run the application
 

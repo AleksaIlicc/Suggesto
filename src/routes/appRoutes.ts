@@ -5,7 +5,6 @@ import { requireAuth } from '../middlewares/auth';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
-import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import upload from '../config/multer';
 
 const router = express.Router();
@@ -59,13 +58,5 @@ router.put(
 
 // DELETE methods - authenticated
 router.delete('/:id', requireAuth, appController.deleteApp);
-
-// API routes for authenticated actions
-router.put(
-  '/api/suggestions/:suggestionId/status',
-  requireAuth,
-  [validateDto(UpdateStatusDto, 'body')],
-  appController.updateSuggestionStatus
-);
 
 export default router;

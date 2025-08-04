@@ -34,4 +34,7 @@ export class EditAppDto {
 
   @IsOptional()
   public readonly allowPublicSubmissions?: string;
+
+  @IsOptional()
+  public readonly enablePublicRoadmap?: string;
 }

@@ -4,7 +4,6 @@ import { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
-import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
 import {
@@ -168,6 +167,8 @@ const postAddApp = async (
       isPublic: req.body.isPublic !== 'false', // Default true unless explicitly set to false
       allowAnonymousVotes: req.body.allowAnonymousVotes !== 'false',
       allowPublicSubmissions: req.body.allowPublicSubmissions !== 'false',
+      // Roadmap settings
+      enablePublicRoadmap: req.body.enablePublicRoadmap === 'true', // Default false unless explicitly enabled
       user: user._id,
     });
 
@@ -381,6 +382,9 @@ const putEditApp = async (
     app.allowAnonymousVotes = req.body.allowAnonymousVotes === 'true';
     app.allowPublicSubmissions = req.body.allowPublicSubmissions === 'true';
 
+    // Handle roadmap settings
+    app.enablePublicRoadmap = req.body.enablePublicRoadmap === 'true';
+
     await app.save();
 
     req.flash('success', 'Application has been updated successfully.');
@@ -537,54 +541,6 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
     }
   } catch (error: unknown) {
     res.status(500).json({ success: false, message: 'Failed to process vote' });
-  }
-};
-
-const updateSuggestionStatus = async (
-  req: Request<{ suggestionId: string }, {}, UpdateStatusDto>,
-  res: Response
-): Promise<void> => {
-  try {
-    const user = req.user as IUser;
-    const suggestionId = req.params.suggestionId;
-
-    const suggestion = await Suggestion.findById(suggestionId);
-    if (!suggestion) {
-      res
-        .status(404)
-        .json({ success: false, message: 'Suggestion not found.' });
-      return;
-    }
-
-    // Check if user is the owner of the application
-    const app = await Application.findOne({
-      _id: suggestion.applicationId,
-      user: user._id,
-    });
-
-    if (!app) {
-      res
-        .status(403)
-        .json({
-          success: false,
-          message:
-            'You do not have permission to update this suggestion status.',
-        });
-      return;
-    }
-
-    suggestion.status = req.body.status as any;
-    await suggestion.save();
-
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: 'Suggestion status has been updated successfully.',
-      });
-  } catch (error: unknown) {
-    req.flash('error', 'Failed to update suggestion status. Please try again.');
-    return res.status(500).redirect('/apps');
   }
 };
 
@@ -811,7 +767,6 @@ export default {
   putEditApp,
   deleteApp,
   voteOnSuggestion,
-  updateSuggestionStatus,
   uploadLogo,
   removeLogo,
 };

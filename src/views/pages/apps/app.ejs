@@ -47,12 +47,22 @@
     <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
       <div class="w-full max-w-xl">
         <div class="mb-4 w-full sm:mb-8">
-          <button
-            id="addSuggestionBtn"
-            onclick="window.location.href = '<%= app._id %>/add-suggestion'"
-            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
-            Add Suggestion
-          </button>
+          <div class="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+            <button
+              id="addSuggestionBtn"
+              onclick="window.location.href = '<%= app._id %>/add-suggestion'"
+              class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
+              Add Suggestion
+            </button>
+            <% if (app.enablePublicRoadmap) { %>
+            <button
+              onclick="window.location.href = '/apps/<%= app._id %>/roadmap'"
+              class="cursor-pointer rounded-xl border-2 border-white px-6 py-3 text-base text-white transition-all hover:bg-white hover:text-gray-800 active:scale-95">
+              <i class="fas fa-road mr-2"></i>
+              View Roadmap
+            </button>
+            <% } %>
+          </div>
         </div>
 
         <!-- Sorting Buttons -->
@@ -81,33 +91,6 @@
           suggestions.forEach(suggestion => { %>
           <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-3 flex flex-wrap items-center gap-2">
-              <% if (suggestion.status) { %>
-                <% 
-                let statusColor = 'bg-gray-100 text-gray-800';
-                let statusText = suggestion.status;
-                switch(suggestion.status) {
-                  case 'pending': 
-                    statusColor = 'bg-yellow-100 text-yellow-800';
-                    statusText = 'Pending';
-                    break;
-                  case 'in-progress': 
-                    statusColor = 'bg-blue-100 text-blue-800';
-                    statusText = 'In Progress';
-                    break;
-                  case 'completed': 
-                    statusColor = 'bg-green-100 text-green-800';
-                    statusText = 'Completed';
-                    break;
-                  case 'rejected': 
-                    statusColor = 'bg-red-100 text-red-800';
-                    statusText = 'Rejected';
-                    break;
-                }
-                %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= statusColor %>">
-                  <%= statusText %>
-                </span>
-              <% } %>
               <% if (suggestion.category) { %>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.category.color %>">
@@ -154,20 +137,6 @@
               </div>
               
               <div class="flex items-center justify-end space-x-3">
-                <!-- Status Update (Only for app owner) -->
-                <% if (isOwner) { %>
-                  <div class="relative">
-                    <select 
-                      onchange="updateStatus('<%= suggestion._id %>', this.value)"
-                      class="text-sm border rounded-md px-2 py-1">
-                      <option value="pending" <%= suggestion.status === 'pending' ? 'selected' : '' %>>Pending</option>
-                      <option value="in-progress" <%= suggestion.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
-                      <option value="completed" <%= suggestion.status === 'completed' ? 'selected' : '' %>>Completed</option>
-                      <option value="rejected" <%= suggestion.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
-                    </select>
-                  </div>
-                <% } %>
-                
                 <!-- Vote Button -->
                 <div class="flex items-center space-x-2">
                   <button
@@ -253,33 +222,6 @@
         } catch (error) {
           console.error('Error voting:', error);
           alert('Failed to process vote. Please try again.');
-        }
-      }
-
-      // Status update functionality (for app owners)
-      async function updateStatus(suggestionId, newStatus) {
-        try {
-          const response = await fetch(`/apps/api/suggestions/${suggestionId}/status`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: newStatus })
-          }); 
-
-          const aaa = await response.json();
-
-          console.log('Response:', aaa);
-
-          if (response.ok) {
-            // Reload the page to show updated status
-            window.location.reload();
-          } else {
-            alert('Failed to update status. Please try again.');
-          }
-        } catch (error) {
-          console.error('Error updating status:', error);
-          alert('Failed to update status. Please try again.');
         }
       }
     </script>

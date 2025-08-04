@@ -34,4 +34,7 @@ export class AddAppDto {
 
   @IsOptional()
   public readonly allowPublicSubmissions?: string;
+
+  @IsOptional()
+  public readonly enablePublicRoadmap?: string;
 }
