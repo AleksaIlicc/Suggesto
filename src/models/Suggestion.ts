@@ -6,15 +6,8 @@ export interface ISuggestion extends Document {
   _id: string;
   title: string;
   description: string;
-  categories: {
-    name: string;
-    color: string;
-  }[];
-  comments?: {
-    user: IUser;
-    text: string;
-    createdAt: Date;
-  }[];
+  category: { name: string; color: string };
+  comments?: { user: IUser; text: string; createdAt: Date }[];
   status: 'pending' | 'in-progress' | 'completed' | 'rejected';
   voteCount: number;
   files?: {
@@ -34,16 +27,10 @@ const SuggestionSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    categories: [
-      {
-        name: {
-          type: String,
-          required: true,
-          enum: ['bug', 'feature', 'improvement', 'design', 'other'],
-        },
-        color: { type: String, required: true },
-      },
-    ],
+    category: {
+      name: { type: String, required: true },
+      color: { type: String, required: true },
+    },
     comments: [
       {
         user: { type: Schema.Types.ObjectId, ref: 'User' },

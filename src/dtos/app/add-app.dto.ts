@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsBoolean, IsArray } from 'class-validator';
 
 export class AddAppDto {
   @IsNotEmpty()
@@ -18,4 +18,11 @@ export class AddAppDto {
 
   @IsOptional()
   public readonly logo?: string;
+
+  @IsOptional()
+  @IsArray()
+  public readonly customCategories?: { name: string; color: string }[];
+
+  @IsOptional()
+  public readonly defaultCategoriesEnabled?: string;
 }

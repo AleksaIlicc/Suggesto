@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsIn } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsIn, IsObject } from 'class-validator';
 
 export class AddSuggestionDto {
   @IsNotEmpty()
@@ -12,5 +12,6 @@ export class AddSuggestionDto {
   public readonly status?: string;
 
   @IsOptional()
-  public readonly categories?: string[];
+  @IsObject()
+  public readonly category?: { name: string; color: string };
 }

@@ -93,7 +93,7 @@
                       placeholder="Brief description of what feedback you're collecting..."
                       class="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 transition-colors focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                       oninput="updatePreview()">
-<%= app.description %></textarea
+                      <%= app.description %></textarea
                     >
                     <p class="mt-1 text-xs text-gray-500">
                       Explain what kind of feedback or suggestions you want
@@ -292,6 +292,76 @@
                         <span class="text-xs">Sky</span>
                       </button>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Categories Configuration -->
+                <div class="space-y-4">
+                  <h3
+                    class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
+                    Categories Configuration
+                  </h3>
+
+                  <!-- Category Toggle -->
+                  <div class="space-y-1">
+                    <div class="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        id="defaultCategoriesEnabled"
+                        name="defaultCategoriesEnabled"
+                        value="true"
+                        <%= app.defaultCategoriesEnabled ? 'checked' : '' %>
+                        class="h-4 w-4 text-gray-dark bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        onchange="toggleCategoryMode()" />
+                      <label
+                        for="defaultCategoriesEnabled"
+                        class="text-sm font-medium text-gray-700">
+                        Use default categories (bug, feature, improvement, other)
+                      </label>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-7">
+                      Uncheck to create your own custom categories
+                    </p>
+                  </div>
+
+                  <!-- Custom Categories Section -->
+                  <div id="customCategoriesSection" class="<%= app.defaultCategoriesEnabled ? 'hidden' : '' %> space-y-3">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Custom Categories
+                    </label>
+                    <div id="customCategoriesList" class="space-y-2">
+                      <% if (app.customCategories && app.customCategories.length > 0) { %>
+                        <% app.customCategories.forEach((category, index) => { %>
+                          <div class="custom-category-item flex items-center space-x-3">
+                            <input
+                              type="text"
+                              name="customCategories[<%= index %>][name]"
+                              placeholder="Category name"
+                              value="<%= category.name %>"
+                              class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                              required />
+                            <input
+                              type="color"
+                              name="customCategories[<%= index %>][color]"
+                              value="<%= category.color %>"
+                              class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300" />
+                            <button
+                              type="button"
+                              onclick="removeCustomCategory(this)"
+                              class="flex h-8 w-8 items-center justify-center rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
+                              <i class="fas fa-times text-xs"></i>
+                            </button>
+                          </div>
+                        <% }); %>
+                      <% } %>
+                    </div>
+                    <button
+                      type="button"
+                      onclick="addCustomCategory()"
+                      class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:outline-none">
+                      <i class="fas fa-plus mr-2"></i>
+                      Add Category
+                    </button>
                   </div>
                 </div>
 
@@ -764,6 +834,58 @@
           document.body.appendChild(form);
           form.submit();
         }
+      }
+
+      // Category management functions
+      let categoryCounter = parseInt('<%= app.customCategories ? app.customCategories.length : 0 %>');
+
+      function toggleCategoryMode() {
+        const isDefault = document.getElementById('defaultCategoriesEnabled').checked;
+        const customSection = document.getElementById('customCategoriesSection');
+        
+        if (isDefault) {
+          customSection.classList.add('hidden');
+        } else {
+          customSection.classList.remove('hidden');
+          // Add one default custom category if none exist
+          if (document.querySelectorAll('.custom-category-item').length === 0) {
+            addCustomCategory();
+          }
+        }
+      }
+
+      function addCustomCategory(name = '', color = '#6b7280') {
+        const categoriesList = document.getElementById('customCategoriesList');
+        const categoryId = `category_${categoryCounter++}`;
+        
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'custom-category-item flex items-center space-x-3';
+        categoryDiv.innerHTML = `
+          <input
+            type="text"
+            name="customCategories[${categoryCounter-1}][name]"
+            placeholder="Category name"
+            value="${name}"
+            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            required />
+          <input
+            type="color"
+            name="customCategories[${categoryCounter-1}][color]"
+            value="${color}"
+            class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300" />
+          <button
+            type="button"
+            onclick="removeCustomCategory(this)"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        `;
+        
+        categoriesList.appendChild(categoryDiv);
+      }
+
+      function removeCustomCategory(button) {
+        button.closest('.custom-category-item').remove();
       }
 
       // Form validation

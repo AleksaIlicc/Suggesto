@@ -269,6 +269,54 @@
                   </div>
                 </div>
 
+                <!-- Categories Configuration -->
+                <div class="space-y-4">
+                  <h3
+                    class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
+                    Categories Configuration
+                  </h3>
+
+                  <!-- Category Toggle -->
+                  <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        id="defaultCategoriesEnabled"
+                        name="defaultCategoriesEnabled"
+                        value="true"
+                        checked
+                        class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        onchange="toggleCategoryMode()" />
+                      <label
+                        for="defaultCategoriesEnabled"
+                        class="text-sm font-medium text-gray-700">
+                        Use default categories (bug, feature, improvement,
+                        other)
+                      </label>
+                    </div>
+                    <p class="ml-7 text-xs text-gray-500">
+                      Uncheck to create your own custom categories
+                    </p>
+                  </div>
+
+                  <!-- Custom Categories Section -->
+                  <div id="customCategoriesSection" class="hidden space-y-3">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Custom Categories
+                    </label>
+                    <div id="customCategoriesList" class="space-y-2">
+                      <!-- Custom categories will be added here dynamically -->
+                    </div>
+                    <button
+                      type="button"
+                      onclick="addCustomCategory()"
+                      class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:outline-none">
+                      <i class="fas fa-plus mr-2"></i>
+                      Add Category
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Submit Button -->
                 <div class="border-t border-gray-200 pt-4">
                   <button
@@ -556,10 +604,7 @@
           formData.append('logo', file);
           formData.append('appId', 'temp'); // Mark as temporary upload for new apps
 
-          fetch('/apps/api/upload-logo', {
-            method: 'POST',
-            body: formData,
-          })
+          fetch('/apps/api/upload-logo', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
               if (data.success) {
@@ -624,9 +669,7 @@
           // Clean up the temporarily uploaded file via API
           fetch('/apps/api/remove-logo/temp', {
             method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ logoPath: logoPath }),
           })
             .then(response => {
@@ -663,6 +706,63 @@
         // Clear hidden input and file input
         document.getElementById('logo').value = '';
         document.getElementById('logoUpload').value = '';
+      }
+
+      // Category management functions
+      let categoryCounter = 0;
+
+      function toggleCategoryMode() {
+        const isDefault = document.getElementById(
+          'defaultCategoriesEnabled'
+        ).checked;
+        const customSection = document.getElementById(
+          'customCategoriesSection'
+        );
+
+        if (isDefault) {
+          customSection.classList.add('hidden');
+        } else {
+          customSection.classList.remove('hidden');
+          // Add one default custom category if none exist
+          if (document.querySelectorAll('.custom-category-item').length === 0) {
+            addCustomCategory();
+          }
+        }
+      }
+
+      function addCustomCategory(name = '', color = '#6b7280') {
+        const categoriesList = document.getElementById('customCategoriesList');
+        const categoryId = `category_${categoryCounter++}`;
+
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className =
+          'custom-category-item flex items-center space-x-3';
+        categoryDiv.innerHTML = `
+          <input
+            type="text"
+            name="customCategories[${categoryCounter - 1}][name]"
+            placeholder="Category name"
+            value="${name}"
+            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            required />
+          <input
+            type="color"
+            name="customCategories[${categoryCounter - 1}][color]"
+            value="${color}"
+            class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300" />
+          <button
+            type="button"
+            onclick="removeCustomCategory(this)"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        `;
+
+        categoriesList.appendChild(categoryDiv);
+      }
+
+      function removeCustomCategory(button) {
+        button.closest('.custom-category-item').remove();
       }
 
       // Form validation

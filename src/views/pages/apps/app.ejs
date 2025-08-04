@@ -108,6 +108,12 @@
                   <%= statusText %>
                 </span>
               <% } %>
+              <% if (suggestion.category) { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
+                   <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.category.color %>">
+                  <%= suggestion.category.name.charAt(0).toUpperCase() + suggestion.category.name.slice(1) %>
+                </span>
+              <% } %>
               <span class="text-xs text-gray-500">
                 by <%= suggestion.userId ? `${suggestion.userId.firstName} ${suggestion.userId.lastName}` : 'Anonymous User' %> • 
                 <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>

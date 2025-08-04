@@ -18,6 +18,8 @@ export interface IApplication extends Document {
     backgroundColor: string;
     logo?: string;
   };
+  customCategories: { name: string; color: string }[];
+  defaultCategoriesEnabled: boolean;
   user: IUser;
   lastOpened?: Date;
   createdAt: Date;
@@ -43,6 +45,13 @@ const ApplicationSchema: Schema = new Schema(
       backgroundColor: { type: String, required: true, default: '#F3F4F6' },
       logo: { type: String, default: '' },
     },
+    customCategories: [
+      {
+        name: { type: String, required: true },
+        color: { type: String, required: true },
+      },
+    ],
+    defaultCategoriesEnabled: { type: Boolean, default: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     lastOpened: { type: Date, default: Date.now },
   },

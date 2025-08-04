@@ -7,6 +7,10 @@ import { EditAppDto } from '../dtos/app/edit-app.dto';
 import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
+import {
+  getDefaultCategories,
+  getCategoryByName,
+} from '../utils/defaultCategories';
 
 const getApp = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -14,9 +18,9 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
     const sessionId = req.sessionID;
     const sortType = (req.query.sort as string) || 'new';
 
-    const app = await Application.findOne({
-      _id: req.params.id,
-    }).populate('user');
+    const app = await Application.findOne({ _id: req.params.id }).populate(
+      'user'
+    );
 
     if (!app) {
       req.flash('error', 'Application not found.');
@@ -52,11 +56,7 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
             as: 'recentVotes',
           },
         },
-        {
-          $addFields: {
-            recentVoteCount: { $size: '$recentVotes' },
-          },
-        },
+        { $addFields: { recentVoteCount: { $size: '$recentVotes' } } },
         { $sort: { recentVoteCount: -1, createdAt: -1 } },
         {
           $lookup: {
@@ -66,16 +66,8 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
             as: 'userDetails',
           },
         },
-        {
-          $addFields: {
-            userId: { $arrayElemAt: ['$userDetails', 0] },
-          },
-        },
-        {
-          $project: {
-            userDetails: 0,
-          },
-        },
+        { $addFields: { userId: { $arrayElemAt: ['$userDetails', 0] } } },
+        { $project: { userDetails: 0 } },
       ]);
     } else if (sortType === 'top') {
       // Top: most votes overall
@@ -134,9 +126,7 @@ const getApps = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user as IUser;
 
-    const apps = await Application.find({
-      user: user._id,
-    });
+    const apps = await Application.find({ user: user._id });
 
     res.render('pages/apps/my-apps', { apps });
   } catch (err: unknown) {
@@ -165,6 +155,8 @@ const postAddApp = async (
         backgroundColor: req.body.backgroundColor,
         logo: req.body.logo || '',
       },
+      customCategories: req.body.customCategories || [],
+      defaultCategoriesEnabled: req.body.defaultCategoriesEnabled === 'true',
       user: user._id,
     });
 
@@ -184,16 +176,24 @@ const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
     const user = req.user as IUser | undefined;
     const _id = req.params.id;
 
-    const app = await Application.findOne({
-      _id: _id,
-    });
+    const app = await Application.findOne({ _id: _id });
 
     if (!app) {
       req.flash('error', 'Application not found.');
       return res.status(404).redirect('/');
     }
 
-    res.render('pages/apps/add-suggestion', { appId: _id, app, user });
+    // Get available categories based on app settings
+    const availableCategories = app.defaultCategoriesEnabled
+      ? getDefaultCategories()
+      : app.customCategories;
+
+    res.render('pages/apps/add-suggestion', {
+      appId: _id,
+      app,
+      user,
+      availableCategories,
+    });
   } catch (err: unknown) {
     req.flash('error', 'Failed to fetch application. Please try again.');
     return res.status(500).redirect('/');
@@ -208,9 +208,7 @@ const postAddSuggestion = async (
     const user = req.user as IUser | undefined;
     const files = (req as any).files;
 
-    const app = await Application.findOne({
-      _id: req.params.id,
-    });
+    const app = await Application.findOne({ _id: req.params.id });
 
     if (!app) {
       req.flash('error', 'Application not found.');
@@ -228,9 +226,23 @@ const postAddSuggestion = async (
         }))
       : [];
 
+    // Handle category selection
+    let selectedCategory = req.body.category;
+    if (!selectedCategory) {
+      // Default to first available category if none selected
+      const availableCategories = app.defaultCategoriesEnabled
+        ? getDefaultCategories()
+        : app.customCategories;
+      selectedCategory = availableCategories[0] || {
+        name: 'other',
+        color: '#6b7280',
+      };
+    }
+
     const newSuggestion = new Suggestion({
       title: req.body.title,
       description: req.body.description,
+      category: selectedCategory,
       status: 'pending',
       applicationId: req.params.id,
       userId: user ? user._id : null, // Support anonymous submissions
@@ -278,7 +290,8 @@ const getEditApp = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/apps');
     }
 
-    res.render('pages/apps/edit-app', { app });
+    const defaultCategories = getDefaultCategories();
+    res.render('pages/apps/edit-app', { app, defaultCategories });
   } catch (err: unknown) {
     req.flash(
       'error',
@@ -318,6 +331,13 @@ const putEditApp = async (
       logo: req.body.logo || app.design?.logo || '',
     };
 
+    // Update category-related fields
+    if (req.body.customCategories !== undefined) {
+      app.customCategories = req.body.customCategories;
+    }
+
+    // Handle checkbox: if not present in request body, it means unchecked (false)
+    app.defaultCategoriesEnabled = req.body.defaultCategoriesEnabled === 'true';
     await app.save();
 
     req.flash('success', 'Application has been updated successfully.');
@@ -443,11 +463,7 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
         await app.save();
       }
 
-      res.json({
-        success: true,
-        voted: true,
-        voteCount: suggestion.voteCount,
-      });
+      res.json({ success: true, voted: true, voteCount: suggestion.voteCount });
       return;
     }
   } catch (error: unknown) {
@@ -465,10 +481,9 @@ const updateSuggestionStatus = async (
 
     const suggestion = await Suggestion.findById(suggestionId);
     if (!suggestion) {
-      res.status(404).json({
-        success: false,
-        message: 'Suggestion not found.',
-      });
+      res
+        .status(404)
+        .json({ success: false, message: 'Suggestion not found.' });
       return;
     }
 
@@ -479,20 +494,25 @@ const updateSuggestionStatus = async (
     });
 
     if (!app) {
-      res.status(403).json({
-        success: false,
-        message: 'You do not have permission to update this suggestion status.',
-      });
+      res
+        .status(403)
+        .json({
+          success: false,
+          message:
+            'You do not have permission to update this suggestion status.',
+        });
       return;
     }
 
     suggestion.status = req.body.status as any;
     await suggestion.save();
 
-    res.status(200).json({
-      success: true,
-      message: 'Suggestion status has been updated successfully.',
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: 'Suggestion status has been updated successfully.',
+      });
   } catch (error: unknown) {
     req.flash('error', 'Failed to update suggestion status. Please try again.');
     return res.status(500).redirect('/apps');
@@ -525,10 +545,7 @@ const uploadLogo = async (req: Request, res: Response): Promise<void> => {
       console.log('Updating app design with new logo...');
 
       // Find the application and verify ownership
-      const app = await Application.findOne({
-        _id: appId,
-        user: user._id,
-      });
+      const app = await Application.findOne({ _id: appId, user: user._id });
 
       if (app) {
         console.log('App found, updating logo in database...');
@@ -557,10 +574,7 @@ const uploadLogo = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Update app design with new logo
-        app.design = {
-          ...app.design,
-          logo: logoPath,
-        };
+        app.design = { ...app.design, logo: logoPath };
 
         await app.save();
         console.log('✅ App design updated with new logo');
@@ -642,10 +656,7 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
     console.log('Handling permanent logo removal...');
 
     // Find the application and verify ownership
-    const app = await Application.findOne({
-      _id: appId,
-      user: user._id,
-    });
+    const app = await Application.findOne({ _id: appId, user: user._id });
 
     console.log('Found app:', !!app);
     console.log('App design:', app?.design);
@@ -653,11 +664,13 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
 
     if (!app) {
       console.log('App not found or permission denied');
-      res.status(404).json({
-        success: false,
-        message:
-          'Application not found or you do not have permission to modify it',
-      });
+      res
+        .status(404)
+        .json({
+          success: false,
+          message:
+            'Application not found or you do not have permission to modify it',
+        });
       return;
     }
 
@@ -705,19 +718,13 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
 
     // Update application to remove logo
     console.log('Updating database to remove logo path...');
-    app.design = {
-      ...app.design,
-      logo: '',
-    };
+    app.design = { ...app.design, logo: '' };
 
     await app.save();
     console.log('✅ Database updated successfully - logo path cleared');
 
     console.log('=== REMOVE LOGO REQUEST END ===');
-    res.json({
-      success: true,
-      message: 'Logo removed successfully',
-    });
+    res.json({ success: true, message: 'Logo removed successfully' });
   } catch (error: unknown) {
     console.error('❌ Error in removeLogo function:', error);
     res.status(500).json({ success: false, message: 'Failed to remove logo' });
