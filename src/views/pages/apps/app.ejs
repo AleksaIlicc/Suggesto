@@ -86,18 +86,59 @@
           </div>
         </div>
 
+        <!-- Recent Suggestions Header -->
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold sm:text-2xl" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor || '#111827' %>">
+            Recent Suggestions
+          </h2>
+        </div>
+
         <div class="w-full space-y-4">
           <% if (suggestions && suggestions.length > 0) { %> <%
           suggestions.forEach(suggestion => { %>
-          <div class="rounded-xl bg-white p-4 shadow-sm sm:p-6">
+          <div class="rounded-xl p-4 shadow-sm sm:p-6" <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.suggestionCardBgColor || '#FFFFFF' %>">
             <div class="mb-3 flex flex-wrap items-center gap-2">
+              <!-- Status Badge -->
+              <% 
+                let statusColor = 'bg-yellow-100 text-yellow-800';
+                let statusText = 'Pending';
+                if (suggestion.status === 'in-progress') {
+                  statusColor = 'bg-blue-100 text-blue-800';
+                  statusText = 'In Progress';
+                } else if (suggestion.status === 'completed') {
+                  statusColor = 'bg-green-100 text-green-800';
+                  statusText = 'Completed';
+                } else if (suggestion.status === 'rejected') {
+                  statusColor = 'bg-red-100 text-red-800';
+                  statusText = 'Rejected';
+                }
+              %>
+              <% if (isOwner) { %>
+                <div class="relative">
+                  <select 
+                    onchange="updateSuggestionStatus('<%= suggestion._id %>', this.value)"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer <%= statusColor %> border-none focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    <option value="pending" <%= suggestion.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="in-progress" <%= suggestion.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="completed" <%= suggestion.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                    <option value="rejected" <%= suggestion.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                  </select>
+                </div>
+              <% } else { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= statusColor %>">
+                  <%= statusText %>
+                </span>
+              <% } %>
+              
+              <!-- Category Badge -->
               <% if (suggestion.category) { %>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
-                   <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.category.color %>">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
+                 <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.category.color %>">
                   <%= suggestion.category.name.charAt(0).toUpperCase() + suggestion.category.name.slice(1) %>
                 </span>
               <% } %>
-              <span class="text-xs text-gray-500">
+              
+              <span class="text-xs" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionMetaColor || '#6B7280' %>">
                 by <%= suggestion.userId ? `${suggestion.userId.firstName} ${suggestion.userId.lastName}` : 'Anonymous User' %> • 
                 <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>
               </span>
@@ -106,10 +147,10 @@
             <div
               class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
               <div class="flex-1">
-                <h3 class="text-base font-medium sm:text-lg mb-2">
+                <h3 class="text-base font-medium sm:text-lg mb-2" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor || '#374151' %>">
                   <%= suggestion.title %>
                 </h3>
-                <p class="text-sm text-gray-600 sm:text-base mb-3">
+                <p class="text-sm sm:text-base mb-3" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor || '#374151' %>">
                   <%= suggestion.description %>
                 </p>
                 
@@ -142,7 +183,10 @@
                   <button
                     onclick="toggleVote('<%= suggestion._id %>')"
                     id="vote-btn-<%= suggestion._id %>"
-                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:bg-gray-100 active:scale-95 <%= suggestion.hasUserVoted ? 'bg-blue-100 text-blue-600' : '' %>">
+                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95 <%= suggestion.hasUserVoted ? 'bg-blue-100 text-blue-600' : '' %>"
+                    <% if (!suggestion.hasUserVoted) { %>
+                      <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.voteButtonBgColor || '#E5E7EB' %>; color: <%= app.design?.voteButtonTextColor || '#374151' %>"
+                    <% } %>>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5 sm:h-6 sm:w-6"
@@ -155,7 +199,10 @@
                         stroke-width="2"
                         d="M5 15l7-7 7 7" />
                     </svg>
-                    <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>">
+                    <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>"
+                       <% if (!suggestion.hasUserVoted) { %>
+                         <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.voteButtonTextColor || '#374151' %>"
+                       <% } %>>
                       <%= suggestion.voteCount || 0 %>
                     </p>
                   </button>
@@ -186,7 +233,10 @@
 
         const backgroundColor =
           '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        document.body.style.backgroundColor = backgroundColor;
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+          mainElement.style.backgroundColor = backgroundColor;
+        }
       });
 
       // Voting functionality
@@ -222,6 +272,31 @@
         } catch (error) {
           console.error('Error voting:', error);
           alert('Failed to process vote. Please try again.');
+        }
+      }
+
+      // Update suggestion status function
+      async function updateSuggestionStatus(suggestionId, newStatus) {
+        try {
+          const response = await fetch(`/apps/api/suggestions/${suggestionId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Reload the page to reflect status change
+            window.location.reload();
+          } else {
+            alert(data.message || 'Failed to update status');
+          }
+        } catch (error) {
+          console.error('Error updating status:', error);
+          alert('Failed to update status. Please try again.');
         }
       }
     </script>

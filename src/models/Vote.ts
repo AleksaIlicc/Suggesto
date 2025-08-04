@@ -14,14 +14,32 @@ const VoteSchema: Schema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     sessionId: { type: String, required: false }, // For anonymous voting
-    suggestion: { type: Schema.Types.ObjectId, ref: 'Suggestion', required: true },
+    suggestion: {
+      type: Schema.Types.ObjectId,
+      ref: 'Suggestion',
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-// Ensure one vote per user/session per suggestion
-VoteSchema.index({ user: 1, suggestion: 1 }, { unique: true, sparse: true });
-VoteSchema.index({ sessionId: 1, suggestion: 1 }, { unique: true, sparse: true });
+// Create a compound index that handles both authenticated and anonymous votes
+// For authenticated users: user + suggestion must be unique
+// For anonymous users: sessionId + suggestion must be unique
+VoteSchema.index(
+  { user: 1, suggestion: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { user: { $exists: true, $ne: null } },
+  }
+);
+VoteSchema.index(
+  { sessionId: 1, suggestion: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { sessionId: { $exists: true, $ne: null } },
+  }
+);
 
 const Vote = mongoose.model<IVote>('Vote', VoteSchema);
 

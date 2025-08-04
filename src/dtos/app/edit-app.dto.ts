@@ -16,6 +16,24 @@ export class EditAppDto {
   @IsNotEmpty()
   public readonly backgroundColor: string;
 
+  @IsNotEmpty()
+  public readonly suggestionsHeaderColor: string;
+
+  @IsNotEmpty()
+  public readonly suggestionTextColor: string;
+
+  @IsNotEmpty()
+  public readonly suggestionCardBgColor: string;
+
+  @IsNotEmpty()
+  public readonly voteButtonBgColor: string;
+
+  @IsNotEmpty()
+  public readonly voteButtonTextColor: string;
+
+  @IsNotEmpty()
+  public readonly suggestionMetaColor: string;
+
   @IsOptional()
   public readonly logo?: string;
 

@@ -16,6 +16,12 @@ export interface IApplication extends Document {
     headerColor: string;
     buttonColor: string;
     backgroundColor: string;
+    suggestionsHeaderColor: string;
+    suggestionTextColor: string;
+    suggestionCardBgColor: string;
+    voteButtonBgColor: string;
+    voteButtonTextColor: string;
+    suggestionMetaColor: string;
     logo?: string;
   };
   customCategories: { name: string; color: string }[];
@@ -49,6 +55,20 @@ const ApplicationSchema: Schema = new Schema(
       headerColor: { type: String, required: true, default: '#374151' },
       buttonColor: { type: String, required: true, default: '#111827' },
       backgroundColor: { type: String, required: true, default: '#F3F4F6' },
+      suggestionsHeaderColor: {
+        type: String,
+        required: true,
+        default: '#111827',
+      },
+      suggestionTextColor: { type: String, required: true, default: '#374151' },
+      suggestionCardBgColor: {
+        type: String,
+        required: true,
+        default: '#F9FAFB',
+      },
+      voteButtonBgColor: { type: String, required: true, default: '#E5E7EB' },
+      voteButtonTextColor: { type: String, required: true, default: '#374151' },
+      suggestionMetaColor: { type: String, required: true, default: '#6B7280' },
       logo: { type: String, default: '' },
     },
     customCategories: [

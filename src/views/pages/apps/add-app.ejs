@@ -231,6 +231,171 @@
                     </div>
                   </div>
 
+                  <!-- Suggestions Section Colors -->
+                  <div class="space-y-4 border-t border-gray-200 pt-4">
+                    <h4 class="text-base font-medium text-gray-800">
+                      Suggestions Section Colors
+                    </h4>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          for="suggestionsHeaderColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Suggestions Header Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionsHeaderColor"
+                            name="suggestionsHeaderColor"
+                            value="#111827"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionsHeaderColorText"
+                            value="#111827"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionsHeader')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for "Recent Suggestions" heading
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="suggestionTextColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Suggestion Text Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionTextColor"
+                            name="suggestionTextColor"
+                            value="#374151"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionTextColorText"
+                            value="#374151"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionText')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for suggestion titles and descriptions
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="suggestionCardBgColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Suggestion Card Background
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionCardBgColor"
+                            name="suggestionCardBgColor"
+                            value="#F9FAFB"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionCardBgColorText"
+                            value="#F9FAFB"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionCardBg')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Background color for suggestion cards
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="voteButtonBgColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Vote Button Background
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="voteButtonBgColor"
+                            name="voteButtonBgColor"
+                            value="#E5E7EB"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="voteButtonBgColorText"
+                            value="#E5E7EB"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('voteButtonBg')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Background color for vote buttons
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="voteButtonTextColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Vote Button Text Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="voteButtonTextColor"
+                            name="voteButtonTextColor"
+                            value="#374151"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="voteButtonTextColorText"
+                            value="#374151"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('voteButtonText')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Text color for vote buttons
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="suggestionMetaColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Suggestion Meta Text Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionMetaColor"
+                            name="suggestionMetaColor"
+                            value="#6B7280"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionMetaColorText"
+                            value="#6B7280"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionMeta')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for author, date, and vote count text
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- Preset Color Themes -->
                   <div>
                     <label class="mb-3 block text-sm font-medium text-gray-700"
@@ -239,28 +404,28 @@
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                       <button
                         type="button"
-                        onclick="applyTheme('#374151', '#111827', '#F3F4F6')"
+                        onclick="applyFullTheme('#374151', '#111827', '#F3F4F6', '#111827', '#374151', '#F9FAFB', '#E5E7EB', '#374151', '#6B7280')"
                         class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
                         <div class="h-4 w-4 rounded-full bg-gray-600"></div>
                         <span class="text-xs">Default</span>
                       </button>
                       <button
                         type="button"
-                        onclick="applyTheme('#5E81AC', '#2E3440', '#ECEFF4')"
+                        onclick="applyFullTheme('#5E81AC', '#2E3440', '#ECEFF4', '#2E3440', '#4C566A', '#F9FBFF', '#D8DEE9', '#2E3440', '#8891A4')"
                         class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
                         <div class="h-4 w-4 rounded-full bg-[#5E81AC]"></div>
                         <span class="text-xs">Ocean</span>
                       </button>
                       <button
                         type="button"
-                        onclick="applyTheme('#6DB56D', '#3E4E3E', '#F3F8F2')"
+                        onclick="applyFullTheme('#6DB56D', '#3E4E3E', '#F3F8F2', '#3E4E3E', '#5A6B5A', '#F8FBF8', '#E8F4E8', '#3E4E3E', '#9CA3AF')"
                         class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
                         <div class="h-4 w-4 rounded-full bg-[#6DB56D]"></div>
                         <span class="text-xs">Meadow</span>
                       </button>
                       <button
                         type="button"
-                        onclick="applyTheme('#2d6da9', '#1f477e', '#e2e7e8')"
+                        onclick="applyFullTheme('#2d6da9', '#1f477e', '#e2e7e8', '#1f477e', '#4a6ba3', '#f0f4f7', '#d1dde6', '#1f477e', '#78909C')"
                         class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
                         <div class="h-4 w-4 rounded-full bg-[#2d6da9]"></div>
                         <span class="text-xs">Sky</span>
@@ -488,19 +653,27 @@
 
                   <!-- Sample Suggestions -->
                   <div class="bg-white px-6 py-8">
-                    <h2 class="mb-4 text-xl font-semibold text-gray-900">
+                    <h2
+                      id="previewSuggestionsHeader"
+                      class="mb-4 text-xl font-semibold"
+                      style="color: #111827">
                       Recent Suggestions
                     </h2>
 
                     <div class="space-y-3">
                       <div
-                        class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md">
+                        id="previewSuggestionCard1"
+                        class="rounded-xl border border-gray-100 p-4 shadow-sm transition-all hover:shadow-md"
+                        style="background-color: #f9fafb">
                         <div class="mb-3 flex flex-wrap items-center gap-2">
                           <span
                             class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
                             Pending
                           </span>
-                          <span class="text-xs text-gray-500"
+                          <span
+                            id="previewSuggestionMeta1"
+                            class="text-xs"
+                            style="color: #6b7280"
                             >by Anonymous • Dec 15, 2024</span
                           >
                         </div>
@@ -508,64 +681,34 @@
                           class="flex flex-col space-y-3 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
                           <div class="flex-1">
                             <h3
-                              class="text-gray-dark mb-2 text-base font-semibold sm:text-lg">
+                              id="previewSuggestionTitle1"
+                              class="mb-2 text-base font-semibold sm:text-lg"
+                              style="color: #374151">
                               Add dark mode support
                             </h3>
                             <p
-                              class="mb-3 text-sm leading-relaxed text-gray-600 sm:text-base">
+                              id="previewSuggestionText1"
+                              class="mb-3 text-sm leading-relaxed sm:text-base"
+                              style="color: #374151">
                               Would love to have a dark theme option for better
                               user experience during night time usage.
                             </p>
                           </div>
                           <div class="flex flex-col items-end space-y-2">
                             <div class="flex items-center space-x-2">
-                              <span class="text-sm text-gray-500"
+                              <span
+                                id="previewVoteCount1"
+                                class="text-sm"
+                                style="color: #6b7280"
                                 >23 votes</span
                               >
                               <button
                                 id="previewVoteButton1"
-                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-                                style="background-color: #111827">
-                                ↑
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md">
-                        <div class="mb-3 flex flex-wrap items-center gap-2">
-                          <span
-                            class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                            In Progress
-                          </span>
-                          <span class="text-xs text-gray-500"
-                            >by Anonymous • Dec 10, 2024</span
-                          >
-                        </div>
-                        <div
-                          class="flex flex-col space-y-3 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
-                          <div class="flex-1">
-                            <h3
-                              class="text-gray-dark mb-2 text-base font-semibold sm:text-lg">
-                              Mobile app version
-                            </h3>
-                            <p
-                              class="mb-3 text-sm leading-relaxed text-gray-600 sm:text-base">
-                              Native mobile app would be great for on-the-go
-                              access and push notifications.
-                            </p>
-                          </div>
-                          <div class="flex flex-col items-end space-y-2">
-                            <div class="flex items-center space-x-2">
-                              <span class="text-sm text-gray-500"
-                                >15 votes</span
-                              >
-                              <button
-                                id="previewVoteButton2"
-                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-                                style="background-color: #111827">
+                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
+                                style="
+                                  background-color: #e5e7eb;
+                                  color: #374151;
+                                ">
                                 ↑
                               </button>
                             </div>
@@ -600,6 +743,25 @@
         const backgroundColor =
           document.getElementById('backgroundColor').value;
 
+        // Get new suggestion colors
+        const suggestionsHeaderColor = document.getElementById(
+          'suggestionsHeaderColor'
+        ).value;
+        const suggestionTextColor = document.getElementById(
+          'suggestionTextColor'
+        ).value;
+        const suggestionCardBgColor = document.getElementById(
+          'suggestionCardBgColor'
+        ).value;
+        const voteButtonBgColor =
+          document.getElementById('voteButtonBgColor').value;
+        const voteButtonTextColor = document.getElementById(
+          'voteButtonTextColor'
+        ).value;
+        const suggestionMetaColor = document.getElementById(
+          'suggestionMetaColor'
+        ).value;
+
         // Update preview elements
         document.getElementById('previewTitle').textContent = name;
         document.getElementById('previewDescription').textContent = description;
@@ -607,10 +769,48 @@
           headerColor;
         document.getElementById('previewButton').style.backgroundColor =
           buttonColor;
+
+        // Update suggestions section colors
+        document.getElementById('previewSuggestionsHeader').style.color =
+          suggestionsHeaderColor;
+
+        // Update suggestion cards
+        document.getElementById(
+          'previewSuggestionCard1'
+        ).style.backgroundColor = suggestionCardBgColor;
+        document.getElementById(
+          'previewSuggestionCard2'
+        ).style.backgroundColor = suggestionCardBgColor;
+
+        // Update suggestion text colors
+        document.getElementById('previewSuggestionTitle1').style.color =
+          suggestionTextColor;
+        document.getElementById('previewSuggestionTitle2').style.color =
+          suggestionTextColor;
+        document.getElementById('previewSuggestionText1').style.color =
+          suggestionTextColor;
+        document.getElementById('previewSuggestionText2').style.color =
+          suggestionTextColor;
+
+        // Update vote buttons
         document.getElementById('previewVoteButton1').style.backgroundColor =
-          buttonColor;
+          voteButtonBgColor;
+        document.getElementById('previewVoteButton1').style.color =
+          voteButtonTextColor;
         document.getElementById('previewVoteButton2').style.backgroundColor =
-          buttonColor;
+          voteButtonBgColor;
+        document.getElementById('previewVoteButton2').style.color =
+          voteButtonTextColor;
+
+        // Update meta text colors
+        document.getElementById('previewSuggestionMeta1').style.color =
+          suggestionMetaColor;
+        document.getElementById('previewSuggestionMeta2').style.color =
+          suggestionMetaColor;
+        document.getElementById('previewVoteCount1').style.color =
+          suggestionMetaColor;
+        document.getElementById('previewVoteCount2').style.color =
+          suggestionMetaColor;
 
         // Update background colors - only in preview area
         const contentSections = document.querySelectorAll(
@@ -638,6 +838,18 @@
         document.getElementById('headerColorText').value = headerColor;
         document.getElementById('buttonColorText').value = buttonColor;
         document.getElementById('backgroundColorText').value = backgroundColor;
+        document.getElementById('suggestionsHeaderColorText').value =
+          suggestionsHeaderColor;
+        document.getElementById('suggestionTextColorText').value =
+          suggestionTextColor;
+        document.getElementById('suggestionCardBgColorText').value =
+          suggestionCardBgColor;
+        document.getElementById('voteButtonBgColorText').value =
+          voteButtonBgColor;
+        document.getElementById('voteButtonTextColorText').value =
+          voteButtonTextColor;
+        document.getElementById('suggestionMetaColorText').value =
+          suggestionMetaColor;
       }
 
       function updateColorFromText(type) {
@@ -662,6 +874,51 @@
         document.getElementById('headerColorText').value = headerColor;
         document.getElementById('buttonColorText').value = buttonColor;
         document.getElementById('backgroundColorText').value = backgroundColor;
+        updatePreview();
+      }
+
+      function applyFullTheme(
+        headerColor,
+        buttonColor,
+        backgroundColor = '#F3F4F6',
+        suggestionsHeaderColor = '#111827',
+        suggestionTextColor = '#374151',
+        suggestionCardBgColor = '#F9FAFB',
+        voteButtonBgColor = '#E5E7EB',
+        voteButtonTextColor = '#374151',
+        suggestionMetaColor = '#6B7280'
+      ) {
+        document.getElementById('headerColor').value = headerColor;
+        document.getElementById('buttonColor').value = buttonColor;
+        document.getElementById('backgroundColor').value = backgroundColor;
+        document.getElementById('suggestionsHeaderColor').value =
+          suggestionsHeaderColor;
+        document.getElementById('suggestionTextColor').value =
+          suggestionTextColor;
+        document.getElementById('suggestionCardBgColor').value =
+          suggestionCardBgColor;
+        document.getElementById('voteButtonBgColor').value = voteButtonBgColor;
+        document.getElementById('voteButtonTextColor').value =
+          voteButtonTextColor;
+        document.getElementById('suggestionMetaColor').value =
+          suggestionMetaColor;
+
+        document.getElementById('headerColorText').value = headerColor;
+        document.getElementById('buttonColorText').value = buttonColor;
+        document.getElementById('backgroundColorText').value = backgroundColor;
+        document.getElementById('suggestionsHeaderColorText').value =
+          suggestionsHeaderColor;
+        document.getElementById('suggestionTextColorText').value =
+          suggestionTextColor;
+        document.getElementById('suggestionCardBgColorText').value =
+          suggestionCardBgColor;
+        document.getElementById('voteButtonBgColorText').value =
+          voteButtonBgColor;
+        document.getElementById('voteButtonTextColorText').value =
+          voteButtonTextColor;
+        document.getElementById('suggestionMetaColorText').value =
+          suggestionMetaColor;
+
         updatePreview();
       }
 

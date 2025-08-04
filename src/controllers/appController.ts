@@ -4,6 +4,7 @@ import { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
+import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
 import {
@@ -159,6 +160,12 @@ const postAddApp = async (
         headerColor: req.body.headerColor,
         buttonColor: req.body.buttonColor,
         backgroundColor: req.body.backgroundColor,
+        suggestionsHeaderColor: req.body.suggestionsHeaderColor,
+        suggestionTextColor: req.body.suggestionTextColor,
+        suggestionCardBgColor: req.body.suggestionCardBgColor,
+        voteButtonBgColor: req.body.voteButtonBgColor,
+        voteButtonTextColor: req.body.voteButtonTextColor,
+        suggestionMetaColor: req.body.suggestionMetaColor,
         logo: req.body.logo || '',
       },
       customCategories: req.body.customCategories || [],
@@ -266,15 +273,22 @@ const postAddSuggestion = async (
 
     // Handle category selection
     let selectedCategory = req.body.category;
-    if (!selectedCategory) {
-      // Default to first available category if none selected
+    if (
+      !selectedCategory ||
+      !selectedCategory.name ||
+      !selectedCategory.color
+    ) {
+      // Default to first available category if none selected or invalid
       const availableCategories = app.defaultCategoriesEnabled
         ? getDefaultCategories()
         : app.customCategories;
-      selectedCategory = availableCategories[0] || {
-        name: 'other',
-        color: '#6b7280',
-      };
+      selectedCategory =
+        availableCategories && availableCategories.length > 0
+          ? availableCategories[0]
+          : {
+              name: 'general',
+              color: '#6b7280',
+            };
     }
 
     const newSuggestion = new Suggestion({
@@ -366,6 +380,12 @@ const putEditApp = async (
       headerColor: req.body.headerColor,
       buttonColor: req.body.buttonColor,
       backgroundColor: req.body.backgroundColor,
+      suggestionsHeaderColor: req.body.suggestionsHeaderColor,
+      suggestionTextColor: req.body.suggestionTextColor,
+      suggestionCardBgColor: req.body.suggestionCardBgColor,
+      voteButtonBgColor: req.body.voteButtonBgColor,
+      voteButtonTextColor: req.body.voteButtonTextColor,
+      suggestionMetaColor: req.body.suggestionMetaColor,
       logo: req.body.logo || app.design?.logo || '',
     };
 
@@ -491,8 +511,14 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
     if (existingVote) {
       // Remove vote (toggle off)
       await Vote.findByIdAndDelete(existingVote._id);
-      suggestion.voteCount = Math.max(0, suggestion.voteCount - 1);
-      await suggestion.save();
+      const newVoteCount = Math.max(0, suggestion.voteCount - 1);
+
+      // Update vote count directly without full validation
+      await Suggestion.findByIdAndUpdate(
+        suggestionId,
+        { voteCount: newVoteCount },
+        { runValidators: false }
+      );
 
       // Update application's suggestions array
       const app = await Application.findById(suggestion.applicationId);
@@ -501,7 +527,7 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
           s => s._id.toString() === suggestionId
         );
         if (suggestionInApp) {
-          suggestionInApp.voteCount = suggestion.voteCount;
+          suggestionInApp.voteCount = newVoteCount;
         }
         await app.save();
       }
@@ -509,20 +535,35 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       res.json({
         success: true,
         voted: false,
-        voteCount: suggestion.voteCount,
+        voteCount: newVoteCount,
       });
       return;
     } else {
       // Add vote
-      const newVote = new Vote({
-        user: user ? user._id : undefined,
-        sessionId: user ? undefined : sessionId,
-        suggestion: suggestionId,
-      });
+      let newVote;
+      if (user) {
+        // Authenticated user vote
+        newVote = new Vote({
+          user: user._id,
+          suggestion: suggestionId,
+        });
+      } else {
+        // Anonymous vote
+        newVote = new Vote({
+          sessionId: sessionId,
+          suggestion: suggestionId,
+        });
+      }
       await newVote.save();
 
-      suggestion.voteCount += 1;
-      await suggestion.save();
+      const newVoteCount = suggestion.voteCount + 1;
+
+      // Update vote count directly without full validation
+      await Suggestion.findByIdAndUpdate(
+        suggestionId,
+        { voteCount: newVoteCount },
+        { runValidators: false }
+      );
 
       // Update application's suggestions array
       const app = await Application.findById(suggestion.applicationId);
@@ -531,15 +572,16 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
           s => s._id.toString() === suggestionId
         );
         if (suggestionInApp) {
-          suggestionInApp.voteCount = suggestion.voteCount;
+          suggestionInApp.voteCount = newVoteCount;
         }
         await app.save();
       }
 
-      res.json({ success: true, voted: true, voteCount: suggestion.voteCount });
+      res.json({ success: true, voted: true, voteCount: newVoteCount });
       return;
     }
   } catch (error: unknown) {
+    console.log('Error processing vote:', error);
     res.status(500).json({ success: false, message: 'Failed to process vote' });
   }
 };
@@ -689,13 +731,11 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
 
     if (!app) {
       console.log('App not found or permission denied');
-      res
-        .status(404)
-        .json({
-          success: false,
-          message:
-            'Application not found or you do not have permission to modify it',
-        });
+      res.status(404).json({
+        success: false,
+        message:
+          'Application not found or you do not have permission to modify it',
+      });
       return;
     }
 
@@ -756,6 +796,60 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const updateSuggestionStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = req.user as IUser;
+    const { suggestionId } = req.params;
+    const { status } = req.body as UpdateStatusDto;
+
+    // Find the suggestion and populate the application to check ownership
+    const suggestion = await Suggestion.findById(suggestionId).populate({
+      path: 'applicationId',
+      populate: {
+        path: 'user',
+      },
+    });
+
+    if (!suggestion) {
+      res.status(404).json({ success: false, message: 'Suggestion not found' });
+      return;
+    }
+
+    // Check if user owns the application
+    const app = suggestion.applicationId as any;
+    if (!user || user._id.toString() !== app.user._id.toString()) {
+      res.status(403).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    // Update only the status field directly in database
+    const updatedSuggestion = await Suggestion.findByIdAndUpdate(
+      suggestionId,
+      {
+        status: status as 'pending' | 'in-progress' | 'completed' | 'rejected',
+      },
+      { new: true, runValidators: false } // Skip validation to avoid category issues
+    );
+
+    if (!updatedSuggestion) {
+      res
+        .status(404)
+        .json({ success: false, message: 'Failed to update suggestion' });
+      return;
+    }
+
+    res.json({ success: true, message: 'Status updated successfully', status });
+  } catch (error) {
+    console.error('Error updating suggestion status:', error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to update status' });
+  }
+};
+
 export default {
   getApp,
   getApps,
@@ -769,4 +863,5 @@ export default {
   voteOnSuggestion,
   uploadLogo,
   removeLogo,
+  updateSuggestionStatus,
 };
