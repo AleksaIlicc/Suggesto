@@ -11,7 +11,16 @@ export class AddAppDto {
   public readonly headerColor: string;
 
   @IsNotEmpty()
+  public readonly headerTextColor: string;
+
+  @IsNotEmpty()
   public readonly buttonColor: string;
+
+  @IsNotEmpty()
+  public readonly buttonTextColor: string;
+
+  @IsNotEmpty()
+  public readonly backButtonColor: string;
 
   @IsNotEmpty()
   public readonly backgroundColor: string;

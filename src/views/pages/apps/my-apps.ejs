@@ -79,7 +79,7 @@
                 <a
                   href="/apps/<%= app._id %>"
                   class="w-full rounded-lg px-3 py-2.5 text-center text-sm font-medium text-white transition-colors hover:opacity-90"
-                  <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.buttonColor || '#111827' %>">
+                  <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.buttonColor %>; color: <%= app.design?.buttonTextColor %>">
                   Public View
                 </a>
               </div>
@@ -174,8 +174,16 @@
 
     <%- include('../../shared/includes/scripts') %>
     <script>
+      // Helper function for safe element access
+      const safeGetElement = (id) => {
+        const element = document.getElementById(id);
+        return element;
+      };
+
       function toggleAppMenu(appId) {
-        const menu = document.getElementById(`app-menu-${appId}`);
+        const menu = safeGetElement(`app-menu-${appId}`);
+        if (!menu) return;
+        
         const allMenus = document.querySelectorAll('[id^="app-menu-"]');
 
         // Close all other menus
@@ -215,8 +223,11 @@
             document.body.removeChild(textArea);
           });
 
-        // Close the menu
-        document.getElementById(`app-menu-${appId}`).classList.add('hidden');
+        // Close the menu safely
+        const menu = safeGetElement(`app-menu-${appId}`);
+        if (menu) {
+          menu.classList.add('hidden');
+        }
       }
 
       function confirmDelete(appId, appName) {
@@ -233,19 +244,25 @@
           form.submit();
         }
 
-        // Close the menu
-        document.getElementById(`app-menu-${appId}`).classList.add('hidden');
+        // Close the menu safely
+        const menu = safeGetElement(`app-menu-${appId}`);
+        if (menu) {
+          menu.classList.add('hidden');
+        }
       }
 
       function showToast(message) {
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
-        toastMessage.textContent = message;
-        toast.classList.remove('hidden');
+        const toast = safeGetElement('toast');
+        const toastMessage = safeGetElement('toast-message');
+        
+        if (toast && toastMessage) {
+          toastMessage.textContent = message;
+          toast.classList.remove('hidden');
 
-        setTimeout(() => {
-          toast.classList.add('hidden');
-        }, 3000);
+          setTimeout(() => {
+            toast.classList.add('hidden');
+          }, 3000);
+        }
       }
     </script>
   </body>

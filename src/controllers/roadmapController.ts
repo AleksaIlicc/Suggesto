@@ -239,23 +239,11 @@ const putEditRoadmapItem = async (
         ? new Date(req.body.actualReleaseDate)
         : undefined;
     }
-    if (req.body.tags !== undefined) {
-      // Parse tags if they come as JSON string
-      try {
-        roadmapItem.tags =
-          typeof req.body.tags === 'string'
-            ? JSON.parse(req.body.tags)
-            : req.body.tags;
-      } catch (e) {
-        roadmapItem.tags = [];
-      }
-    }
+
     if (req.body.assignedTo !== undefined)
       roadmapItem.assignedTo = req.body.assignedTo
         ? (req.body.assignedTo as any)
         : undefined;
-    if (req.body.progress !== undefined)
-      roadmapItem.progress = req.body.progress;
     if (req.body.changelogNotes !== undefined)
       roadmapItem.changelogNotes = req.body.changelogNotes;
     if (req.body.order !== undefined) roadmapItem.order = req.body.order;
@@ -290,12 +278,10 @@ const deleteRoadmapItem = async (
       );
       // Check if it's an AJAX request
       if (req.headers.accept?.includes('application/json')) {
-        return res
-          .status(404)
-          .json({
-            error:
-              'Application not found or you do not have permission to manage it.',
-          });
+        return res.status(404).json({
+          error:
+            'Application not found or you do not have permission to manage it.',
+        });
       }
       return res.status(404).redirect('/apps');
     }

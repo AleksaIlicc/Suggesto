@@ -6,7 +6,7 @@
     <%- include('../../shared/includes/styles') %>
   </head>
 
-  <body class="bg-background">
+  <body id="pageBody" class="bg-background">
     <% if (isOwner) { %>
     <div class="fixed right-8 bottom-8">
       <a
@@ -17,11 +17,20 @@
     </div>
     <% } %>
 
+    <!-- Back Button -->
+    <div class="fixed top-8 left-8">
+      <a
+        href="/apps/<%= app._id %>"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md transition-opacity hover:opacity-90">
+        <i class="fas fa-arrow-left text-gray-dark text-xl"></i>
+      </a>
+    </div>
+
     <!-- Header Section -->
     <div
       id="appHeader"
       class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
-      <div class="flex w-full max-w-6xl flex-col justify-center space-y-3">
+      <div class="flex w-full max-w-xl flex-col justify-center space-y-3">
         <div class="flex items-center space-x-4">
           <div
             class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
@@ -36,118 +45,115 @@
             >
             <% } %>
           </div>
-          <div>
-            <h1 class="text-lg font-medium text-white sm:text-xl">
-              <%= app.name %> Roadmap
-            </h1>
-            <p class="text-sm text-gray-200">Track our development progress</p>
-          </div>
+          <h1 class="text-lg font-medium text-white sm:text-xl">
+            <%= app.name %> Roadmap
+          </h1>
         </div>
-        <div class="flex items-center space-x-4">
-          <a href="/apps/<%= app._id %>" class="text-gray-200 hover:text-white transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Back to App
-          </a>
-          <% if (isOwner) { %>
+
+        <p class="max-w-2xl text-sm text-gray-100 sm:text-base">
+          Track our development progress and upcoming features
+        </p>
+      </div>
+    </div>
+
+    <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
+      <div class="w-full max-w-xl">
+        <!-- Add Item Button for Owners -->
+        <% if (isOwner) { %>
+        <div class="mb-6 flex justify-end">
           <a
             href="/apps/<%= app._id %>/roadmap/add"
-            class="cursor-pointer rounded-xl px-4 py-2 text-sm text-white transition-all hover:opacity-90 active:scale-95"
+            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95"
             id="addRoadmapBtn">
             <i class="fas fa-plus mr-2"></i>
             Add Item
           </a>
-          <% } %>
         </div>
-      </div>
-    </div>
+        <% } %>
 
-    <main class="mx-auto flex justify-center p-4 sm:p-6 lg:px-8 xl:px-28 lg:py-8">
-      <div class="w-full max-w-full lg:max-w-6xl xl:max-w-7xl 2xl:max-w-full">
         <!-- Roadmap Board -->
-        <!-- Mobile: Single column stack, Tablet: 2x2 grid, Desktop: 4 columns with scroll, XL: 4 columns fit -->
-        <div class="flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:gap-6 lg:flex lg:flex-row lg:gap-6 lg:overflow-x-auto lg:pb-4 2xl:grid 2xl:grid-cols-4 2xl:overflow-visible 2xl:pb-0 mb-6">
+        <div class="mb-6 space-y-4">
           <!-- Planned Column -->
-          <div class="w-full sm:w-auto lg:flex-shrink-0 lg:w-80 xl:w-96 2xl:w-80 rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">
-                Planned
-              </h2>
-              <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+              <h2 class="text-lg font-semibold text-gray-800">Planned</h2>
+              <span
+                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                 <%= roadmapItems.planned.length %>
               </span>
             </div>
-            <div class="space-y-3 min-h-[150px] sm:min-h-[200px] lg:min-h-[300px]">
-              <% roadmapItems.planned.forEach(item => { %>
-                <%- include('../../shared/partials/roadmap-item', { item, isOwner }) %>
-              <% }) %>
+            <div class="min-h-[100px] space-y-3">
+              <% roadmapItems.planned.forEach(item => { %> <%-
+              include('../../shared/partials/roadmap-item', { item, isOwner })
+              %> <% }) %>
             </div>
           </div>
 
           <!-- In Progress Column -->
-          <div class="w-full sm:w-auto lg:flex-shrink-0 lg:w-80 xl:w-96 2xl:w-80 rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">
-                In Progress
-              </h2>
-              <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+              <h2 class="text-lg font-semibold text-gray-800">In Progress</h2>
+              <span
+                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                 <%= roadmapItems['in-progress'].length %>
               </span>
             </div>
-            <div class="space-y-3 min-h-[150px] sm:min-h-[200px] lg:min-h-[300px]">
-              <% roadmapItems['in-progress'].forEach(item => { %>
-                <%- include('../../shared/partials/roadmap-item', { item, isOwner }) %>
-              <% }) %>
+            <div class="min-h-[100px] space-y-3">
+              <% roadmapItems['in-progress'].forEach(item => { %> <%-
+              include('../../shared/partials/roadmap-item', { item, isOwner })
+              %> <% }) %>
             </div>
           </div>
 
           <!-- Completed Column -->
-          <div class="w-full sm:w-auto lg:flex-shrink-0 lg:w-80 xl:w-96 2xl:w-80 rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">
-                Completed
-              </h2>
-              <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+              <h2 class="text-lg font-semibold text-gray-800">Completed</h2>
+              <span
+                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                 <%= roadmapItems.completed.length %>
               </span>
             </div>
-            <div class="space-y-3 min-h-[150px] sm:min-h-[200px] lg:min-h-[300px]">
-              <% roadmapItems.completed.forEach(item => { %>
-                <%- include('../../shared/partials/roadmap-item', { item, isOwner }) %>
-              <% }) %>
+            <div class="min-h-[100px] space-y-3">
+              <% roadmapItems.completed.forEach(item => { %> <%-
+              include('../../shared/partials/roadmap-item', { item, isOwner })
+              %> <% }) %>
             </div>
           </div>
 
           <!-- Cancelled Column -->
-          <div class="w-full sm:w-auto lg:flex-shrink-0 lg:w-80 xl:w-96 2xl:w-80 rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">
-                Cancelled
-              </h2>
-              <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+              <h2 class="text-lg font-semibold text-gray-800">Cancelled</h2>
+              <span
+                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                 <%= roadmapItems.cancelled.length %>
               </span>
             </div>
-            <div class="space-y-3 min-h-[150px] sm:min-h-[200px] lg:min-h-[300px]">
-              <% roadmapItems.cancelled.forEach(item => { %>
-                <%- include('../../shared/partials/roadmap-item', { item, isOwner }) %>
-              <% }) %>
+            <div class="min-h-[100px] space-y-3">
+              <% roadmapItems.cancelled.forEach(item => { %> <%-
+              include('../../shared/partials/roadmap-item', { item, isOwner })
+              %> <% }) %>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <% if (roadmapItems.planned.length === 0 && roadmapItems['in-progress'].length === 0 && roadmapItems.completed.length === 0 && roadmapItems.cancelled.length === 0) { %>
-        <div class="rounded-xl bg-white p-8 shadow-sm text-center">
-          <div class="mx-auto h-16 w-16 text-gray-400 mb-4">
+        <% if (roadmapItems.planned.length === 0 &&
+        roadmapItems['in-progress'].length === 0 &&
+        roadmapItems.completed.length === 0 && roadmapItems.cancelled.length ===
+        0) { %>
+        <div class="rounded-xl bg-white p-8 text-center shadow-sm">
+          <div class="mx-auto mb-4 h-16 w-16 text-gray-400">
             <i class="fas fa-road text-4xl"></i>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">No roadmap items yet</h3>
-          <p class="text-gray-500 mb-4">
-            <% if (isOwner) { %>
-              Get started by adding your first roadmap item to share your development plans.
-            <% } else { %>
-              The development team hasn't shared any roadmap items yet.
-            <% } %>
+          <h3 class="mb-2 text-lg font-medium text-gray-900">
+            No roadmap items yet
+          </h3>
+          <p class="mb-4 text-gray-500">
+            <% if (isOwner) { %> Get started by adding your first roadmap item
+            to share your development plans. <% } else { %> The development team
+            hasn't shared any roadmap items yet. <% } %>
           </p>
           <% if (isOwner) { %>
           <a
@@ -164,17 +170,39 @@
     </main>
 
     <%- include('../../shared/includes/scripts') %>
-    
+
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+        // Apply custom app design
+        const backgroundColor =
+          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
         const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const header = document.getElementById('appHeader');
-        header.style.backgroundColor = headerColor;
-
         const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const cardBgColor =
+          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
+
+        // Set header background
+        const headerElement = document.getElementById('appHeader');
+        if (headerElement) {
+          headerElement.style.backgroundColor = headerColor;
+        }
+
+        // Set body background
+        const bodyElement = document.getElementById('pageBody');
+        if (bodyElement) {
+          bodyElement.style.backgroundColor = backgroundColor;
+        }
+
+        // Set main background
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+          mainElement.style.backgroundColor = backgroundColor;
+        }
+
+        // Set button backgrounds
         const addButton = document.getElementById('addRoadmapBtn');
         const addFirstButton = document.getElementById('addFirstItemBtn');
-        
+
         if (addButton) {
           addButton.style.backgroundColor = buttonColor;
         }
@@ -182,8 +210,13 @@
           addFirstButton.style.backgroundColor = buttonColor;
         }
 
-        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        document.body.style.backgroundColor = backgroundColor;
+        // Style roadmap columns with custom card background
+        const roadmapColumns = document.querySelectorAll(
+          '.rounded-xl.bg-white'
+        );
+        roadmapColumns.forEach(column => {
+          column.style.backgroundColor = cardBgColor;
+        });
       });
     </script>
   </body>

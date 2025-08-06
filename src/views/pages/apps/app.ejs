@@ -5,7 +5,7 @@
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
-  <body class="bg-background">
+  <body id="pageBody" class="bg-background">
     <% if (isOwner) { %>
     <div class="fixed right-8 bottom-8">
       <a
@@ -56,40 +56,29 @@
             </button>
             <% if (app.enablePublicRoadmap) { %>
             <button
+              id="viewRoadmapBtn"
               onclick="window.location.href = '/apps/<%= app._id %>/roadmap'"
-              class="cursor-pointer rounded-xl border-2 border-white px-6 py-3 text-base text-white transition-all hover:bg-white hover:text-gray-800 active:scale-95">
-              <i class="fas fa-road mr-2"></i>
+              class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
               View Roadmap
             </button>
             <% } %>
           </div>
         </div>
 
-        <!-- Sorting Buttons -->
-        <div class="mb-6 flex justify-center">
-          <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1">
-            <button
-              onclick="window.location.href = '/apps/<%= app._id %>?sort=trending'"
-              class="rounded-md px-4 py-2 text-sm font-medium transition-all <%= currentSort === 'trending' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' %>">
-              Trending
-            </button>
-            <button
-              onclick="window.location.href = '/apps/<%= app._id %>?sort=top'"
-              class="rounded-md px-4 py-2 text-sm font-medium transition-all <%= currentSort === 'top' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' %>">
-              Top
-            </button>
-            <button
-              onclick="window.location.href = '/apps/<%= app._id %>?sort=new'"
-              class="rounded-md px-4 py-2 text-sm font-medium transition-all <%= currentSort === 'new' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' %>">
-              New
-            </button>
-          </div>
-        </div>
-
-        <!-- Recent Suggestions Header -->
-        <div class="mb-6">
-          <h2 class="text-xl font-semibold sm:text-2xl" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor || '#111827' %>">
-            Recent Suggestions
+        <!-- Suggestions Header with Dropdown -->
+        <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-xl font-semibold flex items-center" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor || '#111827' %>">
+            Showing 
+            <select 
+              id="sortDropdown"
+              onchange="changeSorting(this.value)"
+              class="mx-2 px-3 py-1 rounded-md border-b border-gray-300 text-xl font-semibold cursor-pointer focus:outline-none"
+              <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor %>; background-color: <%= app.design?.backgroundColor || '#F3F4F6' %>;">
+              <option value="top" <%= currentSort === 'top' || !currentSort ? 'selected' : '' %>>Top</option>
+              <option value="trending" <%= currentSort === 'trending' ? 'selected' : '' %>>Trending</option>
+              <option value="new" <%= currentSort === 'new' ? 'selected' : '' %>>New</option>
+            </select>
+            suggestions
           </h2>
         </div>
 
@@ -98,38 +87,6 @@
           suggestions.forEach(suggestion => { %>
           <div class="rounded-xl p-4 shadow-sm sm:p-6" <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.suggestionCardBgColor || '#FFFFFF' %>">
             <div class="mb-3 flex flex-wrap items-center gap-2">
-              <!-- Status Badge -->
-              <% 
-                let statusColor = 'bg-yellow-100 text-yellow-800';
-                let statusText = 'Pending';
-                if (suggestion.status === 'in-progress') {
-                  statusColor = 'bg-blue-100 text-blue-800';
-                  statusText = 'In Progress';
-                } else if (suggestion.status === 'completed') {
-                  statusColor = 'bg-green-100 text-green-800';
-                  statusText = 'Completed';
-                } else if (suggestion.status === 'rejected') {
-                  statusColor = 'bg-red-100 text-red-800';
-                  statusText = 'Rejected';
-                }
-              %>
-              <% if (isOwner) { %>
-                <div class="relative">
-                  <select 
-                    onchange="updateSuggestionStatus('<%= suggestion._id %>', this.value)"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer <%= statusColor %> border-none focus:outline-none focus:ring-2 focus:ring-gray-300">
-                    <option value="pending" <%= suggestion.status === 'pending' ? 'selected' : '' %>>Pending</option>
-                    <option value="in-progress" <%= suggestion.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
-                    <option value="completed" <%= suggestion.status === 'completed' ? 'selected' : '' %>>Completed</option>
-                    <option value="rejected" <%= suggestion.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
-                  </select>
-                </div>
-              <% } else { %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= statusColor %>">
-                  <%= statusText %>
-                </span>
-              <% } %>
-              
               <!-- Category Badge -->
               <% if (suggestion.category) { %>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
@@ -183,26 +140,11 @@
                   <button
                     onclick="toggleVote('<%= suggestion._id %>')"
                     id="vote-btn-<%= suggestion._id %>"
-                    class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95 <%= suggestion.hasUserVoted ? 'bg-blue-100 text-blue-600' : '' %>"
-                    <% if (!suggestion.hasUserVoted) { %>
-                      <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.voteButtonBgColor || '#E5E7EB' %>; color: <%= app.design?.voteButtonTextColor || '#374151' %>"
-                    <% } %>>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 sm:h-6 sm:w-6"
-                      fill="<%= suggestion.hasUserVoted ? 'currentColor' : 'none' %>"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 15l7-7 7 7" />
-                    </svg>
+                    class="flex items-center cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95"
+                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveBgColor || '#DBEAFE') : (app.design?.voteButtonBgColor || '#E5E7EB') %>; color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveTextColor || '#2563EB') : (app.design?.voteButtonTextColor || '#374151') %>">
+                    <i class="fas fa-chevron-up text-md"></i>
                     <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>"
-                       <% if (!suggestion.hasUserVoted) { %>
-                         <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.voteButtonTextColor || '#374151' %>"
-                       <% } %>>
+                       <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveTextColor || '#2563EB') : (app.design?.voteButtonTextColor || '#374151') %>">
                       <%= suggestion.voteCount || 0 %>
                     </p>
                   </button>
@@ -224,20 +166,52 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const header = document.getElementById('appHeader');
-        header.style.backgroundColor = headerColor;
-
+        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
         const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const addButton = document.getElementById('addSuggestionBtn');
-        addButton.style.backgroundColor = buttonColor;
+        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
+        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
+        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
 
-        const backgroundColor =
-          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        // Helper function for safe style application
+        const safeApplyStyle = (element, property, value) => {
+          if (element && value) {
+            element.style[property] = value;
+          }
+        };
+
+        // Apply header styles
+        const header = document.getElementById('appHeader');
+        safeApplyStyle(header, 'backgroundColor', headerColor);
+        
+        // Apply header text colors
+        const headerTitle = header ? header.querySelector('h1') : null;
+        const headerDescription = header ? header.querySelector('p') : null;
+        safeApplyStyle(headerTitle, 'color', headerTextColor);
+        safeApplyStyle(headerDescription, 'color', headerTextColor);
+
+        // Apply button styles
+        const addButton = document.getElementById('addSuggestionBtn');
+        safeApplyStyle(addButton, 'backgroundColor', buttonColor);
+        safeApplyStyle(addButton, 'color', buttonTextColor);
+
+        // Style View Roadmap button with same colors
+        const roadmapButton = document.getElementById('viewRoadmapBtn');
+        safeApplyStyle(roadmapButton, 'backgroundColor', buttonColor);
+        safeApplyStyle(roadmapButton, 'color', buttonTextColor);
+
+        // Apply background colors
         const mainElement = document.querySelector('main');
-        if (mainElement) {
-          mainElement.style.backgroundColor = backgroundColor;
-        }
+        safeApplyStyle(mainElement, 'backgroundColor', backgroundColor);
+
+        // Set body background to custom color
+        const bodyElement = document.getElementById('pageBody');
+        safeApplyStyle(bodyElement, 'backgroundColor', backgroundColor);        
       });
+
+      // Dropdown sorting function
+      function changeSorting(sortValue) {
+        window.location.href = '/apps/<%= app._id %>?sort=' + sortValue;
+      }
 
       // Voting functionality
       async function toggleVote(suggestionId) {
@@ -256,15 +230,34 @@
             const voteCount = document.getElementById(`vote-count-${suggestionId}`);
             
             // Update vote count
-            voteCount.textContent = data.voteCount;
+            if (voteCount) {
+              voteCount.textContent = data.voteCount;
+            }
             
-            // Update button appearance
-            if (data.voted) {
-              voteBtn.classList.add('bg-blue-100', 'text-blue-600');
-              voteBtn.querySelector('svg').setAttribute('fill', 'currentColor');
-            } else {
-              voteBtn.classList.remove('bg-blue-100', 'text-blue-600');
-              voteBtn.querySelector('svg').setAttribute('fill', 'none');
+            // Get design colors
+            const voteButtonBgColor = '<%= app.design?.voteButtonBgColor || "#E5E7EB" %>';
+            const voteButtonTextColor = '<%= app.design?.voteButtonTextColor || "#374151" %>';
+            const voteButtonActiveBgColor = '<%= app.design?.voteButtonActiveBgColor || "#DBEAFE" %>';
+            const voteButtonActiveTextColor = '<%= app.design?.voteButtonActiveTextColor || "#2563EB" %>';
+            
+            // Update button appearance with custom colors
+            if (voteBtn) {
+              if (data.voted) {
+                voteBtn.style.backgroundColor = voteButtonActiveBgColor;
+                voteBtn.style.color = voteButtonActiveTextColor;
+              } else {
+                voteBtn.style.backgroundColor = voteButtonBgColor;
+                voteBtn.style.color = voteButtonTextColor;
+              }
+            }
+            
+            // Update vote count color
+            if (voteCount) {
+              if (data.voted) {
+                voteCount.style.color = voteButtonActiveTextColor;
+              } else {
+                voteCount.style.color = voteButtonTextColor;
+              }
             }
           } else {
             alert(data.message || 'Failed to process vote');
@@ -272,31 +265,6 @@
         } catch (error) {
           console.error('Error voting:', error);
           alert('Failed to process vote. Please try again.');
-        }
-      }
-
-      // Update suggestion status function
-      async function updateSuggestionStatus(suggestionId, newStatus) {
-        try {
-          const response = await fetch(`/apps/api/suggestions/${suggestionId}/status`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: newStatus })
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            // Reload the page to reflect status change
-            window.location.reload();
-          } else {
-            alert(data.message || 'Failed to update status');
-          }
-        } catch (error) {
-          console.error('Error updating status:', error);
-          alert('Failed to update status. Please try again.');
         }
       }
     </script>

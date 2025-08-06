@@ -5,7 +5,6 @@ import { requireAuth } from '../middlewares/auth';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
-import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import upload from '../config/multer';
 
 const router = express.Router();
@@ -35,14 +34,6 @@ router.post(
 router.post(
   '/api/suggestions/:suggestionId/vote',
   appController.voteOnSuggestion
-);
-
-// API route for updating suggestion status (authenticated)
-router.put(
-  '/api/suggestions/:suggestionId/status',
-  requireAuth,
-  [validateDto(UpdateStatusDto, 'body')],
-  appController.updateSuggestionStatus
 );
 
 // API routes for logo upload/removal (authenticated)

@@ -14,12 +14,10 @@ export interface IRoadmapItem extends Document {
   suggestion?: ISuggestion; // Optional link back to the original suggestion
   estimatedReleaseDate?: Date;
   actualReleaseDate?: Date;
-  tags?: string[];
   voteCount: number;
   order: number; // For custom ordering within status columns
   createdBy: IUser;
   assignedTo?: IUser;
-  progress?: number; // 0-100 for in-progress items
   changelogNotes?: string; // For completed items
   createdAt: Date;
   updatedAt: Date;
@@ -57,12 +55,10 @@ const RoadmapItemSchema: Schema = new Schema(
     },
     estimatedReleaseDate: { type: Date },
     actualReleaseDate: { type: Date },
-    tags: [{ type: String, maxlength: 50 }],
     voteCount: { type: Number, default: 0 },
     order: { type: Number, default: 0 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: false },
-    progress: { type: Number, min: 0, max: 100, default: 0 },
     changelogNotes: { type: String, maxlength: 1000 },
   },
   { timestamps: true }

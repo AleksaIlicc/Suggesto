@@ -14,7 +14,10 @@ export interface IApplication extends Document {
   }[];
   design: {
     headerColor: string;
+    headerTextColor: string;
     buttonColor: string;
+    buttonTextColor: string;
+    backButtonColor: string;
     backgroundColor: string;
     suggestionsHeaderColor: string;
     suggestionTextColor: string;
@@ -53,7 +56,10 @@ const ApplicationSchema: Schema = new Schema(
     ],
     design: {
       headerColor: { type: String, required: true, default: '#374151' },
+      headerTextColor: { type: String, required: true, default: '#FFFFFF' },
       buttonColor: { type: String, required: true, default: '#111827' },
+      buttonTextColor: { type: String, required: true, default: '#FFFFFF' },
+      backButtonColor: { type: String, required: true, default: '#6B7280' },
       backgroundColor: { type: String, required: true, default: '#F3F4F6' },
       suggestionsHeaderColor: {
         type: String,

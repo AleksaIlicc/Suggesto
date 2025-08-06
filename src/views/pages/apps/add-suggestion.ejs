@@ -5,14 +5,55 @@
     <%- include('../../shared/includes/meta') %> <%-
     include('../../shared/includes/styles') %>
   </head>
-  <body class="bg-background">
-    <main class="mx-auto flex justify-center px-4 py-4 sm:px-28 sm:py-8">
-      <form
-        action="/apps/<%= appId %>/add-suggestion"
-        method="post"
-        enctype="multipart/form-data"
-        class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10">
-        <h2 class="text-center text-2xl">Add suggestion</h2>
+  <body id="pageBody" class="bg-background">
+    <!-- Back Button -->
+    <div class="fixed left-8 top-8">
+      <a
+        href="/apps/<%= appId %>"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md hover:opacity-90 transition-opacity">
+        <i class="fas fa-arrow-left text-gray-dark text-xl"></i>
+      </a>
+    </div>
+
+    <!-- App Header -->
+    <div
+      id="appHeader"
+      class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
+      <div class="flex w-full max-w-xl flex-col justify-center space-y-3">
+        <div class="flex items-center space-x-4">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+            <% if (app.design && app.design.logo) { %>
+            <img
+              src="<%= app.design.logo %>"
+              alt="<%= app.name %>"
+              class="h-full w-full rounded-full object-cover" />
+            <% } else { %>
+            <span class="text-lg font-medium text-black"
+              ><%= app.name.charAt(0) %></span
+            >
+            <% } %>
+          </div>
+          <h1 class="text-lg font-medium text-white sm:text-xl">
+            <%= app.name %>
+          </h1>
+        </div>
+
+        <p class="max-w-2xl text-sm text-gray-100 sm:text-base">
+          Add a new suggestion to improve this application
+        </p>
+      </div>
+    </div>
+
+    <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
+      <div class="w-full max-w-xl">
+        <form
+          action="/apps/<%= appId %>/add-suggestion"
+          method="post"
+          enctype="multipart/form-data"
+          id="suggestionForm"
+          class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10 mx-auto">
+          <h2 id="formTitle" class="text-center text-2xl">Add suggestion</h2>
         <div class="space-y-4">
           <div>
             <label for="title" class="block text-sm font-medium text-gray-700"
@@ -67,17 +108,10 @@
               id="categoryColor"
               name="category[color]"
               value="" />
-            <div class="mt-2 flex items-center space-x-2">
-              <span class="text-xs text-gray-500"
-                >Selected category color:</span
-              >
-              <div
-                id="categoryColorPreview"
-                class="h-4 w-4 rounded-full border border-gray-300"
-                style="background-color: #6b7280"></div>
-            </div>
+            <div class="mb-2 flex items-center space-x-2">
           </div>
-          <div>
+        </div>
+        <div>
             <label class="block text-sm font-medium text-gray-700"
               >Media Files</label
             >
@@ -114,13 +148,14 @@
                 class="text-gray-dark mt-2 hidden text-sm"></p>
             </div>
           </div>
-        </div>
         <button
+          id="submitButton"
           type="submit"
           class="bg-gray-dark hover:bg-gray-light w-full cursor-pointer rounded-xl py-2 text-white transition-colors duration-300 ease-in-out hover:text-white focus:ring-2 focus:ring-black focus:outline-none">
           Add Suggestion
         </button>
       </form>
+      </div>
     </main>
 
     <%- include('../../shared/includes/scripts') %>
@@ -249,13 +284,82 @@
         const color = selectedOption.getAttribute('data-color') || '#6b7280';
 
         document.getElementById('categoryColor').value = color;
-        document.getElementById('categoryColorPreview').style.backgroundColor =
-          color;
       }
 
       // Initialize category color on page load
       document.addEventListener('DOMContentLoaded', function () {
         updateCategoryColor();
+        
+        // Apply custom app design
+        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
+        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
+        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
+        const cardBgColor = '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
+        const textColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
+        
+        // Set header background and text
+        const headerElement = document.getElementById('appHeader');
+        if (headerElement) {
+          headerElement.style.backgroundColor = headerColor;
+          const headerTitle = headerElement.querySelector('h1');
+          const headerDescription = headerElement.querySelector('p');
+          if (headerTitle) headerTitle.style.color = headerTextColor;
+          if (headerDescription) headerDescription.style.color = headerTextColor;
+        }
+        
+        // Apply back button color
+        const backButton = document.querySelector('a[href*="/apps/"]');
+        if (backButton) {
+          backButton.style.color = backButtonColor;
+        }
+        
+        // Set body background
+        const bodyElement = document.getElementById('pageBody');
+        if (bodyElement) {
+          bodyElement.style.backgroundColor = backgroundColor;
+        }
+        
+        // Set main background
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+          mainElement.style.backgroundColor = backgroundColor;
+        }
+        
+        // Set form background
+        const formElement = document.getElementById('suggestionForm');
+        if (formElement) {
+          formElement.style.backgroundColor = cardBgColor;
+        }
+        
+        // Set form title color
+        const titleElement = document.getElementById('formTitle');
+        if (titleElement) {
+          titleElement.style.color = textColor;
+        }
+        
+        // Set label colors
+        const labels = document.querySelectorAll('label');
+        labels.forEach(label => {
+          label.style.color = textColor;
+        });
+        
+        // Set submit button background and text
+        const submitButton = document.getElementById('submitButton');
+        if (submitButton) {
+          submitButton.style.backgroundColor = buttonColor;
+          submitButton.style.color = buttonTextColor;
+        }
+        
+        // Update upload container text colors
+        const uploadText = document.querySelectorAll('#uploadContainer p');
+        uploadText.forEach(text => {
+          if (text.classList.contains('text-gray-700')) {
+            text.style.color = textColor;
+          }
+        });
       });
     </script>
   </body>

@@ -182,7 +182,7 @@
                       <label
                         for="headerColor"
                         class="mb-2 block text-sm font-medium text-gray-700">
-                        Header Color
+                        Header Background Color
                       </label>
                       <div class="flex items-center space-x-3">
                         <input
@@ -206,9 +206,35 @@
 
                     <div>
                       <label
+                        for="headerTextColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Header Text Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="headerTextColor"
+                          name="headerTextColor"
+                          value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="headerTextColorText"
+                          value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('headerText')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Text color for header title and description
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
                         for="buttonColor"
                         class="mb-2 block text-sm font-medium text-gray-700">
-                        Button Color
+                        Button Background Color
                       </label>
                       <div class="flex items-center space-x-3">
                         <input
@@ -226,7 +252,59 @@
                           oninput="updateColorFromText('button')" />
                       </div>
                       <p class="mt-1 text-xs text-gray-500">
-                        Color for buttons and call-to-action elements
+                        Background color for buttons and call-to-action elements
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        for="buttonTextColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Button Text Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="buttonTextColor"
+                          name="buttonTextColor"
+                          value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="buttonTextColorText"
+                          value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('buttonText')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Text color for buttons
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        for="backButtonColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Back Button Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="backButtonColor"
+                          name="backButtonColor"
+                          value="<%= app.design?.backButtonColor || '#6B7280' %>"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="backButtonColorText"
+                          value="<%= app.design?.backButtonColor || '#6B7280' %>"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('backButton')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Color for back/navigation buttons
                       </p>
                     </div>
 
@@ -685,22 +763,21 @@
 
                 <!-- Preview Content -->
                 <div id="previewContent" class="min-h-[600px]">
-                  <!-- Header Section -->
+                  <!-- Header Section (more accurate to app.ejs) -->
                   <div
                     id="previewHeader"
-                    class="flex w-full justify-center p-6 shadow-sm">
-                    <div
-                      class="flex w-full max-w-6xl flex-col justify-center space-y-3">
+                    class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
+                    <div class="flex w-full max-w-xl flex-col justify-center space-y-3">
                       <div class="flex items-center space-x-4">
                         <div
                           id="previewLogoContainer"
-                          class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white">
+                          class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
                           <% if (app.design?.logo) { %>
                           <img
                             id="previewLogoImg"
                             src="<%= app.design.logo %>"
-                            alt="Logo"
-                            class="h-full w-full object-cover" />
+                            alt="<%= app.name %>"
+                            class="h-full w-full rounded-full object-cover" />
                           <% } else { %>
                           <span
                             id="previewIcon"
@@ -709,15 +786,13 @@
                           >
                           <% } %>
                         </div>
-                        <div>
-                          <h1
-                            id="previewTitle"
-                            class="text-xl font-medium text-white sm:text-2xl">
-                            <%= app.name %>
-                          </h1>
-                          <p class="text-sm text-gray-200">by You</p>
-                        </div>
+                        <h1
+                          id="previewTitle"
+                          class="text-lg font-medium text-white sm:text-xl">
+                          <%= app.name %>
+                        </h1>
                       </div>
+
                       <p
                         id="previewDescription"
                         class="max-w-2xl text-sm text-gray-100 sm:text-base">
@@ -726,73 +801,123 @@
                     </div>
                   </div>
 
-                  <!-- Content Section -->
-                  <div class="bg-background px-6 py-6">
-                    <div class="mb-6 w-full">
-                      <button
-                        id="previewButton"
-                        type="button"
-                        class="inline-block cursor-pointer rounded-xl px-6 py-3 text-base font-medium text-white transition-colors"
-                        disabled>
-                        Submit Feature Request
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Sample Suggestions -->
-                  <div class="px-6 py-8">
-                    <h2 id="previewSuggestionsHeader" class="mb-4 text-xl font-semibold" style="color: #111827;">
-                      Recent Suggestions
-                    </h2>
-
-                    <div class="space-y-3">
-                      <div
-                        id="previewSuggestionCard1"
-                        class="rounded-xl border border-gray-100 p-4 shadow-sm transition-all hover:shadow-md"
-                        style="background-color: #F9FAFB;">
-                        <div class="mb-3 flex flex-wrap items-center gap-2">
-                          <span
-                            class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                            Pending
-                          </span>
-                          <span id="previewSuggestionMeta1" class="text-xs" style="color: #6B7280;"
-                            >by Anonymous • Dec 15, 2024</span
-                          >
+                  <!-- Main Content Section -->
+                  <main id="previewMain" class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
+                    <div class="w-full max-w-xl">
+                      <div class="mb-4 w-full sm:mb-8">
+                        <div class="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+                          <button
+                            id="previewAddSuggestionBtn"
+                            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
+                            Add Suggestion
+                          </button>
+                          <button
+                            id="previewViewRoadmapBtn"
+                            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
+                            View Roadmap
+                          </button>
                         </div>
-                        <div
-                          class="flex flex-col space-y-3 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
-                          <div class="flex-1">
-                            <h3
-                              id="previewSuggestionTitle1"
-                              class="mb-2 text-base font-semibold sm:text-lg"
-                              style="color: #374151;">
-                              Add dark mode support
-                            </h3>
-                            <p
-                              id="previewSuggestionText1"
-                              class="mb-3 text-sm leading-relaxed sm:text-base"
-                              style="color: #374151;">
-                              Would love to have a dark theme option for better
-                              user experience during night time usage.
-                            </p>
+                      </div>
+
+                      <!-- Back Button Preview -->
+                      <div class="mb-4">
+                        <button
+                          id="previewBackBtn"
+                          class="flex items-center text-sm transition-colors hover:opacity-80">
+                          <i class="fas fa-arrow-left mr-2"></i>
+                          Back to Add Suggestion
+                        </button>
+                      </div>
+
+                      <!-- Suggestions Header with Dropdown -->
+                      <div class="mb-6 flex items-center justify-between">
+                        <h2 id="previewSuggestionsHeader" class="text-xl font-semibold flex items-center">
+                          Showing 
+                          <select class="mx-2 px-3 py-1 rounded-md border-b border-gray-300 text-xl font-semibold cursor-pointer focus:outline-none">
+                            <option value="top">Top</option>
+                            <option value="trending">Trending</option>
+                            <option value="new">New</option>
+                          </select>
+                          suggestions
+                        </h2>
+                      </div>
+
+                      <!-- Sample Suggestions -->
+                      <div class="w-full space-y-4">
+                        <div id="previewSuggestionCard1" class="rounded-xl p-4 shadow-sm sm:p-6">
+                          <div class="mb-3 flex flex-wrap items-center gap-2">
+                            <!-- Category Badge -->
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-blue-500">
+                              Feature
+                            </span>
+                            
+                            <span id="previewSuggestionMeta1" class="text-xs">
+                              by John Doe • Dec 15, 2024
+                            </span>
                           </div>
-                          <div class="flex flex-col items-end space-y-2">
-                            <div class="flex items-center space-x-2">
-                              <span id="previewVoteCount1" class="text-sm" style="color: #6B7280;"
-                                >23 votes</span
-                              >
-                              <button
-                                id="previewVoteButton1"
-                                class="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
-                                style="background-color: #E5E7EB; color: #374151;">
-                                ↑
-                              </button>
+                          
+                          <div class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
+                            <div class="flex-1">
+                              <h3 id="previewSuggestionTitle1" class="text-base font-medium sm:text-lg mb-2">
+                                Add dark mode support
+                              </h3>
+                              <p id="previewSuggestionText1" class="text-sm sm:text-base mb-3">
+                                Would love to have a dark theme option for better user experience during night time usage.
+                              </p>
+                            </div>
+                            
+                            <div class="flex items-center justify-end space-x-3">
+                              <!-- Vote Button -->
+                              <div class="flex items-center space-x-2">
+                                <button id="previewVoteButton1" class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                  </svg>
+                                  <p id="previewVoteCount1" class="text-sm font-medium sm:text-base">23</p>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div id="previewSuggestionCard2" class="rounded-xl p-4 shadow-sm sm:p-6">
+                          <div class="mb-3 flex flex-wrap items-center gap-2">
+                            <!-- Category Badge -->
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-green-500">
+                              Improvement
+                            </span>
+                            
+                            <span id="previewSuggestionMeta2" class="text-xs">
+                              by Jane Smith • Dec 14, 2024
+                            </span>
+                          </div>
+                          
+                          <div class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
+                            <div class="flex-1">
+                              <h3 id="previewSuggestionTitle2" class="text-base font-medium sm:text-lg mb-2">
+                                Improve mobile responsiveness
+                              </h3>
+                              <p id="previewSuggestionText2" class="text-sm sm:text-base mb-3">
+                                The current mobile layout could be optimized for better touch interactions and readability.
+                              </p>
+                            </div>
+                            
+                            <div class="flex items-center justify-end space-x-3">
+                              <!-- Vote Button -->
+                              <div class="flex items-center space-x-2">
+                                <button id="previewVoteButton2" class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                  </svg>
+                                  <p id="previewVoteCount2" class="text-sm font-medium sm:text-base">15</p>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </main>
                 </div>
               </div>
             </div>
@@ -807,87 +932,196 @@
       // Initialize preview on page load
       document.addEventListener('DOMContentLoaded', function () {
         // Set initial colors from server-side values
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const backgroundColor =
-          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor || "#111827" %>';
-        const suggestionTextColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
-        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor || "#F9FAFB" %>';
-        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor || "#E5E7EB" %>';
-        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor || "#374151" %>';
-        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor || "#6B7280" %>';
+        const headerColor = '<%= app.design?.headerColor %>';
+        const headerTextColor = '<%= app.design?.headerTextColor %>';
+        const buttonColor = '<%= app.design?.buttonColor %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor %>';
+        const backButtonColor = '<%= app.design?.backButtonColor %>';
+        const backgroundColor = '<%= app.design?.backgroundColor %>';
+        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor %>';
+        const suggestionTextColor = '<%= app.design?.suggestionTextColor %>';
+        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor %>';
+        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor %>';
+        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor %>';
+        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor %>';
 
-        // Apply initial styles
-        document.getElementById('previewHeader').style.backgroundColor =
-          headerColor;
-        document.getElementById('previewButton').style.backgroundColor =
-          buttonColor;
+        // Helper function for safe style application
+        const safeApplyStyle = (id, property, value) => {
+          const element = document.getElementById(id);
+          if (element && value) {
+            element.style[property] = value;
+          }
+        };
+
+        // Apply initial styles safely
+        safeApplyStyle('previewHeader', 'backgroundColor', headerColor);
+        
+        // Apply header text colors
+        safeApplyStyle('previewTitle', 'color', headerTextColor);
+        safeApplyStyle('previewDescription', 'color', headerTextColor);
+        
+        // Apply button colors
+        safeApplyStyle('previewAddSuggestionBtn', 'backgroundColor', buttonColor);
+        safeApplyStyle('previewAddSuggestionBtn', 'color', buttonTextColor);
+        safeApplyStyle('previewViewRoadmapBtn', 'backgroundColor', buttonColor);
+        safeApplyStyle('previewViewRoadmapBtn', 'color', buttonTextColor);
+        
+        // Apply back button color
+        safeApplyStyle('previewBackBtn', 'color', backButtonColor);
+        
+        // Apply main background
+        safeApplyStyle('previewMain', 'backgroundColor', backgroundColor);
         
         // Apply suggestions colors
-        document.getElementById('previewSuggestionsHeader').style.color = suggestionsHeaderColor;
-        document.getElementById('previewSuggestionCard1').style.backgroundColor = suggestionCardBgColor;
-        document.getElementById('previewSuggestionTitle1').style.color = suggestionTextColor;
-        document.getElementById('previewSuggestionText1').style.color = suggestionTextColor;
-        document.getElementById('previewVoteButton1').style.backgroundColor = voteButtonBgColor;
-        document.getElementById('previewVoteButton1').style.color = voteButtonTextColor;
-        document.getElementById('previewSuggestionMeta1').style.color = suggestionMetaColor;
-        document.getElementById('previewVoteCount1').style.color = suggestionMetaColor;
+        safeApplyStyle('previewSuggestionsHeader', 'color', suggestionsHeaderColor);
+        
+        // Apply suggestion cards
+        safeApplyStyle('previewSuggestionCard1', 'backgroundColor', suggestionCardBgColor);
+        safeApplyStyle('previewSuggestionCard2', 'backgroundColor', suggestionCardBgColor);
+        
+        // Apply suggestion text colors
+        safeApplyStyle('previewSuggestionTitle1', 'color', suggestionTextColor);
+        safeApplyStyle('previewSuggestionText1', 'color', suggestionTextColor);
+        safeApplyStyle('previewSuggestionTitle2', 'color', suggestionTextColor);
+        safeApplyStyle('previewSuggestionText2', 'color', suggestionTextColor);
+        
+        // Apply vote buttons
+        safeApplyStyle('previewVoteButton1', 'backgroundColor', voteButtonBgColor);
+        safeApplyStyle('previewVoteButton1', 'color', voteButtonTextColor);
+        safeApplyStyle('previewVoteButton2', 'backgroundColor', voteButtonBgColor);
+        safeApplyStyle('previewVoteButton2', 'color', voteButtonTextColor);
 
-        // Update background colors (only in preview area)
-        const contentSections = document.querySelectorAll(
-          '#previewContent .bg-background'
-        );
-        contentSections.forEach(section => {
-          section.style.backgroundColor = backgroundColor;
-        });
+        // Apply meta text colors
+        safeApplyStyle('previewSuggestionMeta1', 'color', suggestionMetaColor);
+        safeApplyStyle('previewSuggestionMeta2', 'color', suggestionMetaColor);
+        safeApplyStyle('previewVoteCount1', 'color', voteButtonTextColor);
+        safeApplyStyle('previewVoteCount2', 'color', voteButtonTextColor);
 
         updatePreview();
       });
 
-      function updatePreview() {
-        const name = document.getElementById('name').value || '<%= app.name %>';
-        const description =
-          document.getElementById('description').value ||
-          '<%= app.description %>';
-        const headerColor = document.getElementById('headerColor').value;
-        const buttonColor = document.getElementById('buttonColor').value;
-        const backgroundColor =
-          document.getElementById('backgroundColor').value;
-        
-        // Get new suggestion colors
-        const suggestionsHeaderColor = document.getElementById('suggestionsHeaderColor').value;
-        const suggestionTextColor = document.getElementById('suggestionTextColor').value;
-        const suggestionCardBgColor = document.getElementById('suggestionCardBgColor').value;
-        const voteButtonBgColor = document.getElementById('voteButtonBgColor').value;
-        const voteButtonTextColor = document.getElementById('voteButtonTextColor').value;
-        const suggestionMetaColor = document.getElementById('suggestionMetaColor').value;
+      function updateColorFromText(type) {
+        const textInput = document.getElementById(type + 'ColorText');
+        const colorInput = document.getElementById(type + 'Color');
 
-        // Update preview elements
-        document.getElementById('previewTitle').textContent = name;
-        document.getElementById('previewDescription').textContent = description;
-        document.getElementById('previewHeader').style.backgroundColor =
-          headerColor;
-        document.getElementById('previewButton').style.backgroundColor =
-          buttonColor;
+        // Validate hex color format
+        if (/^#[0-9A-F]{6}$/i.test(textInput.value)) {
+          colorInput.value = textInput.value;
+          updatePreview();
+        }
+      }
+
+      function updatePreview() {
+        // Safely get form values
+        const nameEl = document.getElementById('name');
+        const descEl = document.getElementById('description');
+        const headerColorEl = document.getElementById('headerColor');
+        const headerTextColorEl = document.getElementById('headerTextColor');
+        const buttonColorEl = document.getElementById('buttonColor');
+        const buttonTextColorEl = document.getElementById('buttonTextColor');
+        const backButtonColorEl = document.getElementById('backButtonColor');
+        const backgroundColorEl = document.getElementById('backgroundColor');
+        const suggestionsHeaderColorEl = document.getElementById('suggestionsHeaderColor');
+        const suggestionTextColorEl = document.getElementById('suggestionTextColor');
+        const suggestionCardBgColorEl = document.getElementById('suggestionCardBgColor');
+        const voteButtonBgColorEl = document.getElementById('voteButtonBgColor');
+        const voteButtonTextColorEl = document.getElementById('voteButtonTextColor');
+        const suggestionMetaColorEl = document.getElementById('suggestionMetaColor');
+
+        const name = nameEl ? nameEl.value || '<%= app.name %>' : '<%= app.name %>';
+        const description = descEl ? descEl.value || '<%= app.description %>' : '<%= app.description %>';
+        const headerColor = headerColorEl ? headerColorEl.value : '';
+        const headerTextColor = headerTextColorEl ? headerTextColorEl.value : '';
+        const buttonColor = buttonColorEl ? buttonColorEl.value : '';
+        const buttonTextColor = buttonTextColorEl ? buttonTextColorEl.value : '';
+        const backButtonColor = backButtonColorEl ? backButtonColorEl.value : '';
+        const backgroundColor = backgroundColorEl ? backgroundColorEl.value : '';
+        const suggestionsHeaderColor = suggestionsHeaderColorEl ? suggestionsHeaderColorEl.value : '';
+        const suggestionTextColor = suggestionTextColorEl ? suggestionTextColorEl.value : '';
+        const suggestionCardBgColor = suggestionCardBgColorEl ? suggestionCardBgColorEl.value : '';
+        const voteButtonBgColor = voteButtonBgColorEl ? voteButtonBgColorEl.value : '';
+        const voteButtonTextColor = voteButtonTextColorEl ? voteButtonTextColorEl.value : '';
+        const suggestionMetaColor = suggestionMetaColorEl ? suggestionMetaColorEl.value : '';
+
+        // Update preview elements safely
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDescription = document.getElementById('previewDescription');
+        const previewHeader = document.getElementById('previewHeader');
+        
+        if (previewTitle) previewTitle.textContent = name;
+        if (previewDescription) previewDescription.textContent = description;
+        if (previewHeader) {
+          previewHeader.style.backgroundColor = headerColor;
+        }
+
+        // Update header text colors
+        if (previewTitle) previewTitle.style.color = headerTextColor;
+        if (previewDescription) previewDescription.style.color = headerTextColor;
+
+        // Update buttons safely
+        const previewAddSuggestionBtn = document.getElementById('previewAddSuggestionBtn');
+        const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
+        
+        if (previewAddSuggestionBtn) {
+          previewAddSuggestionBtn.style.backgroundColor = buttonColor;
+          previewAddSuggestionBtn.style.color = buttonTextColor;
+        }
+        if (previewViewRoadmapBtn) {
+          previewViewRoadmapBtn.style.backgroundColor = buttonColor;
+          previewViewRoadmapBtn.style.color = buttonTextColor;
+        }
+
+        // Update back button
+        const previewBackBtn = document.getElementById('previewBackBtn');
+        if (previewBackBtn) previewBackBtn.style.color = backButtonColor;
+
+        // Update main background
+        const previewMain = document.getElementById('previewMain');
+        if (previewMain) previewMain.style.backgroundColor = backgroundColor;
 
         // Update suggestions section colors
-        document.getElementById('previewSuggestionsHeader').style.color = suggestionsHeaderColor;
+        const previewSuggestionsHeader = document.getElementById('previewSuggestionsHeader');
+        if (previewSuggestionsHeader) previewSuggestionsHeader.style.color = suggestionsHeaderColor;
         
         // Update suggestion cards
-        document.getElementById('previewSuggestionCard1').style.backgroundColor = suggestionCardBgColor;
+        const previewSuggestionCard1 = document.getElementById('previewSuggestionCard1');
+        const previewSuggestionCard2 = document.getElementById('previewSuggestionCard2');
+        if (previewSuggestionCard1) previewSuggestionCard1.style.backgroundColor = suggestionCardBgColor;
+        if (previewSuggestionCard2) previewSuggestionCard2.style.backgroundColor = suggestionCardBgColor;
         
         // Update suggestion text colors
-        document.getElementById('previewSuggestionTitle1').style.color = suggestionTextColor;
-        document.getElementById('previewSuggestionText1').style.color = suggestionTextColor;
+        const previewSuggestionTitle1 = document.getElementById('previewSuggestionTitle1');
+        const previewSuggestionText1 = document.getElementById('previewSuggestionText1');
+        const previewSuggestionTitle2 = document.getElementById('previewSuggestionTitle2');
+        const previewSuggestionText2 = document.getElementById('previewSuggestionText2');
+        
+        if (previewSuggestionTitle1) previewSuggestionTitle1.style.color = suggestionTextColor;
+        if (previewSuggestionText1) previewSuggestionText1.style.color = suggestionTextColor;
+        if (previewSuggestionTitle2) previewSuggestionTitle2.style.color = suggestionTextColor;
+        if (previewSuggestionText2) previewSuggestionText2.style.color = suggestionTextColor;
         
         // Update vote buttons
-        document.getElementById('previewVoteButton1').style.backgroundColor = voteButtonBgColor;
-        document.getElementById('previewVoteButton1').style.color = voteButtonTextColor;
+        const previewVoteButton1 = document.getElementById('previewVoteButton1');
+        const previewVoteButton2 = document.getElementById('previewVoteButton2');
+        if (previewVoteButton1) {
+          previewVoteButton1.style.backgroundColor = voteButtonBgColor;
+          previewVoteButton1.style.color = voteButtonTextColor;
+        }
+        if (previewVoteButton2) {
+          previewVoteButton2.style.backgroundColor = voteButtonBgColor;
+          previewVoteButton2.style.color = voteButtonTextColor;
+        }
 
         // Update meta text colors
-        document.getElementById('previewSuggestionMeta1').style.color = suggestionMetaColor;
-        document.getElementById('previewVoteCount1').style.color = suggestionMetaColor;
+        const previewSuggestionMeta1 = document.getElementById('previewSuggestionMeta1');
+        const previewSuggestionMeta2 = document.getElementById('previewSuggestionMeta2');
+        const previewVoteCount1 = document.getElementById('previewVoteCount1');
+        const previewVoteCount2 = document.getElementById('previewVoteCount2');
+        
+        if (previewSuggestionMeta1) previewSuggestionMeta1.style.color = suggestionMetaColor;
+        if (previewSuggestionMeta2) previewSuggestionMeta2.style.color = suggestionMetaColor;
+        if (previewVoteCount1) previewVoteCount1.style.color = voteButtonTextColor;
+        if (previewVoteCount2) previewVoteCount2.style.color = voteButtonTextColor;
 
         // Update background colors (only in preview area)
         const contentSections = document.querySelectorAll(
@@ -906,21 +1140,31 @@
           }
         }
 
-        // Update color text inputs
-        document.getElementById('headerColorText').value = headerColor;
-        document.getElementById('buttonColorText').value = buttonColor;
-        document.getElementById('backgroundColorText').value = backgroundColor;
-        document.getElementById('suggestionsHeaderColorText').value = suggestionsHeaderColor;
-        document.getElementById('suggestionTextColorText').value = suggestionTextColor;
-        document.getElementById('suggestionCardBgColorText').value = suggestionCardBgColor;
-        document.getElementById('voteButtonBgColorText').value = voteButtonBgColor;
-        document.getElementById('voteButtonTextColorText').value = voteButtonTextColor;
-        document.getElementById('suggestionMetaColorText').value = suggestionMetaColor;
+        // Update color text inputs safely
+        const safeUpdateTextInput = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.value = value;
+        };
+
+        safeUpdateTextInput('headerColorText', headerColor);
+        safeUpdateTextInput('headerTextColorText', headerTextColor);
+        safeUpdateTextInput('buttonColorText', buttonColor);
+        safeUpdateTextInput('buttonTextColorText', buttonTextColor);
+        safeUpdateTextInput('backButtonColorText', backButtonColor);
+        safeUpdateTextInput('backgroundColorText', backgroundColor);
+        safeUpdateTextInput('suggestionsHeaderColorText', suggestionsHeaderColor);
+        safeUpdateTextInput('suggestionTextColorText', suggestionTextColor);
+        safeUpdateTextInput('suggestionCardBgColorText', suggestionCardBgColor);
+        safeUpdateTextInput('voteButtonBgColorText', voteButtonBgColor);
+        safeUpdateTextInput('voteButtonTextColorText', voteButtonTextColor);
+        safeUpdateTextInput('suggestionMetaColorText', suggestionMetaColor);
       }
 
       function updateColorFromText(type) {
         const textInput = document.getElementById(type + 'ColorText');
         const colorInput = document.getElementById(type + 'Color');
+
+        if (!textInput || !colorInput) return;
 
         // Validate hex color format
         if (/^#[0-9A-F]{6}$/i.test(textInput.value)) {
@@ -934,45 +1178,55 @@
         buttonColor,
         backgroundColor = '#F3F4F6'
       ) {
-        document.getElementById('headerColor').value = headerColor;
-        document.getElementById('buttonColor').value = buttonColor;
-        document.getElementById('backgroundColor').value = backgroundColor;
-        document.getElementById('headerColorText').value = headerColor;
-        document.getElementById('buttonColorText').value = buttonColor;
-        document.getElementById('backgroundColorText').value = backgroundColor;
+        const safeSetValue = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.value = value;
+        };
+
+        safeSetValue('headerColor', headerColor);
+        safeSetValue('buttonColor', buttonColor);
+        safeSetValue('backgroundColor', backgroundColor);
+        safeSetValue('headerColorText', headerColor);
+        safeSetValue('buttonColorText', buttonColor);
+        safeSetValue('backgroundColorText', backgroundColor);
         updatePreview();
       }
 
       function applyFullTheme(
         headerColor,
         buttonColor,
-        backgroundColor = '#F3F4F6',
-        suggestionsHeaderColor = '#111827',
-        suggestionTextColor = '#374151',
-        suggestionCardBgColor = '#F9FAFB',
-        voteButtonBgColor = '#E5E7EB',
-        voteButtonTextColor = '#374151',
-        suggestionMetaColor = '#6B7280'
+        backgroundColor,
+        suggestionsHeaderColor,
+        suggestionTextColor,
+        suggestionCardBgColor,
+        voteButtonBgColor,
+        voteButtonTextColor,
+        suggestionMetaColor
       ) {
-        document.getElementById('headerColor').value = headerColor;
-        document.getElementById('buttonColor').value = buttonColor;
-        document.getElementById('backgroundColor').value = backgroundColor;
-        document.getElementById('suggestionsHeaderColor').value = suggestionsHeaderColor;
-        document.getElementById('suggestionTextColor').value = suggestionTextColor;
-        document.getElementById('suggestionCardBgColor').value = suggestionCardBgColor;
-        document.getElementById('voteButtonBgColor').value = voteButtonBgColor;
-        document.getElementById('voteButtonTextColor').value = voteButtonTextColor;
-        document.getElementById('suggestionMetaColor').value = suggestionMetaColor;
+        const safeSetValue = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.value = value;
+        };
+
+        safeSetValue('headerColor', headerColor);
+        safeSetValue('buttonColor', buttonColor);
+        safeSetValue('backgroundColor', backgroundColor);
+        safeSetValue('suggestionsHeaderColor', suggestionsHeaderColor);
+        safeSetValue('suggestionTextColor', suggestionTextColor);
+        safeSetValue('suggestionCardBgColor', suggestionCardBgColor);
+        safeSetValue('voteButtonBgColor', voteButtonBgColor);
+        safeSetValue('voteButtonTextColor', voteButtonTextColor);
+        safeSetValue('suggestionMetaColor', suggestionMetaColor);
         
-        document.getElementById('headerColorText').value = headerColor;
-        document.getElementById('buttonColorText').value = buttonColor;
-        document.getElementById('backgroundColorText').value = backgroundColor;
-        document.getElementById('suggestionsHeaderColorText').value = suggestionsHeaderColor;
-        document.getElementById('suggestionTextColorText').value = suggestionTextColor;
-        document.getElementById('suggestionCardBgColorText').value = suggestionCardBgColor;
-        document.getElementById('voteButtonBgColorText').value = voteButtonBgColor;
-        document.getElementById('voteButtonTextColorText').value = voteButtonTextColor;
-        document.getElementById('suggestionMetaColorText').value = suggestionMetaColor;
+        safeSetValue('headerColorText', headerColor);
+        safeSetValue('buttonColorText', buttonColor);
+        safeSetValue('backgroundColorText', backgroundColor);
+        safeSetValue('suggestionsHeaderColorText', suggestionsHeaderColor);
+        safeSetValue('suggestionTextColorText', suggestionTextColor);
+        safeSetValue('suggestionCardBgColorText', suggestionCardBgColor);
+        safeSetValue('voteButtonBgColorText', voteButtonBgColor);
+        safeSetValue('voteButtonTextColorText', voteButtonTextColor);
+        safeSetValue('suggestionMetaColorText', suggestionMetaColor);
         
         updatePreview();
       }

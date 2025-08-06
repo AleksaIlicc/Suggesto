@@ -156,7 +156,7 @@
                       <label
                         for="headerColor"
                         class="mb-2 block text-sm font-medium text-gray-700">
-                        Header Color
+                        Header Background Color
                       </label>
                       <div class="flex items-center space-x-3">
                         <input
@@ -180,9 +180,35 @@
 
                     <div>
                       <label
+                        for="headerTextColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Header Text Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="headerTextColor"
+                          name="headerTextColor"
+                          value="#FFFFFF"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="headerTextColorText"
+                          value="#FFFFFF"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('headerText')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Text color for header title and description
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
                         for="buttonColor"
                         class="mb-2 block text-sm font-medium text-gray-700">
-                        Button Color
+                        Button Background Color
                       </label>
                       <div class="flex items-center space-x-3">
                         <input
@@ -198,6 +224,63 @@
                           value="#111827"
                           class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                           oninput="updateColorFromText('button')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Background color for buttons and call-to-action elements
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        for="buttonTextColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Button Text Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="buttonTextColor"
+                          name="buttonTextColor"
+                          value="#FFFFFF"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="buttonTextColorText"
+                          value="#FFFFFF"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('buttonText')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Text color for buttons
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        for="backButtonColor"
+                        class="mb-2 block text-sm font-medium text-gray-700">
+                        Back Button Color
+                      </label>
+                      <div class="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          id="backButtonColor"
+                          name="backButtonColor"
+                          value="#6B7280"
+                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                          onchange="updatePreview()" />
+                        <input
+                          type="text"
+                          id="backButtonColorText"
+                          value="#6B7280"
+                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                          oninput="updateColorFromText('backButton')" />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Color for back/navigation buttons
+                      </p>
+                    </div>
                       </div>
                       <p class="mt-1 text-xs text-gray-500">
                         Color for buttons and call-to-action elements

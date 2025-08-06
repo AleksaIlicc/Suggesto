@@ -7,7 +7,6 @@ export interface ISuggestion extends Document {
   title: string;
   description: string;
   category?: { name: string; color: string };
-  status: 'pending' | 'in-progress' | 'completed' | 'rejected';
   comments?: { user: IUser; text: string; createdAt: Date }[];
   voteCount: number;
   files?: {
@@ -30,11 +29,6 @@ const SuggestionSchema: Schema = new Schema(
     category: {
       name: { type: String },
       color: { type: String },
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'in-progress', 'completed', 'rejected'],
-      default: 'pending',
     },
     comments: [
       {

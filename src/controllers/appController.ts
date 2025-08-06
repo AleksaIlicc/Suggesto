@@ -4,7 +4,6 @@ import { IUser } from '../models/User';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
-import { UpdateStatusDto } from '../dtos/app/update-status.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
 import {
@@ -158,7 +157,10 @@ const postAddApp = async (
       description: req.body.description,
       design: {
         headerColor: req.body.headerColor,
+        headerTextColor: req.body.headerTextColor,
         buttonColor: req.body.buttonColor,
+        buttonTextColor: req.body.buttonTextColor,
+        backButtonColor: req.body.backButtonColor,
         backgroundColor: req.body.backgroundColor,
         suggestionsHeaderColor: req.body.suggestionsHeaderColor,
         suggestionTextColor: req.body.suggestionTextColor,
@@ -295,7 +297,6 @@ const postAddSuggestion = async (
       title: req.body.title,
       description: req.body.description,
       category: selectedCategory,
-      status: 'pending',
       applicationId: req.params.id,
       userId: user ? user._id : null, // Support anonymous submissions
       files: processedFiles,
@@ -378,7 +379,10 @@ const putEditApp = async (
     app.description = req.body.description;
     app.design = {
       headerColor: req.body.headerColor,
+      headerTextColor: req.body.headerTextColor,
       buttonColor: req.body.buttonColor,
+      buttonTextColor: req.body.buttonTextColor,
+      backButtonColor: req.body.backButtonColor,
       backgroundColor: req.body.backgroundColor,
       suggestionsHeaderColor: req.body.suggestionsHeaderColor,
       suggestionTextColor: req.body.suggestionTextColor,
@@ -796,60 +800,6 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const updateSuggestionStatus = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const user = req.user as IUser;
-    const { suggestionId } = req.params;
-    const { status } = req.body as UpdateStatusDto;
-
-    // Find the suggestion and populate the application to check ownership
-    const suggestion = await Suggestion.findById(suggestionId).populate({
-      path: 'applicationId',
-      populate: {
-        path: 'user',
-      },
-    });
-
-    if (!suggestion) {
-      res.status(404).json({ success: false, message: 'Suggestion not found' });
-      return;
-    }
-
-    // Check if user owns the application
-    const app = suggestion.applicationId as any;
-    if (!user || user._id.toString() !== app.user._id.toString()) {
-      res.status(403).json({ success: false, message: 'Unauthorized' });
-      return;
-    }
-
-    // Update only the status field directly in database
-    const updatedSuggestion = await Suggestion.findByIdAndUpdate(
-      suggestionId,
-      {
-        status: status as 'pending' | 'in-progress' | 'completed' | 'rejected',
-      },
-      { new: true, runValidators: false } // Skip validation to avoid category issues
-    );
-
-    if (!updatedSuggestion) {
-      res
-        .status(404)
-        .json({ success: false, message: 'Failed to update suggestion' });
-      return;
-    }
-
-    res.json({ success: true, message: 'Status updated successfully', status });
-  } catch (error) {
-    console.error('Error updating suggestion status:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Failed to update status' });
-  }
-};
-
 export default {
   getApp,
   getApps,
@@ -863,5 +813,4 @@ export default {
   voteOnSuggestion,
   uploadLogo,
   removeLogo,
-  updateSuggestionStatus,
 };
