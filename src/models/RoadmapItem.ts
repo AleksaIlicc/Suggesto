@@ -9,8 +9,8 @@ export interface IRoadmapItem extends Document {
   title: string;
   description: string;
   status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
-  priority: 'low' | 'medium' | 'high';
-  type: 'feature' | 'improvement' | 'bug-fix' | 'announcement';
+  priority?: 'low' | 'medium' | 'high';
+  type?: 'feature' | 'improvement' | 'bug-fix' | 'announcement';
   suggestion?: ISuggestion; // Optional link back to the original suggestion
   estimatedReleaseDate?: Date;
   actualReleaseDate?: Date;

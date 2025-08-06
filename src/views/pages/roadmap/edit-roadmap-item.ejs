@@ -21,9 +21,11 @@
               Back to Roadmap
             </a>
           </div>
-          <h1 class="text-gray-dark mb-2 text-3xl font-bold">Edit Roadmap Item</h1>
+          <h1 class="text-gray-dark mb-2 text-3xl font-bold">
+            Edit Roadmap Item
+          </h1>
           <p class="text-base text-gray-600">
-            Update details for this roadmap item.
+            Update details for <%= app.name %>'s roadmap item.
           </p>
         </div>
 
@@ -31,144 +33,241 @@
           <h2 class="mb-6 text-xl font-semibold text-gray-900">
             Roadmap Item Details
           </h2>
+          <form
+            method="POST"
+            action="/apps/<%= app._id %>/roadmap/<%= item._id %>/edit"
+            class="space-y-6">
+            <!-- Basic Information -->
+            <div class="space-y-4">
+              <h3
+                class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
+                Basic Information
+              </h3>
+              <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="lg:col-span-2">
+                  <label
+                    for="title"
+                    class="block text-sm font-medium text-gray-700">
+                    Title <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                    maxlength="200"
+                    value="<%= item.title %>"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                    placeholder="Enter roadmap item title" />
+                </div>
 
-        <form
-          method="POST"
-          action="/apps/<%= app._id %>/roadmap/<%= item._id %>/edit"
-          class="space-y-6">
-          <!-- Basic Information -->
-          <div class="space-y-4">
-            <h3 class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
-              Basic Information
-            </h3>
-          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div class="lg:col-span-2">
-              <label
-                for="title"
-                class="block text-sm font-medium text-gray-700">
-                Title <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                required
-                maxlength="200"
-                value="<%= item.title %>"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                placeholder="Enter roadmap item title" />
+                <div class="lg:col-span-2">
+                  <label
+                    for="description"
+                    class="block text-sm font-medium text-gray-700">
+                    Description <span class="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    required
+                    maxlength="2000"
+                    rows="4"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                    placeholder="Describe what this roadmap item involves...">
+<%= item.description %></textarea
+                  >
+                </div>
+              </div>
             </div>
 
-            <div class="lg:col-span-2">
-              <label
-                for="description"
-                class="block text-sm font-medium text-gray-700">
-                Description <span class="text-red-500">*</span>
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                required
-                maxlength="2000"
-                rows="4"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                placeholder="Describe what this roadmap item involves..."><%= item.description %></textarea>
+            <!-- Settings -->
+            <div class="space-y-4">
+              <h3
+                class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
+                Item Settings
+                <span class="text-sm font-normal text-gray-500"
+                  >(Status is required)</span
+                >
+              </h3>
+              <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div>
+                  <label
+                    for="status"
+                    class="block text-sm font-medium text-gray-700">
+                    Status <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    required
+                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
+                    <% if (item.status === 'planned') { %>
+                    <option value="planned" selected>Planned</option>
+                    <% } else { %>
+                    <option value="planned">Planned</option>
+                    <% } %> <% if (item.status === 'in-progress') { %>
+                    <option value="in-progress" selected>In Progress</option>
+                    <% } else { %>
+                    <option value="in-progress">In Progress</option>
+                    <% } %> <% if (item.status === 'completed') { %>
+                    <option value="completed" selected>Completed</option>
+                    <% } else { %>
+                    <option value="completed">Completed</option>
+                    <% } %> <% if (item.status === 'cancelled') { %>
+                    <option value="cancelled" selected>Cancelled</option>
+                    <% } else { %>
+                    <option value="cancelled">Cancelled</option>
+                    <% } %>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="priority"
+                    class="block text-sm font-medium text-gray-700">
+                    Priority
+                  </label>
+                  <select
+                    id="priority"
+                    name="priority"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
+                    <% if (!item.priority) { %>
+                    <option value="" selected>
+                      Choose priority (optional)
+                    </option>
+                    <% } else { %>
+                    <option value="">Choose priority (optional)</option>
+                    <% } %> <% if (item.priority === 'low') { %>
+                    <option value="low" selected>Low</option>
+                    <% } else { %>
+                    <option value="low">Low</option>
+                    <% } %> <% if (item.priority === 'medium') { %>
+                    <option value="medium" selected>Medium</option>
+                    <% } else { %>
+                    <option value="medium">Medium</option>
+                    <% } %> <% if (item.priority === 'high') { %>
+                    <option value="high" selected>High</option>
+                    <% } else { %>
+                    <option value="high">High</option>
+                    <% } %>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="type"
+                    class="block text-sm font-medium text-gray-700">
+                    Type
+                  </label>
+                  <select
+                    id="type"
+                    name="type"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
+                    <% if (!item.type) { %>
+                    <option value="" selected>Choose type (optional)</option>
+                    <% } else { %>
+                    <option value="">Choose type (optional)</option>
+                    <% } %> <% if (item.type === 'feature') { %>
+                    <option value="feature" selected>Feature</option>
+                    <% } else { %>
+                    <option value="feature">Feature</option>
+                    <% } %> <% if (item.type === 'improvement') { %>
+                    <option value="improvement" selected>Improvement</option>
+                    <% } else { %>
+                    <option value="improvement">Improvement</option>
+                    <% } %> <% if (item.type === 'bug-fix') { %>
+                    <option value="bug-fix" selected>Bug Fix</option>
+                    <% } else { %>
+                    <option value="bug-fix">Bug Fix</option>
+                    <% } %> <% if (item.type === 'announcement') { %>
+                    <option value="announcement" selected>Announcement</option>
+                    <% } else { %>
+                    <option value="announcement">Announcement</option>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-          </div>
 
-          <!-- Settings -->
-          <div class="space-y-4">
-            <h3 class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
-              Item Settings
-            </h3>
-          <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div>
-              <label
-                for="status"
-                class="block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
-                <option value="planned" <%= item.status === 'planned' ? 'selected' : '' %>>Planned</option>
-                <option value="in-progress" <%= item.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
-                <option value="completed" <%= item.status === 'completed' ? 'selected' : '' %>>Completed</option>
-                <option value="cancelled" <%= item.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
-              </select>
+            <!-- Additional Details -->
+            <div class="space-y-4">
+              <h3
+                class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
+                Additional Details
+              </h3>
+
+              <!-- Suggestion Link -->
+              <div>
+                <label
+                  for="suggestion"
+                  class="block text-sm font-medium text-gray-700">
+                  Link to Suggestion (Optional)
+                </label>
+                <select
+                  id="suggestion"
+                  name="suggestion"
+                  class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
+                  <% if (!item.suggestion) { %>
+                  <option value="" selected>No linked suggestion</option>
+                  <% } else { %>
+                  <option value="">No linked suggestion</option>
+                  <% } %> <% suggestions.forEach(suggestion => { %> <% if
+                  (item.suggestion && item.suggestion._id &&
+                  item.suggestion._id.toString() === suggestion._id.toString())
+                  { %>
+                  <option value="<%= suggestion._id %>" selected>
+                    <%= suggestion.title %> <% if (suggestion.category &&
+                    suggestion.category.name) { %> • <%=
+                    suggestion.category.name %> <% } %> • <%=
+                    suggestion.voteCount %> votes
+                  </option>
+                  <% } else { %>
+                  <option value="<%= suggestion._id %>">
+                    <%= suggestion.title %> <% if (suggestion.category &&
+                    suggestion.category.name) { %> • <%=
+                    suggestion.category.name %> <% } %> • <%=
+                    suggestion.voteCount %> votes
+                  </option>
+                  <% } %> <% }) %>
+                </select>
+                <p class="mt-1 text-xs text-gray-500">
+                  Link this roadmap item to a specific user suggestion to show
+                  the connection.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="estimatedReleaseDate"
+                  class="block text-sm font-medium text-gray-700">
+                  Estimated Release Date
+                </label>
+                <input
+                  type="date"
+                  id="estimatedReleaseDate"
+                  name="estimatedReleaseDate"
+                  value="<% if (item.estimatedReleaseDate) { %><%= item.estimatedReleaseDate.toISOString().split('T')[0] %><% } %>"
+                  class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
+              </div>
             </div>
 
-            <div>
-              <label
-                for="priority"
-                class="block text-sm font-medium text-gray-700">
-                Priority
-              </label>
-              <select
-                id="priority"
-                name="priority"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
-                <option value="low" <%= item.priority === 'low' ? 'selected' : '' %>>Low</option>
-                <option value="medium" <%= item.priority === 'medium' ? 'selected' : '' %>>Medium</option>
-                <option value="high" <%= item.priority === 'high' ? 'selected' : '' %>>High</option>
-              </select>
+            <!-- Actions -->
+            <div
+              class="flex justify-end space-x-4 border-t border-gray-200 pt-6">
+              <a
+                href="/apps/<%= app._id %>/roadmap"
+                class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Cancel
+              </a>
+              <button
+                type="submit"
+                class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+                <i class="fas fa-save mr-2"></i>
+                Update Roadmap Item
+              </button>
             </div>
-
-            <div>
-              <label for="type" class="block text-sm font-medium text-gray-700">
-                Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
-                <option value="feature" <%= item.type === 'feature' ? 'selected' : '' %>>Feature</option>
-                <option value="improvement" <%= item.type === 'improvement' ? 'selected' : '' %>>Improvement</option>
-                <option value="bug-fix" <%= item.type === 'bug-fix' ? 'selected' : '' %>>Bug Fix</option>
-                <option value="announcement" <%= item.type === 'announcement' ? 'selected' : '' %>>Announcement</option>
-              </select>
-            </div>
-          </div>
-          </div>
-
-          <!-- Additional Details -->
-          <div class="space-y-4">
-            <h3 class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
-              Additional Details
-            </h3>
-          <div>
-            <label
-              for="estimatedReleaseDate"
-              class="block text-sm font-medium text-gray-700">
-              Estimated Release Date
-            </label>
-            <input
-              type="date"
-              id="estimatedReleaseDate"
-              name="estimatedReleaseDate"
-              value="<%= item.estimatedReleaseDate ? moment(item.estimatedReleaseDate).format('YYYY-MM-DD') : '' %>"
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
-          </div>
-          </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="flex justify-end space-x-4 border-t border-gray-200 pt-6">
-            <a
-              href="/apps/<%= app._id %>/roadmap"
-              class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              Cancel
-            </a>
-            <button
-              type="submit"
-              class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-              <i class="fas fa-save mr-2"></i>
-              Update Roadmap Item
-            </button>
-          </div>
-        </form>
+          </form>
         </div>
       </main>
     </div>

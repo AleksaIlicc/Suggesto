@@ -225,21 +225,35 @@ const postAddRoadmapItem = async (
         ? req.body.assignedTo
         : undefined;
 
-    const newRoadmapItem = new RoadmapItem({
+    const newRoadmapItemData: any = {
       applicationId: appId,
       title: req.body.title,
       description: req.body.description,
       status: req.body.status,
-      priority: cleanPriority,
-      type: cleanType,
-      suggestion: cleanSuggestion,
-      estimatedReleaseDate: cleanEstimatedDate,
       tags: tags,
-      assignedTo: cleanAssignedTo,
       progress: req.body.progress || 0,
       order: newOrder,
       createdBy: user._id,
-    });
+    };
+
+    // Only add optional fields if they have values
+    if (cleanPriority) {
+      newRoadmapItemData.priority = cleanPriority;
+    }
+    if (cleanType) {
+      newRoadmapItemData.type = cleanType;
+    }
+    if (cleanSuggestion) {
+      newRoadmapItemData.suggestion = cleanSuggestion;
+    }
+    if (cleanEstimatedDate) {
+      newRoadmapItemData.estimatedReleaseDate = cleanEstimatedDate;
+    }
+    if (cleanAssignedTo) {
+      newRoadmapItemData.assignedTo = cleanAssignedTo;
+    }
+
+    const newRoadmapItem = new RoadmapItem(newRoadmapItemData);
 
     await newRoadmapItem.save();
 
@@ -288,7 +302,7 @@ const getEditRoadmapItem = async (
     res.render('pages/roadmap/edit-roadmap-item', {
       app,
       user,
-      roadmapItem,
+      item: roadmapItem,
       suggestions,
     });
   } catch (err: unknown) {
@@ -308,6 +322,14 @@ const putEditRoadmapItem = async (
   try {
     const { appId, itemId } = req.params;
     const user = req.user as IUser;
+
+    // Clean up empty strings to undefined for optional fields before processing
+    if (req.body.priority === '') req.body.priority = undefined;
+    if (req.body.type === '') req.body.type = undefined;
+    if (req.body.suggestion === '') req.body.suggestion = undefined;
+    if (req.body.estimatedReleaseDate === '')
+      req.body.estimatedReleaseDate = undefined;
+    if (req.body.assignedTo === '') req.body.assignedTo = undefined;
 
     const app = await Application.findOne({ _id: appId, user: user._id });
 
@@ -329,21 +351,18 @@ const putEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    // Update fields
+    // Update fields with proper handling of optional fields
     if (req.body.title !== undefined) roadmapItem.title = req.body.title;
     if (req.body.description !== undefined)
       roadmapItem.description = req.body.description;
     if (req.body.status !== undefined)
       roadmapItem.status = req.body.status as any;
-    if (req.body.priority !== undefined)
-      roadmapItem.priority = req.body.priority as any;
-    if (req.body.type !== undefined) roadmapItem.type = req.body.type as any;
-    if (req.body.suggestion !== undefined) {
-      roadmapItem.suggestion =
-        req.body.suggestion && req.body.suggestion !== ''
-          ? (req.body.suggestion as any)
-          : undefined;
-    }
+
+    // Handle optional fields - set to undefined if empty
+    roadmapItem.priority = req.body.priority as any;
+    roadmapItem.type = req.body.type as any;
+    roadmapItem.suggestion = req.body.suggestion as any;
+
     if (req.body.estimatedReleaseDate !== undefined) {
       roadmapItem.estimatedReleaseDate = req.body.estimatedReleaseDate
         ? new Date(req.body.estimatedReleaseDate)
@@ -356,9 +375,7 @@ const putEditRoadmapItem = async (
     }
 
     if (req.body.assignedTo !== undefined)
-      roadmapItem.assignedTo = req.body.assignedTo
-        ? (req.body.assignedTo as any)
-        : undefined;
+      roadmapItem.assignedTo = req.body.assignedTo as any;
     if (req.body.changelogNotes !== undefined)
       roadmapItem.changelogNotes = req.body.changelogNotes;
     if (req.body.order !== undefined) roadmapItem.order = req.body.order;
