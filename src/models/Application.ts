@@ -9,7 +9,6 @@ export interface IApplication extends Document {
     _id: string;
     title: string;
     description: string;
-    count: number;
     voteCount?: number;
   }[];
   design: {
@@ -50,7 +49,6 @@ const ApplicationSchema: Schema = new Schema(
         _id: { type: Schema.Types.ObjectId, ref: 'Suggestion' },
         title: { type: String },
         description: { type: String },
-        count: { type: Number },
         voteCount: { type: Number, default: 0 },
       },
     ],

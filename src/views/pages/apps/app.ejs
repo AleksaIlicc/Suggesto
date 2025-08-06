@@ -67,13 +67,13 @@
 
         <!-- Suggestions Header with Dropdown -->
         <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-xl font-semibold flex items-center" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor || '#111827' %>">
+          <h2 class="text-xl font-semibold flex items-center" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor %>">
             Showing 
             <select 
               id="sortDropdown"
               onchange="changeSorting(this.value)"
               class="mx-2 px-3 py-1 rounded-md border-b border-gray-300 text-xl font-semibold cursor-pointer focus:outline-none"
-              <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor %>; background-color: <%= app.design?.backgroundColor || '#F3F4F6' %>;">
+              <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionsHeaderColor %>; background-color: <%= app.design?.backgroundColor %>;">
               <option value="top" <%= currentSort === 'top' || !currentSort ? 'selected' : '' %>>Top</option>
               <option value="trending" <%= currentSort === 'trending' ? 'selected' : '' %>>Trending</option>
               <option value="new" <%= currentSort === 'new' ? 'selected' : '' %>>New</option>
@@ -85,17 +85,18 @@
         <div class="w-full space-y-4">
           <% if (suggestions && suggestions.length > 0) { %> <%
           suggestions.forEach(suggestion => { %>
-          <div class="rounded-xl p-4 shadow-sm sm:p-6" <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.suggestionCardBgColor || '#FFFFFF' %>">
+          <div class="rounded-xl p-4 shadow-sm sm:p-6 cursor-pointer transition-all hover:shadow-md" 
+               onclick="window.location.href = '/apps/<%= app._id %>/suggestions/<%= suggestion._id %>'"
+               <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.suggestionCardBgColor %>">
             <div class="mb-3 flex flex-wrap items-center gap-2">
-              <!-- Category Badge -->
               <% if (suggestion.category) { %>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white" 
                  <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.category.color %>">
                   <%= suggestion.category.name.charAt(0).toUpperCase() + suggestion.category.name.slice(1) %>
                 </span>
               <% } %>
-              
-              <span class="text-xs" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionMetaColor || '#6B7280' %>">
+
+              <span class="text-xs" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionMetaColor %>">
                 by <%= suggestion.userId ? `${suggestion.userId.firstName} ${suggestion.userId.lastName}` : 'Anonymous User' %> • 
                 <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>
               </span>
@@ -104,47 +105,42 @@
             <div
               class="flex flex-col space-y-2 space-x-0 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 sm:space-x-4">
               <div class="flex-1">
-                <h3 class="text-base font-medium sm:text-lg mb-2" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor || '#374151' %>">
+                <h3 class="text-base font-medium sm:text-lg mb-2" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor %>">
                   <%= suggestion.title %>
                 </h3>
-                <p class="text-sm sm:text-base mb-3" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor || '#374151' %>">
-                  <%= suggestion.description %>
+                <% 
+                  // Truncate description to approximately 4 lines (roughly 200 characters)
+                  const truncatedDescription = suggestion.description.length > 200 
+                    ? suggestion.description.substring(0, 200) + '...' 
+                    : suggestion.description;
+                %>
+                <p class="text-sm sm:text-base mb-3" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor %>">
+                  <%= truncatedDescription %>
+                  <% if (suggestion.description.length > 200) { %>
+                    <span class="underline" style="color: <%= app.design?.backButtonColor %>">Read more</span>
+                  <% } %>
                 </p>
                 
-                <!-- Files Display -->
                 <% if (suggestion.files && suggestion.files.length > 0) { %>
                   <div class="mb-3">
-                    <h4 class="text-sm font-medium text-gray-700 mb-2">Attachments:</h4>
-                    <div class="flex flex-wrap gap-2">
-                      <% suggestion.files.forEach(file => { %>
-                        <a href="/uploads/<%= file.filename %>" target="_blank" 
-                           class="inline-flex items-center px-3 py-1 rounded-md bg-gray-100 text-sm text-gray-700 hover:bg-gray-200">
-                          <% if (file.mimetype.startsWith('image/')) { %>
-                            <i class="fas fa-image mr-1"></i>
-                          <% } else if (file.mimetype === 'application/pdf') { %>
-                            <i class="fas fa-file-pdf mr-1"></i>
-                          <% } else { %>
-                            <i class="fas fa-file mr-1"></i>
-                          <% } %>
-                          <%= file.originalName %>
-                        </a>
-                      <% }); %>
+                    <div class="flex items-center text-sm text-gray-600">
+                      <i class="fas fa-paperclip mr-1"></i>
+                      <span><%= suggestion.files.length %> attachment<%= suggestion.files.length > 1 ? 's' : '' %></span>
                     </div>
                   </div>
                 <% } %>
               </div>
               
               <div class="flex items-center justify-end space-x-3">
-                <!-- Vote Button -->
                 <div class="flex items-center space-x-2">
                   <button
-                    onclick="toggleVote('<%= suggestion._id %>')"
+                    onclick="event.stopPropagation(); toggleVote('<%= suggestion._id %>')"
                     id="vote-btn-<%= suggestion._id %>"
                     class="flex items-center cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95"
-                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveBgColor || '#DBEAFE') : (app.design?.voteButtonBgColor || '#E5E7EB') %>; color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveTextColor || '#2563EB') : (app.design?.voteButtonTextColor || '#374151') %>">
+                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.voteButtonBgColor %>; color: <%= app.design?.voteButtonTextColor %>; border: 1px solid <%= suggestion.hasUserVoted ? (app.design?.voteButtonTextColor || '#374151') : 'transparent' %>">
                     <i class="fas fa-chevron-up text-md"></i>
                     <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>"
-                       <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= suggestion.hasUserVoted ? (app.design?.voteButtonActiveTextColor || '#2563EB') : (app.design?.voteButtonTextColor || '#374151') %>">
+                       <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.voteButtonTextColor %>">
                       <%= suggestion.voteCount || 0 %>
                     </p>
                   </button>
@@ -165,12 +161,12 @@
     <%- include('../../shared/includes/scripts') %>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
-        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
-        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        const headerColor = '<%= app.design?.headerColor %>';
+        const headerTextColor = '<%= app.design?.headerTextColor %>';
+        const buttonColor = '<%= app.design?.buttonColor %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor %>';
+        const backButtonColor = '<%= app.design?.backButtonColor %>';
+        const backgroundColor = '<%= app.design?.backgroundColor %>';
 
         // Helper function for safe style application
         const safeApplyStyle = (element, property, value) => {
@@ -235,29 +231,25 @@
             }
             
             // Get design colors
-            const voteButtonBgColor = '<%= app.design?.voteButtonBgColor || "#E5E7EB" %>';
-            const voteButtonTextColor = '<%= app.design?.voteButtonTextColor || "#374151" %>';
-            const voteButtonActiveBgColor = '<%= app.design?.voteButtonActiveBgColor || "#DBEAFE" %>';
-            const voteButtonActiveTextColor = '<%= app.design?.voteButtonActiveTextColor || "#2563EB" %>';
-            
-            // Update button appearance with custom colors
+            const voteButtonBgColor = '<%= app.design?.voteButtonBgColor %>';
+            const voteButtonTextColor = '<%= app.design?.voteButtonTextColor %>';
+
+            // Update button appearance - background stays the same, add border if voted
             if (voteBtn) {
+              voteBtn.style.backgroundColor = voteButtonBgColor;
+              voteBtn.style.color = voteButtonTextColor;
+              
+              // Add border if voted, remove if not voted
               if (data.voted) {
-                voteBtn.style.backgroundColor = voteButtonActiveBgColor;
-                voteBtn.style.color = voteButtonActiveTextColor;
+                voteBtn.style.border = `2px solid ${voteButtonTextColor || '#374151'}`;
               } else {
-                voteBtn.style.backgroundColor = voteButtonBgColor;
-                voteBtn.style.color = voteButtonTextColor;
+                voteBtn.style.border = '2px solid transparent';
               }
             }
             
-            // Update vote count color
+            // Update vote count color - always use the same text color
             if (voteCount) {
-              if (data.voted) {
-                voteCount.style.color = voteButtonActiveTextColor;
-              } else {
-                voteCount.style.color = voteButtonTextColor;
-              }
+              voteCount.style.color = voteButtonTextColor;
             }
           } else {
             alert(data.message || 'Failed to process vote');

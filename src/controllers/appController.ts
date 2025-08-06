@@ -234,6 +234,77 @@ const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getSuggestionDetail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = req.user as IUser | undefined;
+    const sessionId = req.sessionID;
+    const { id: appId, suggestionId } = req.params;
+
+    // Find the application
+    const app = await Application.findOne({ _id: appId }).populate('user');
+
+    if (!app) {
+      req.flash('error', 'Application not found.');
+      return res.status(404).redirect('/');
+    }
+
+    // Check if app is private and user has permission to view
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      req.flash('error', 'This application is private.');
+      return res.status(403).redirect('/');
+    }
+
+    // Find the specific suggestion
+    const suggestion = await Suggestion.findOne({
+      _id: suggestionId,
+      applicationId: appId,
+    })
+      .populate('userId', 'firstName lastName username')
+      .populate('comments.user', 'firstName lastName username');
+
+    if (!suggestion) {
+      req.flash('error', 'Suggestion not found.');
+      return res.status(404).redirect(`/apps/${appId}`);
+    }
+
+    // Check if current user/session has voted for this suggestion
+    let hasUserVoted = false;
+    if (user) {
+      const existingVote = await Vote.findOne({
+        user: user._id,
+        suggestion: suggestionId,
+      });
+      hasUserVoted = !!existingVote;
+    } else {
+      const existingVote = await Vote.findOne({
+        sessionId: sessionId,
+        suggestion: suggestionId,
+      });
+      hasUserVoted = !!existingVote;
+    }
+
+    const enhancedSuggestion = {
+      ...suggestion.toObject(),
+      hasUserVoted,
+    };
+
+    res.render('pages/apps/suggestion-detail', {
+      app,
+      suggestion: enhancedSuggestion,
+      user,
+      isOwner: isAppOwner,
+    });
+  } catch (err: unknown) {
+    console.error('Error fetching suggestion detail:', err);
+    req.flash('error', 'Failed to fetch suggestion. Please try again.');
+    return res.status(500).redirect('/');
+  }
+};
+
 const postAddSuggestion = async (
   req: Request<{ id: string }, {}, AddSuggestionDto>,
   res: Response
@@ -305,12 +376,10 @@ const postAddSuggestion = async (
 
     await newSuggestion.save();
 
-    // Update the application's suggestions array (for backward compatibility)
     app.suggestions.push({
       _id: newSuggestion._id,
       title: req.body.title,
       description: req.body.description,
-      count: app.suggestions.length + 1,
       voteCount: 0,
     });
 
@@ -800,12 +869,68 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const addComment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user as IUser;
+    const suggestionId = req.params.suggestionId;
+    const { text } = req.body;
+
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'Authentication required to add comments.',
+      });
+      return;
+    }
+
+    if (!text || text.trim().length === 0) {
+      res.status(400).json({
+        success: false,
+        message: 'Comment text is required.',
+      });
+      return;
+    }
+
+    const suggestion = await Suggestion.findById(suggestionId);
+    if (!suggestion) {
+      res.status(404).json({
+        success: false,
+        message: 'Suggestion not found.',
+      });
+      return;
+    }
+
+    // Add the new comment with proper typing
+    const newComment = {
+      user: user._id as any, // Cast to any since Mongoose will handle the ObjectId reference
+      text: text.trim(),
+      createdAt: new Date(),
+    };
+
+    suggestion.comments.push(newComment);
+    await suggestion.save();
+
+    res.json({
+      success: true,
+      message: 'Comment added successfully.',
+      comment: newComment,
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error.',
+    });
+  }
+};
+
 export default {
   getApp,
   getApps,
   getAddApp,
   postAddApp,
   getAddSuggestion,
+  getSuggestionDetail,
   postAddSuggestion,
   getEditApp,
   putEditApp,
@@ -813,4 +938,5 @@ export default {
   voteOnSuggestion,
   uploadLogo,
   removeLogo,
+  addComment,
 };

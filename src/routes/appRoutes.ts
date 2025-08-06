@@ -5,6 +5,7 @@ import { requireAuth } from '../middlewares/auth';
 import { AddAppDto } from '../dtos/app/add-app.dto';
 import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
+import { AddCommentDto } from '../dtos/app/add-comment.dto';
 import upload from '../config/multer';
 
 const router = express.Router();
@@ -23,6 +24,7 @@ router.post(
 // Public app view and suggestion routes (no authentication required)
 router.get('/:id', appController.getApp);
 router.get('/:id/add-suggestion', appController.getAddSuggestion);
+router.get('/:id/suggestions/:suggestionId', appController.getSuggestionDetail);
 router.post(
   '/:id/add-suggestion',
   upload.array('files', 3),
@@ -34,6 +36,14 @@ router.post(
 router.post(
   '/api/suggestions/:suggestionId/vote',
   appController.voteOnSuggestion
+);
+
+// API routes for comments (authenticated)
+router.post(
+  '/api/suggestions/:suggestionId/comments',
+  requireAuth,
+  [validateDto(AddCommentDto, 'body')],
+  appController.addComment
 );
 
 // API routes for logo upload/removal (authenticated)
