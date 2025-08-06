@@ -33,10 +33,8 @@ const getRoadmap = async (req: Request, res: Response): Promise<void> => {
 
     // Get roadmap items grouped by status
     const roadmapItems = await RoadmapItem.find({ applicationId: appId })
-      .populate('createdBy', 'username email')
-      .populate('assignedTo', 'username email')
       .populate('suggestion', 'title description')
-      .sort({ order: 1, createdAt: -1 });
+      .sort({ estimatedReleaseDate: 1, createdAt: -1 });
 
     // Group items by status
     const groupedItems = {
@@ -91,17 +89,14 @@ const getRoadmapItemDetail = async (
     const roadmapItem = await RoadmapItem.findOne({
       _id: itemId,
       applicationId: appId,
-    })
-      .populate('createdBy', 'firstName lastName username email')
-      .populate('assignedTo', 'firstName lastName username email')
-      .populate({
-        path: 'suggestion',
-        select: 'title description category voteCount createdAt',
-        populate: {
-          path: 'userId',
-          select: 'firstName lastName username',
-        },
-      });
+    }).populate({
+      path: 'suggestion',
+      select: 'title description category voteCount createdAt',
+      populate: {
+        path: 'userId',
+        select: 'firstName lastName username',
+      },
+    });
 
     if (!roadmapItem) {
       req.flash('error', 'Roadmap item not found.');
@@ -166,14 +161,6 @@ const postAddRoadmapItem = async (
     const appId = req.params.appId;
     const user = req.user as IUser;
 
-    // Clean up empty strings to undefined for optional fields before processing
-    if (req.body.priority === '') req.body.priority = undefined;
-    if (req.body.type === '') req.body.type = undefined;
-    if (req.body.suggestion === '') req.body.suggestion = undefined;
-    if (req.body.estimatedReleaseDate === '')
-      req.body.estimatedReleaseDate = undefined;
-    if (req.body.assignedTo === '') req.body.assignedTo = undefined;
-
     const app = await Application.findOne({ _id: appId, user: user._id });
 
     if (!app) {
@@ -184,73 +171,27 @@ const postAddRoadmapItem = async (
       return res.status(404).redirect('/apps');
     }
 
-    // Get the highest order number for the status
-    const lastItem = await RoadmapItem.findOne({
-      applicationId: appId,
-      status: req.body.status,
-    }).sort({ order: -1 });
-
-    const newOrder = lastItem ? lastItem.order + 1 : 0;
-
-    // Parse tags if they come as JSON string
-    let tags: string[] = [];
-    if (req.body.tags) {
-      try {
-        tags =
-          typeof req.body.tags === 'string'
-            ? JSON.parse(req.body.tags)
-            : req.body.tags;
-      } catch (e) {
-        tags = [];
-      }
-    }
-
-    // Clean up empty string values to undefined for optional fields
-    const cleanPriority =
-      req.body.priority && req.body.priority !== ''
-        ? req.body.priority
-        : undefined;
-    const cleanType =
-      req.body.type && req.body.type !== '' ? req.body.type : undefined;
-    const cleanSuggestion =
-      req.body.suggestion && req.body.suggestion !== ''
-        ? req.body.suggestion
-        : undefined;
-    const cleanEstimatedDate =
-      req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== ''
-        ? req.body.estimatedReleaseDate
-        : undefined;
-    const cleanAssignedTo =
-      req.body.assignedTo && req.body.assignedTo !== ''
-        ? req.body.assignedTo
-        : undefined;
-
     const newRoadmapItemData: any = {
       applicationId: appId,
       title: req.body.title,
       description: req.body.description,
       status: req.body.status,
-      tags: tags,
-      progress: req.body.progress || 0,
-      order: newOrder,
-      createdBy: user._id,
     };
 
-    // Only add optional fields if they have values
-    if (cleanPriority) {
-      newRoadmapItemData.priority = cleanPriority;
+    // Add optional fields only if they have valid values
+    if (req.body.priority && req.body.priority !== '') {
+      newRoadmapItemData.priority = req.body.priority;
     }
-    if (cleanType) {
-      newRoadmapItemData.type = cleanType;
+    if (req.body.type && req.body.type !== '') {
+      newRoadmapItemData.type = req.body.type;
     }
-    if (cleanSuggestion) {
-      newRoadmapItemData.suggestion = cleanSuggestion;
+    if (req.body.suggestion && req.body.suggestion !== '') {
+      newRoadmapItemData.suggestion = req.body.suggestion;
     }
-    if (cleanEstimatedDate) {
-      newRoadmapItemData.estimatedReleaseDate = cleanEstimatedDate;
-    }
-    if (cleanAssignedTo) {
-      newRoadmapItemData.assignedTo = cleanAssignedTo;
+    if (req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== '') {
+      newRoadmapItemData.estimatedReleaseDate = new Date(
+        req.body.estimatedReleaseDate
+      );
     }
 
     const newRoadmapItem = new RoadmapItem(newRoadmapItemData);
@@ -323,14 +264,6 @@ const putEditRoadmapItem = async (
     const { appId, itemId } = req.params;
     const user = req.user as IUser;
 
-    // Clean up empty strings to undefined for optional fields before processing
-    if (req.body.priority === '') req.body.priority = undefined;
-    if (req.body.type === '') req.body.type = undefined;
-    if (req.body.suggestion === '') req.body.suggestion = undefined;
-    if (req.body.estimatedReleaseDate === '')
-      req.body.estimatedReleaseDate = undefined;
-    if (req.body.assignedTo === '') req.body.assignedTo = undefined;
-
     const app = await Application.findOne({ _id: appId, user: user._id });
 
     if (!app) {
@@ -351,34 +284,38 @@ const putEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    // Update fields with proper handling of optional fields
+    // Update required fields if provided
     if (req.body.title !== undefined) roadmapItem.title = req.body.title;
     if (req.body.description !== undefined)
       roadmapItem.description = req.body.description;
     if (req.body.status !== undefined)
       roadmapItem.status = req.body.status as any;
 
-    // Handle optional fields - set to undefined if empty
-    roadmapItem.priority = req.body.priority as any;
-    roadmapItem.type = req.body.type as any;
-    roadmapItem.suggestion = req.body.suggestion as any;
-
+    // Handle optional fields - only update if explicitly provided
+    if (req.body.priority !== undefined) {
+      roadmapItem.priority =
+        req.body.priority && req.body.priority !== ''
+          ? (req.body.priority as any)
+          : undefined;
+    }
+    if (req.body.type !== undefined) {
+      roadmapItem.type =
+        req.body.type && req.body.type !== ''
+          ? (req.body.type as any)
+          : undefined;
+    }
+    if (req.body.suggestion !== undefined) {
+      roadmapItem.suggestion =
+        req.body.suggestion && req.body.suggestion !== ''
+          ? (req.body.suggestion as any)
+          : undefined;
+    }
     if (req.body.estimatedReleaseDate !== undefined) {
-      roadmapItem.estimatedReleaseDate = req.body.estimatedReleaseDate
-        ? new Date(req.body.estimatedReleaseDate)
-        : undefined;
+      roadmapItem.estimatedReleaseDate =
+        req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== ''
+          ? new Date(req.body.estimatedReleaseDate)
+          : undefined;
     }
-    if (req.body.actualReleaseDate !== undefined) {
-      roadmapItem.actualReleaseDate = req.body.actualReleaseDate
-        ? new Date(req.body.actualReleaseDate)
-        : undefined;
-    }
-
-    if (req.body.assignedTo !== undefined)
-      roadmapItem.assignedTo = req.body.assignedTo as any;
-    if (req.body.changelogNotes !== undefined)
-      roadmapItem.changelogNotes = req.body.changelogNotes;
-    if (req.body.order !== undefined) roadmapItem.order = req.body.order;
 
     await roadmapItem.save();
 

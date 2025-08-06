@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './User';
 import { IApplication } from './Application';
 import { ISuggestion } from './Suggestion';
 
@@ -11,16 +10,8 @@ export interface IRoadmapItem extends Document {
   status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
   priority?: 'low' | 'medium' | 'high';
   type?: 'feature' | 'improvement' | 'bug-fix' | 'announcement';
-  suggestion?: ISuggestion; // Optional link back to the original suggestion
+  suggestion?: ISuggestion;
   estimatedReleaseDate?: Date;
-  actualReleaseDate?: Date;
-  voteCount: number;
-  order: number; // For custom ordering within status columns
-  createdBy: IUser;
-  assignedTo?: IUser;
-  changelogNotes?: string; // For completed items
-  tags?: string[]; // Tags for categorization
-  progress?: number; // Progress percentage (0-100)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,21 +44,20 @@ const RoadmapItemSchema: Schema = new Schema(
       ref: 'Suggestion',
       required: false,
     },
-    estimatedReleaseDate: { type: Date },
-    actualReleaseDate: { type: Date },
-    voteCount: { type: Number, default: 0 },
-    order: { type: Number, default: 0 },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: false },
-    changelogNotes: { type: String, maxlength: 1000 },
-    tags: [{ type: String, maxlength: 50 }], // Array of tags
-    progress: { type: Number, min: 0, max: 100, default: 0 }, // Progress percentage
+    estimatedReleaseDate: {
+      type: Date,
+      required: false,
+    },
   },
   { timestamps: true }
 );
 
 // Index for efficient queries
-RoadmapItemSchema.index({ applicationId: 1, status: 1, order: 1 });
+RoadmapItemSchema.index({
+  applicationId: 1,
+  status: 1,
+  estimatedReleaseDate: 1,
+});
 RoadmapItemSchema.index({ applicationId: 1, createdAt: -1 });
 
 const RoadmapItem = mongoose.model<IRoadmapItem>(

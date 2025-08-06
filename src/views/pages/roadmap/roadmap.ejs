@@ -53,7 +53,8 @@
         <div class="mb-6 flex justify-start">
           <a
             href="/apps/<%= app._id %>"
-            class="flex items-center text-gray-600 transition-colors hover:text-gray-900">
+            class="flex items-center transition-colors"
+            id="backButton">
             <i class="fas fa-arrow-left mr-2"></i>
             Back to App
           </a>
@@ -74,66 +75,76 @@
         <!-- Roadmap Board -->
         <div class="mb-6 space-y-4">
           <!-- Planned Column -->
-          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl p-4 shadow-sm" id="plannedColumn">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">Planned</h2>
+              <h2 class="text-lg font-semibold" id="plannedHeader">Planned</h2>
               <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                class="rounded-full px-2 py-1 text-xs font-medium"
+                id="plannedBadge">
                 <%= roadmapItems.planned.length %>
               </span>
             </div>
             <div class="min-h-[75px] space-y-3">
               <% roadmapItems.planned.forEach(item => { %> <%-
-              include('../../shared/partials/roadmap-item', { item, isOwner })
-              %> <% }) %>
+              include('../../shared/partials/roadmap-item', { item, isOwner, app
+              }) %> <% }) %>
             </div>
           </div>
 
           <!-- In Progress Column -->
-          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl p-4 shadow-sm" id="inProgressColumn">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">In Progress</h2>
+              <h2 class="text-lg font-semibold" id="inProgressHeader">
+                In Progress
+              </h2>
               <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                class="rounded-full px-2 py-1 text-xs font-medium"
+                id="inProgressBadge">
                 <%= roadmapItems['in-progress'].length %>
               </span>
             </div>
             <div class="min-h-[100px] space-y-3">
               <% roadmapItems['in-progress'].forEach(item => { %> <%-
-              include('../../shared/partials/roadmap-item', { item, isOwner })
-              %> <% }) %>
+              include('../../shared/partials/roadmap-item', { item, isOwner, app
+              }) %> <% }) %>
             </div>
           </div>
 
           <!-- Completed Column -->
-          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl p-4 shadow-sm" id="completedColumn">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">Completed</h2>
+              <h2 class="text-lg font-semibold" id="completedHeader">
+                Completed
+              </h2>
               <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                class="rounded-full px-2 py-1 text-xs font-medium"
+                id="completedBadge">
                 <%= roadmapItems.completed.length %>
               </span>
             </div>
             <div class="min-h-[100px] space-y-3">
               <% roadmapItems.completed.forEach(item => { %> <%-
-              include('../../shared/partials/roadmap-item', { item, isOwner })
-              %> <% }) %>
+              include('../../shared/partials/roadmap-item', { item, isOwner, app
+              }) %> <% }) %>
             </div>
           </div>
 
           <!-- Cancelled Column -->
-          <div class="w-full rounded-xl bg-white p-4 shadow-sm">
+          <div class="w-full rounded-xl p-4 shadow-sm" id="cancelledColumn">
             <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">Cancelled</h2>
+              <h2 class="text-lg font-semibold" id="cancelledHeader">
+                Cancelled
+              </h2>
               <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                class="rounded-full px-2 py-1 text-xs font-medium"
+                id="cancelledBadge">
                 <%= roadmapItems.cancelled.length %>
               </span>
             </div>
             <div class="min-h-[100px] space-y-3">
               <% roadmapItems.cancelled.forEach(item => { %> <%-
-              include('../../shared/partials/roadmap-item', { item, isOwner })
-              %> <% }) %>
+              include('../../shared/partials/roadmap-item', { item, isOwner, app
+              }) %> <% }) %>
             </div>
           </div>
         </div>
@@ -143,11 +154,11 @@
         roadmapItems['in-progress'].length === 0 &&
         roadmapItems.completed.length === 0 && roadmapItems.cancelled.length ===
         0) { %>
-        <div class="rounded-xl bg-white p-8 text-center shadow-sm">
-          <h3 class="mb-2 text-lg font-medium text-gray-900">
+        <div class="rounded-xl p-8 text-center shadow-sm" id="emptyStateCard">
+          <h3 class="mb-2 text-lg font-medium" id="emptyStateTitle">
             No roadmap items yet
           </h3>
-          <p class="mb-8 text-gray-500">
+          <p class="mb-8" id="emptyStateDescription">
             <% if (isOwner) { %> Get started by adding your first roadmap item
             to share your development plans. <% } else { %> The development team
             hasn't shared any roadmap items yet. <% } %>
@@ -169,61 +180,70 @@
     <%- include('../../shared/includes/scripts') %>
 
     <script>
+      // Make app design available globally for roadmap items
+      window.appDesign = {
+        backgroundColor: '<%= app.design?.backgroundColor || "#F3F4F6" %>',
+        headerColor: '<%= app.design?.headerColor || "#374151" %>',
+        headerTextColor: '<%= app.design?.headerTextColor || "#FFFFFF" %>',
+        buttonColor: '<%= app.design?.buttonColor || "#111827" %>',
+        buttonTextColor: '<%= app.design?.buttonTextColor || "#FFFFFF" %>',
+        backButtonColor: '<%= app.design?.backButtonColor || "#6B7280" %>',
+        suggestionCardBgColor:
+          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>',
+        suggestionTextColor:
+          '<%= app.design?.suggestionTextColor || "#374151" %>',
+        suggestionMetaColor:
+          '<%= app.design?.suggestionMetaColor || "#6B7280" %>',
+        suggestionsHeaderColor:
+          '<%= app.design?.suggestionsHeaderColor || "#374151" %>',
+      };
+
       document.addEventListener('DOMContentLoaded', function () {
         // Apply custom app design
-        const backgroundColor =
-          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const headerTextColor =
-          '<%= app.design?.headerTextColor || "#FFFFFF" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const backButtonColor =
-          '<%= app.design?.backButtonColor || "#6B7280" %>';
-        const cardBgColor =
-          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
+        const backgroundColor = window.appDesign.backgroundColor;
+        const headerColor = window.appDesign.headerColor;
+        const headerTextColor = window.appDesign.headerTextColor;
+        const buttonColor = window.appDesign.buttonColor;
+        const buttonTextColor = window.appDesign.buttonTextColor;
+        const backButtonColor = window.appDesign.backButtonColor;
+        const cardBgColor = window.appDesign.suggestionCardBgColor;
+        const textColor = window.appDesign.suggestionTextColor;
+        const metaColor = window.appDesign.suggestionMetaColor;
+        const suggestionsHeaderColor = window.appDesign.suggestionsHeaderColor;
+
+        // Helper function for safe style application
+        const safeApplyStyle = (element, property, value) => {
+          if (element && value) {
+            element.style[property] = value;
+          }
+        };
 
         // Set header background
         const headerElement = document.getElementById('appHeader');
-        if (headerElement) {
-          headerElement.style.backgroundColor = headerColor;
+        safeApplyStyle(headerElement, 'backgroundColor', headerColor);
 
-          // Apply header text colors
-          const headerTitle = headerElement.querySelector('h1');
-          const headerDescription = headerElement.querySelector('p');
-          if (headerTitle) headerTitle.style.color = headerTextColor;
-          if (headerDescription)
-            headerDescription.style.color = headerTextColor;
-        }
+        // Apply header text colors
+        const headerTitle = headerElement
+          ? headerElement.querySelector('h1')
+          : null;
+        const headerDescription = headerElement
+          ? headerElement.querySelector('p')
+          : null;
+        safeApplyStyle(headerTitle, 'color', headerTextColor);
+        safeApplyStyle(headerDescription, 'color', headerTextColor);
 
         // Set body background
         const bodyElement = document.getElementById('pageBody');
-        if (bodyElement) {
-          bodyElement.style.backgroundColor = backgroundColor;
-        }
+        safeApplyStyle(bodyElement, 'backgroundColor', backgroundColor);
 
         // Set main background
         const mainElement = document.querySelector('main');
-        if (mainElement) {
-          mainElement.style.backgroundColor = backgroundColor;
-        }
-
-        // Set button backgrounds
-        const addButton = document.getElementById('addRoadmapBtn');
-        const addFirstButton = document.getElementById('addFirstItemBtn');
-
-        if (addButton) {
-          addButton.style.backgroundColor = buttonColor;
-        }
-        if (addFirstButton) {
-          addFirstButton.style.backgroundColor = buttonColor;
-        }
+        safeApplyStyle(mainElement, 'backgroundColor', backgroundColor);
 
         // Style back button
-        const backButton = document.querySelector('a[href*="/apps/"]');
+        const backButton = document.getElementById('backButton');
+        safeApplyStyle(backButton, 'color', backButtonColor);
         if (backButton) {
-          backButton.style.color = backButtonColor;
-          // Override hover state to maintain custom color
-          backButton.style.setProperty('color', backButtonColor, 'important');
           backButton.addEventListener('mouseenter', () => {
             backButton.style.setProperty('color', backButtonColor, 'important');
           });
@@ -232,13 +252,60 @@
           });
         }
 
+        // Set button backgrounds and text colors
+        const addButton = document.getElementById('addRoadmapBtn');
+        const addFirstButton = document.getElementById('addFirstItemBtn');
+        safeApplyStyle(addButton, 'backgroundColor', buttonColor);
+        safeApplyStyle(addButton, 'color', buttonTextColor);
+        safeApplyStyle(addFirstButton, 'backgroundColor', buttonColor);
+        safeApplyStyle(addFirstButton, 'color', buttonTextColor);
+
         // Style roadmap columns with custom card background
-        const roadmapColumns = document.querySelectorAll(
-          '.rounded-xl.bg-white'
-        );
-        roadmapColumns.forEach(column => {
-          column.style.backgroundColor = cardBgColor;
+        const columns = [
+          'plannedColumn',
+          'inProgressColumn',
+          'completedColumn',
+          'cancelledColumn',
+        ];
+        columns.forEach(columnId => {
+          const column = document.getElementById(columnId);
+          safeApplyStyle(column, 'backgroundColor', cardBgColor);
         });
+
+        // Style column headers
+        const headers = [
+          'plannedHeader',
+          'inProgressHeader',
+          'completedHeader',
+          'cancelledHeader',
+        ];
+        headers.forEach(headerId => {
+          const header = document.getElementById(headerId);
+          safeApplyStyle(header, 'color', suggestionsHeaderColor);
+        });
+
+        // Style column badges
+        const badges = [
+          'plannedBadge',
+          'inProgressBadge',
+          'completedBadge',
+          'cancelledBadge',
+        ];
+        badges.forEach(badgeId => {
+          const badge = document.getElementById(badgeId);
+          safeApplyStyle(badge, 'backgroundColor', metaColor + '20');
+          safeApplyStyle(badge, 'color', metaColor);
+        });
+
+        // Style empty state elements
+        const emptyStateCard = document.getElementById('emptyStateCard');
+        const emptyStateTitle = document.getElementById('emptyStateTitle');
+        const emptyStateDescription = document.getElementById(
+          'emptyStateDescription'
+        );
+        safeApplyStyle(emptyStateCard, 'backgroundColor', cardBgColor);
+        safeApplyStyle(emptyStateTitle, 'color', textColor);
+        safeApplyStyle(emptyStateDescription, 'color', metaColor);
       });
     </script>
   </body>
