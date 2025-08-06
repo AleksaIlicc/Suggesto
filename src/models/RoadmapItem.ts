@@ -19,6 +19,8 @@ export interface IRoadmapItem extends Document {
   createdBy: IUser;
   assignedTo?: IUser;
   changelogNotes?: string; // For completed items
+  tags?: string[]; // Tags for categorization
+  progress?: number; // Progress percentage (0-100)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,12 +43,10 @@ const RoadmapItemSchema: Schema = new Schema(
     priority: {
       type: String,
       enum: ['low', 'medium', 'high'],
-      default: 'medium',
     },
     type: {
       type: String,
       enum: ['feature', 'improvement', 'bug-fix', 'announcement'],
-      default: 'feature',
     },
     suggestion: {
       type: Schema.Types.ObjectId,
@@ -60,6 +60,8 @@ const RoadmapItemSchema: Schema = new Schema(
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     changelogNotes: { type: String, maxlength: 1000 },
+    tags: [{ type: String, maxlength: 50 }], // Array of tags
+    progress: { type: Number, min: 0, max: 100, default: 0 }, // Progress percentage
   },
   { timestamps: true }
 );

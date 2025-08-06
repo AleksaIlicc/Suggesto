@@ -1,26 +1,31 @@
 <div
-  class="rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4">
+  class="rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4 cursor-pointer"
+  onclick="window.location.href='/apps/<%= item.applicationId %>/roadmap/<%= item._id %>'">
   <!-- Item Header -->
   <div class="mb-2 sm:mb-3">
     <div class="flex items-start justify-between">
       <div class="flex-1">
         <h3
-          class="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base">
+          class="mb-1 line-clamp-2 text-sm font-medium text-gray-900 sm:mb-2 sm:text-base hover:text-blue-600 transition-colors">
           <%= item.title %>
         </h3>
         <div class="mb-2 flex flex-wrap items-center gap-1 sm:gap-2">
           <!-- Simple Type Badge -->
+          <% if (item.type) { %>
           <span
             class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 sm:px-2.5">
             <%= item.type.charAt(0).toUpperCase() +
             item.type.slice(1).replace('-', ' ') %>
           </span>
+          <% } %>
 
           <!-- Simple Priority Text -->
+          <% if (item.priority) { %>
           <span class="text-xs text-gray-500">
             <%= item.priority.charAt(0).toUpperCase() + item.priority.slice(1)
             %> priority
           </span>
+          <% } %>
         </div>
       </div>
 
@@ -28,11 +33,12 @@
       <div class="ml-2 flex flex-shrink-0 space-x-1">
         <a
           href="/apps/<%= item.applicationId %>/roadmap/<%= item._id %>/edit"
+          onclick="event.stopPropagation()"
           class="p-1 text-gray-400 hover:text-gray-600">
           <i class="fas fa-edit text-xs sm:text-sm"></i>
         </a>
         <button
-          onclick="deleteRoadmapItem('<%= item._id %>')"
+          onclick="event.stopPropagation(); deleteRoadmapItem('<%= item._id %>')"
           class="p-1 text-gray-400 hover:text-red-600">
           <i class="fas fa-trash text-xs sm:text-sm"></i>
         </button>
@@ -81,10 +87,9 @@
   <!-- Footer -->
   <div class="flex items-center justify-between text-xs text-gray-500">
     <div class="flex items-center space-x-2">
-      <!-- Created By -->
+      <!-- Created Date -->
       <span>
-        by <%= item.createdBy ? item.createdBy.username : 'Unknown' %> • <%=
-        moment(item.createdAt).format('MMM DD, YYYY') %>
+        <%= moment(item.createdAt).format('MMM DD, YYYY') %>
       </span>
     </div>
 

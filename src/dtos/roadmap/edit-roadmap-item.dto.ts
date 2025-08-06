@@ -30,6 +30,10 @@ export class EditRoadmapItemDto {
   @IsOptional()
   type?: string;
 
+  @IsString()
+  @IsOptional()
+  suggestion?: string; // Suggestion ID
+
   @IsDateString()
   @IsOptional()
   estimatedReleaseDate?: string;

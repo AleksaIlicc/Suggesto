@@ -10,7 +10,7 @@ const router = Router();
 // Public roadmap view
 router.get('/:appId/roadmap', roadmapController.getRoadmap);
 
-// Management routes (requires authentication and ownership)
+// Management routes (requires authentication and ownership) - These must come BEFORE the wildcard :itemId route
 router.get(
   '/:appId/roadmap/add',
   requireAuth,
@@ -40,5 +40,8 @@ router.delete(
   requireAuth,
   roadmapController.deleteRoadmapItem
 );
+
+// Public roadmap item detail view - This must come AFTER specific routes to avoid conflicts
+router.get('/:appId/roadmap/:itemId', roadmapController.getRoadmapItemDetail);
 
 export default router;

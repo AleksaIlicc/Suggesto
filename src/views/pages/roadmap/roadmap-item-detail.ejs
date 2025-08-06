@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../../shared/includes/meta') %>
+    <title><%= roadmapItem.title %> - <%= app.name %> Roadmap</title>
+    <%- include('../../shared/includes/styles') %>
+  </head>
+
+  <body id="pageBody" class="bg-background">
+    <% if (isOwner) { %>
+    <div class="fixed right-8 bottom-8">
+      <a
+        href="/apps"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md">
+        <i class="fas fa-th text-gray-dark text-xl"></i>
+      </a>
+    </div>
+    <% } %>
+
+    <!-- Header Section -->
+    <div
+      id="appHeader"
+      class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
+      <div class="flex w-full max-w-xl flex-col justify-center space-y-3">
+        <div class="flex items-center space-x-4">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+            <% if (app.design && app.design.logo) { %>
+            <img
+              src="<%= app.design.logo %>"
+              alt="<%= app.name %>"
+              class="h-full w-full rounded-full object-cover" />
+            <% } else { %>
+            <span class="text-lg font-medium text-black"
+              ><%= app.name.charAt(0) %></span
+            >
+            <% } %>
+          </div>
+          <h1 class="text-lg font-medium text-white sm:text-xl">
+            <%= app.name %> - Roadmap
+          </h1>
+        </div>
+
+        <p class="max-w-2xl text-sm text-gray-100 sm:text-base">
+          <%= app.description %>
+        </p>
+      </div>
+    </div>
+
+    <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
+      <div class="w-full max-w-xl">
+        <!-- Back Button -->
+        <div class="mb-6 flex justify-start">
+          <a
+            href="/apps/<%= app._id %>/roadmap"
+            class="flex items-center text-gray-600 transition-colors hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Roadmap
+          </a>
+        </div>
+
+        <!-- Roadmap Item Detail Card -->
+        <div class="rounded-xl bg-white p-6 shadow-sm">
+          <!-- Header with Status and Actions -->
+          <div class="mb-6 flex items-start justify-between">
+            <div class="flex-1">
+              <div class="mb-3 flex items-center space-x-3">
+                <!-- Status Badge -->
+                <span
+                  class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium"
+                  id="statusBadge">
+                  <i class="fas fa-circle mr-2 text-xs"></i>
+                  <%= roadmapItem.status.charAt(0).toUpperCase() +
+                  roadmapItem.status.slice(1).replace('-', ' ') %>
+                </span>
+
+                <!-- Type Badge -->
+                <% if (roadmapItem.type) { %>
+                <span
+                  class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                  <%= roadmapItem.type.charAt(0).toUpperCase() +
+                  roadmapItem.type.slice(1).replace('-', ' ') %>
+                </span>
+                <% } %>
+
+                <!-- Priority Indicator -->
+                <% if (roadmapItem.priority) { %>
+                <span class="text-sm text-gray-500">
+                  <%= roadmapItem.priority.charAt(0).toUpperCase() +
+                  roadmapItem.priority.slice(1) %> priority
+                </span>
+                <% } %>
+              </div>
+
+              <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">
+                <%= roadmapItem.title %>
+              </h1>
+            </div>
+
+            <% if (isOwner) { %>
+            <div class="ml-4 flex flex-shrink-0 space-x-2">
+              <a
+                href="/apps/<%= app._id %>/roadmap/<%= roadmapItem._id %>/edit"
+                class="flex items-center rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200">
+                <i class="fas fa-edit mr-2"></i>
+                Edit
+              </a>
+              <button
+                onclick="deleteRoadmapItem('<%= roadmapItem._id %>')"
+                class="flex items-center rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700 transition-colors hover:bg-red-200">
+                <i class="fas fa-trash mr-2"></i>
+                Delete
+              </button>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-6">
+            <h2 class="mb-3 text-lg font-medium text-gray-900">Description</h2>
+            <div class="prose prose-sm max-w-none text-gray-700">
+              <%= roadmapItem.description %>
+            </div>
+          </div>
+
+          <!-- Progress Bar (for in-progress items) -->
+          <% if (roadmapItem.status === 'in-progress' && roadmapItem.progress
+          !== undefined && roadmapItem.progress > 0) { %>
+          <div class="mb-6">
+            <div class="mb-2 flex items-center justify-between">
+              <h3 class="text-lg font-medium text-gray-900">Progress</h3>
+              <span class="text-sm font-medium text-gray-700"
+                ><%= roadmapItem.progress %>%</span
+              >
+            </div>
+            <div class="h-3 w-full rounded-full bg-gray-200">
+              <div
+                class="h-3 rounded-full bg-blue-600 transition-all duration-300"
+                <% /* eslint-disable css-propertyvalueexpected */ %> style="width: <%= roadmapItem.progress || 0 %>%"></div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Linked Suggestion -->
+          <% if (roadmapItem.suggestion) { %>
+          <div class="mb-6">
+            <h3 class="mb-3 text-lg font-medium text-gray-900">
+              Related Suggestion
+            </h3>
+            <div class="rounded-lg border border-gray-200 p-4">
+              <div class="mb-2 flex items-start justify-between">
+                <div class="flex-1">
+                  <h4 class="font-medium text-gray-900">
+                    <a
+                      href="/apps/<%= app._id %>/suggestions/<%= roadmapItem.suggestion._id %>"
+                      class="hover:text-blue-600">
+                      <%= roadmapItem.suggestion.title %>
+                    </a>
+                  </h4>
+                  <% if (roadmapItem.suggestion.category &&
+                  roadmapItem.suggestion.category.name) { %>
+                  <span
+                    class="mt-1 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= roadmapItem.suggestion.category.color %>20; color: <%= roadmapItem.suggestion.category.color %>">
+                    <%= roadmapItem.suggestion.category.name %>
+                  </span>
+                  <% } %>
+                </div>
+                <div class="ml-4 flex items-center space-x-2 text-sm text-gray-500">
+                  <i class="fas fa-arrow-up"></i>
+                  <span><%= roadmapItem.suggestion.voteCount %></span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 line-clamp-2">
+                <%= roadmapItem.suggestion.description %>
+              </p>
+              <div class="mt-2 text-xs text-gray-500">
+                <% if (roadmapItem.suggestion.userId) { %>
+                Suggested by <%= roadmapItem.suggestion.userId.firstName %>
+                <%= roadmapItem.suggestion.userId.lastName %> •
+                <% } %>
+                <%= moment(roadmapItem.suggestion.createdAt).format('MMM DD,
+                YYYY') %>
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Tags -->
+          <% if (roadmapItem.tags && roadmapItem.tags.length > 0) { %>
+          <div class="mb-6">
+            <h3 class="mb-3 text-lg font-medium text-gray-900">Tags</h3>
+            <div class="flex flex-wrap gap-2">
+              <% roadmapItem.tags.forEach(tag => { %>
+              <span
+                class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                #<%= tag %>
+              </span>
+              <% }) %>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Dates Section -->
+          <div class="mb-6">
+            <h3 class="mb-3 text-lg font-medium text-gray-900">Timeline</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Created</span>
+                <span class="text-sm font-medium text-gray-900">
+                  <%= moment(roadmapItem.createdAt).format('MMM DD, YYYY') %>
+                </span>
+              </div>
+              <% if (roadmapItem.estimatedReleaseDate) { %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Estimated Release</span>
+                <span class="text-sm font-medium text-gray-900">
+                  <%= moment(roadmapItem.estimatedReleaseDate).format('MMM DD,
+                  YYYY') %>
+                </span>
+              </div>
+              <% } %> <% if (roadmapItem.actualReleaseDate) { %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Actual Release</span>
+                <span class="text-sm font-medium text-green-600">
+                  <%= moment(roadmapItem.actualReleaseDate).format('MMM DD,
+                  YYYY') %>
+                </span>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Team Section -->
+          <% if (roadmapItem.assignedTo) { %>
+          <div class="mb-6">
+            <h3 class="mb-3 text-lg font-medium text-gray-900">Team</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Assigned to</span>
+                <span class="text-sm font-medium text-gray-900">
+                  <%= roadmapItem.assignedTo.firstName %>
+                  <%= roadmapItem.assignedTo.lastName %>
+                  <span class="text-gray-500"
+                    >(@<%= roadmapItem.assignedTo.username %>)</span
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Changelog Notes (for completed items) -->
+          <% if (roadmapItem.changelogNotes && roadmapItem.status ===
+          'completed') { %>
+          <div class="mb-6">
+            <h3 class="mb-3 text-lg font-medium text-gray-900">
+              Release Notes
+            </h3>
+            <div class="rounded-lg bg-green-50 p-4">
+              <div class="prose prose-sm max-w-none text-green-800">
+                <%= roadmapItem.changelogNotes %>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <%- include('../../shared/includes/scripts') %>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Apply custom app design
+        const backgroundColor =
+          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const headerTextColor =
+          '<%= app.design?.headerTextColor || "#FFFFFF" %>';
+        const backButtonColor =
+          '<%= app.design?.backButtonColor || "#6B7280" %>';
+        const cardBgColor =
+          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
+
+        // Set header background
+        const headerElement = document.getElementById('appHeader');
+        if (headerElement) {
+          headerElement.style.backgroundColor = headerColor;
+
+          // Apply header text colors
+          const headerTitle = headerElement.querySelector('h1');
+          const headerDescription = headerElement.querySelector('p');
+          if (headerTitle) headerTitle.style.color = headerTextColor;
+          if (headerDescription)
+            headerDescription.style.color = headerTextColor;
+        }
+
+        // Set body background
+        const bodyElement = document.getElementById('pageBody');
+        if (bodyElement) {
+          bodyElement.style.backgroundColor = backgroundColor;
+        }
+
+        // Set main background
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+          mainElement.style.backgroundColor = backgroundColor;
+        }
+
+        // Style back button
+        const backButton = document.querySelector('a[href*="/roadmap"]');
+        if (backButton) {
+          backButton.style.color = backButtonColor;
+          backButton.addEventListener('mouseenter', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
+          backButton.addEventListener('mouseleave', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
+        }
+
+        // Style main card with custom background
+        const mainCard = document.querySelector('.rounded-xl.bg-white');
+        if (mainCard) {
+          mainCard.style.backgroundColor = cardBgColor;
+        }
+
+        // Set status badge color based on status
+        const statusBadge = document.getElementById('statusBadge');
+        const status = '<%= roadmapItem.status %>';
+        if (statusBadge) {
+          switch (status) {
+            case 'planned':
+              statusBadge.style.backgroundColor = '#E5E7EB';
+              statusBadge.style.color = '#374151';
+              break;
+            case 'in-progress':
+              statusBadge.style.backgroundColor = '#DBEAFE';
+              statusBadge.style.color = '#1D4ED8';
+              break;
+            case 'completed':
+              statusBadge.style.backgroundColor = '#D1FAE5';
+              statusBadge.style.color = '#065F46';
+              break;
+            case 'cancelled':
+              statusBadge.style.backgroundColor = '#FEE2E2';
+              statusBadge.style.color = '#DC2626';
+              break;
+          }
+        }
+      });
+    </script>
+
+    <% if (isOwner) { %>
+    <script>
+      function deleteRoadmapItem(itemId) {
+        if (confirm('Are you sure you want to delete this roadmap item?')) {
+          fetch(`/apps/<%= app._id %>/roadmap/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                return response.json().then(data => Promise.reject(data));
+              }
+            })
+            .then(data => {
+              if (data.message) {
+                alert(data.message);
+              }
+              window.location.href = '/apps/<%= app._id %>/roadmap';
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              const errorMessage = error.error || 'Failed to delete roadmap item. Please try again.';
+              alert(errorMessage);
+            });
+        }
+      }
+    </script>
+    <% } %>
+  </body>
+</html>

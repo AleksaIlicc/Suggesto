@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import RoadmapItem, { IRoadmapItem } from '../models/RoadmapItem';
 import Application from '../models/Application';
+import Suggestion from '../models/Suggestion';
 import { IUser } from '../models/User';
 import { AddRoadmapItemDto } from '../dtos/roadmap/add-roadmap-item.dto';
 import { EditRoadmapItemDto } from '../dtos/roadmap/edit-roadmap-item.dto';
@@ -58,6 +59,71 @@ const getRoadmap = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getRoadmapItemDetail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { appId, itemId } = req.params;
+    const user = req.user as IUser | undefined;
+
+    const app = await Application.findById(appId);
+
+    if (!app) {
+      req.flash('error', 'Application not found.');
+      return res.status(404).redirect('/');
+    }
+
+    // Check if roadmap is enabled
+    if (!app.enablePublicRoadmap) {
+      req.flash('error', 'Public roadmap is not enabled for this application.');
+      return res.status(403).redirect(`/apps/${appId}`);
+    }
+
+    // Check if app is private and user has permission to view
+    const isAppOwner = user && user._id.toString() === app.user._id.toString();
+    if (!app.isPublic && !isAppOwner) {
+      req.flash('error', 'This application is private.');
+      return res.status(403).redirect('/');
+    }
+
+    // Get the specific roadmap item with all related data populated
+    const roadmapItem = await RoadmapItem.findOne({
+      _id: itemId,
+      applicationId: appId,
+    })
+      .populate('createdBy', 'firstName lastName username email')
+      .populate('assignedTo', 'firstName lastName username email')
+      .populate({
+        path: 'suggestion',
+        select: 'title description category voteCount createdAt',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName username',
+        },
+      });
+
+    if (!roadmapItem) {
+      req.flash('error', 'Roadmap item not found.');
+      return res.status(404).redirect(`/apps/${appId}/roadmap`);
+    }
+
+    res.render('pages/roadmap/roadmap-item-detail', {
+      app,
+      user,
+      roadmapItem,
+      isOwner: isAppOwner,
+    });
+  } catch (err: unknown) {
+    console.error('❌ Error in getRoadmapItemDetail:', err);
+    req.flash(
+      'error',
+      'Failed to fetch roadmap item details. Please try again.'
+    );
+    return res.status(500).redirect(`/apps/${req.params.appId}/roadmap`);
+  }
+};
+
 const getAddRoadmapItem = async (
   req: Request,
   res: Response
@@ -76,7 +142,12 @@ const getAddRoadmapItem = async (
       return res.status(404).redirect('/apps');
     }
 
-    res.render('pages/roadmap/add-roadmap-item', { app, user });
+    // Get all suggestions for this app to allow linking
+    const suggestions = await Suggestion.find({ applicationId: appId })
+      .select('title description category voteCount')
+      .sort({ voteCount: -1, createdAt: -1 });
+
+    res.render('pages/roadmap/add-roadmap-item', { app, user, suggestions });
   } catch (err: unknown) {
     console.error('❌ Error in getAddRoadmapItem:', err);
     req.flash(
@@ -95,6 +166,14 @@ const postAddRoadmapItem = async (
     const appId = req.params.appId;
     const user = req.user as IUser;
 
+    // Clean up empty strings to undefined for optional fields before processing
+    if (req.body.priority === '') req.body.priority = undefined;
+    if (req.body.type === '') req.body.type = undefined;
+    if (req.body.suggestion === '') req.body.suggestion = undefined;
+    if (req.body.estimatedReleaseDate === '')
+      req.body.estimatedReleaseDate = undefined;
+    if (req.body.assignedTo === '') req.body.assignedTo = undefined;
+
     const app = await Application.findOne({ _id: appId, user: user._id });
 
     if (!app) {
@@ -108,7 +187,7 @@ const postAddRoadmapItem = async (
     // Get the highest order number for the status
     const lastItem = await RoadmapItem.findOne({
       applicationId: appId,
-      status: req.body.status || 'planned',
+      status: req.body.status,
     }).sort({ order: -1 });
 
     const newOrder = lastItem ? lastItem.order + 1 : 0;
@@ -126,17 +205,37 @@ const postAddRoadmapItem = async (
       }
     }
 
+    // Clean up empty string values to undefined for optional fields
+    const cleanPriority =
+      req.body.priority && req.body.priority !== ''
+        ? req.body.priority
+        : undefined;
+    const cleanType =
+      req.body.type && req.body.type !== '' ? req.body.type : undefined;
+    const cleanSuggestion =
+      req.body.suggestion && req.body.suggestion !== ''
+        ? req.body.suggestion
+        : undefined;
+    const cleanEstimatedDate =
+      req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== ''
+        ? req.body.estimatedReleaseDate
+        : undefined;
+    const cleanAssignedTo =
+      req.body.assignedTo && req.body.assignedTo !== ''
+        ? req.body.assignedTo
+        : undefined;
+
     const newRoadmapItem = new RoadmapItem({
       applicationId: appId,
       title: req.body.title,
       description: req.body.description,
-      status: req.body.status || 'planned',
-      priority: req.body.priority || 'medium',
-      type: req.body.type || 'feature',
-      suggestion: req.body.suggestion || undefined,
-      estimatedReleaseDate: req.body.estimatedReleaseDate || undefined,
+      status: req.body.status,
+      priority: cleanPriority,
+      type: cleanType,
+      suggestion: cleanSuggestion,
+      estimatedReleaseDate: cleanEstimatedDate,
       tags: tags,
-      assignedTo: req.body.assignedTo || undefined,
+      assignedTo: cleanAssignedTo,
       progress: req.body.progress || 0,
       order: newOrder,
       createdBy: user._id,
@@ -181,7 +280,17 @@ const getEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    res.render('pages/roadmap/edit-roadmap-item', { app, user, roadmapItem });
+    // Get all suggestions for this app to allow linking
+    const suggestions = await Suggestion.find({ applicationId: appId })
+      .select('title description category voteCount')
+      .sort({ voteCount: -1, createdAt: -1 });
+
+    res.render('pages/roadmap/edit-roadmap-item', {
+      app,
+      user,
+      roadmapItem,
+      suggestions,
+    });
   } catch (err: unknown) {
     console.error('❌ Error in getEditRoadmapItem:', err);
     req.flash(
@@ -229,6 +338,12 @@ const putEditRoadmapItem = async (
     if (req.body.priority !== undefined)
       roadmapItem.priority = req.body.priority as any;
     if (req.body.type !== undefined) roadmapItem.type = req.body.type as any;
+    if (req.body.suggestion !== undefined) {
+      roadmapItem.suggestion =
+        req.body.suggestion && req.body.suggestion !== ''
+          ? (req.body.suggestion as any)
+          : undefined;
+    }
     if (req.body.estimatedReleaseDate !== undefined) {
       roadmapItem.estimatedReleaseDate = req.body.estimatedReleaseDate
         ? new Date(req.body.estimatedReleaseDate)
@@ -326,6 +441,7 @@ const deleteRoadmapItem = async (
 
 export default {
   getRoadmap,
+  getRoadmapItemDetail,
   getAddRoadmapItem,
   postAddRoadmapItem,
   getEditRoadmapItem,

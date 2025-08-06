@@ -7,6 +7,7 @@ import {
   IsNumber,
   Min,
   Max,
+  ValidateIf,
 } from 'class-validator';
 
 export class AddRoadmapItemDto {
@@ -17,36 +18,37 @@ export class AddRoadmapItemDto {
   description!: string;
 
   @IsEnum(['planned', 'in-progress', 'completed', 'cancelled'])
-  @IsOptional()
-  status?: string;
+  status!: string;
 
+  @ValidateIf(o => o.priority !== '' && o.priority !== undefined)
   @IsEnum(['low', 'medium', 'high'])
-  @IsOptional()
   priority?: string;
 
+  @ValidateIf(o => o.type !== '' && o.type !== undefined)
   @IsEnum(['feature', 'improvement', 'bug-fix', 'announcement'])
-  @IsOptional()
   type?: string;
 
+  @ValidateIf(o => o.suggestion !== '' && o.suggestion !== undefined)
   @IsString()
-  @IsOptional()
   suggestion?: string; // Suggestion ID
 
+  @ValidateIf(
+    o => o.estimatedReleaseDate !== '' && o.estimatedReleaseDate !== undefined
+  )
   @IsDateString()
-  @IsOptional()
   estimatedReleaseDate?: string;
 
+  @ValidateIf(o => o.tags !== undefined && o.tags.length > 0)
   @IsArray()
-  @IsOptional()
   tags?: string[];
 
+  @ValidateIf(o => o.assignedTo !== '' && o.assignedTo !== undefined)
   @IsString()
-  @IsOptional()
   assignedTo?: string; // User ID
 
+  @ValidateIf(o => o.progress !== undefined)
   @IsNumber()
   @Min(0)
   @Max(100)
-  @IsOptional()
   progress?: number;
 }
