@@ -196,13 +196,13 @@
                             type="color"
                             id="headerColor"
                             name="headerColor"
-                            value="<%= app.design?.headerColor || '#374151' %>"
+                            value="<%= app.design?.headerColor %>"
                             class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
                             onchange="updatePreview()" />
                           <input
                             type="text"
                             id="headerColorText"
-                            value="<%= app.design?.headerColor || '#374151' %>"
+                            value="<%= app.design?.headerColor %>"
                             class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                             oninput="updateColorFromText('header')" />
                         </div>
@@ -222,13 +222,13 @@
                             type="color"
                             id="headerTextColor"
                             name="headerTextColor"
-                            value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                            value="<%= app.design?.headerTextColor %>"
                             class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
                             onchange="updatePreview()" />
                           <input
                             type="text"
                             id="headerTextColorText"
-                            value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                            value="<%= app.design?.headerTextColor %>"
                             class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                             oninput="updateColorFromText('headerText')" />
                         </div>
@@ -1006,18 +1006,18 @@
       // Initialize preview on page load
       document.addEventListener('DOMContentLoaded', function () {
         // Set initial colors from server-side values
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
-        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
-        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor || "#111827" %>';
-        const suggestionTextColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
-        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
-        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor || "#E5E7EB" %>';
-        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor || "#374151" %>';
-        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor || "#6B7280" %>';
+        const headerColor = '<%= app.design?.headerColor %>';
+        const headerTextColor = '<%= app.design?.headerTextColor %>';
+        const buttonColor = '<%= app.design?.buttonColor %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor %>';
+        const backButtonColor = '<%= app.design?.backButtonColor %>';
+        const backgroundColor = '<%= app.design?.backgroundColor %>';
+        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor %>';
+        const suggestionTextColor = '<%= app.design?.suggestionTextColor %>';
+        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor %>';
+        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor %>';
+        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor %>';
+        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor %>';
 
         // Apply initial colors to preview
         const previewHeader = document.getElementById('previewHeader');
@@ -1174,11 +1174,11 @@
         const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
         if (previewAddSuggestionBtn && buttonColor) {
           previewAddSuggestionBtn.style.backgroundColor = buttonColor;
-          previewAddSuggestionBtn.style.color = buttonTextColor || '#FFFFFF';
+          previewAddSuggestionBtn.style.color = buttonTextColor;
         }
         if (previewViewRoadmapBtn && buttonColor) {
           previewViewRoadmapBtn.style.backgroundColor = buttonColor;
-          previewViewRoadmapBtn.style.color = buttonTextColor || '#FFFFFF';
+          previewViewRoadmapBtn.style.color = buttonTextColor;
         }
 
         // Apply back button color

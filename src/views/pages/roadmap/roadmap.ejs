@@ -182,20 +182,16 @@
     <script>
       // Make app design available globally for roadmap items
       window.appDesign = {
-        backgroundColor: '<%= app.design?.backgroundColor || "#F3F4F6" %>',
-        headerColor: '<%= app.design?.headerColor || "#374151" %>',
-        headerTextColor: '<%= app.design?.headerTextColor || "#FFFFFF" %>',
-        buttonColor: '<%= app.design?.buttonColor || "#111827" %>',
-        buttonTextColor: '<%= app.design?.buttonTextColor || "#FFFFFF" %>',
-        backButtonColor: '<%= app.design?.backButtonColor || "#6B7280" %>',
-        suggestionCardBgColor:
-          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>',
-        suggestionTextColor:
-          '<%= app.design?.suggestionTextColor || "#374151" %>',
-        suggestionMetaColor:
-          '<%= app.design?.suggestionMetaColor || "#6B7280" %>',
-        suggestionsHeaderColor:
-          '<%= app.design?.suggestionsHeaderColor || "#374151" %>',
+        backgroundColor: '<%= app.design?.backgroundColor %>',
+        headerColor: '<%= app.design?.headerColor %>',
+        headerTextColor: '<%= app.design?.headerTextColor %>',
+        buttonColor: '<%= app.design?.buttonColor %>',
+        buttonTextColor: '<%= app.design?.buttonTextColor %>',
+        backButtonColor: '<%= app.design?.backButtonColor %>',
+        suggestionCardBgColor: '<%= app.design?.suggestionCardBgColor %>',
+        suggestionTextColor: '<%= app.design?.suggestionTextColor %>',
+        suggestionMetaColor: '<%= app.design?.suggestionMetaColor %>',
+        suggestionsHeaderColor: '<%= app.design?.suggestionsHeaderColor %>',
       };
 
       document.addEventListener('DOMContentLoaded', function () {

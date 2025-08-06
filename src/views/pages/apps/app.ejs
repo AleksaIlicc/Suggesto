@@ -117,7 +117,9 @@
                 <p class="text-sm sm:text-base mb-3" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor %>">
                   <%= truncatedDescription %>
                   <% if (suggestion.description.length > 200) { %>
-                    <span class="underline" style="color: <%= app.design?.backButtonColor %>">Read more</span>
+                    <span class="underline" 
+                      <% /* eslint-disable css-propertyvalueexpected */ %>
+                      style="color: <%= app.design?.backButtonColor %>">Read more</span>
                   <% } %>
                 </p>
                 
@@ -137,7 +139,7 @@
                     onclick="event.stopPropagation(); toggleVote('<%= suggestion._id %>')"
                     id="vote-btn-<%= suggestion._id %>"
                     class="flex items-center cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95"
-                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.voteButtonBgColor %>; color: <%= app.design?.voteButtonTextColor %>; border: 1px solid <%= suggestion.hasUserVoted ? (app.design?.voteButtonTextColor || '#374151') : 'transparent' %>">
+                    <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.voteButtonBgColor %>; color: <%= app.design?.voteButtonTextColor %>; border: 1px solid <%= suggestion.hasUserVoted ? app.design?.voteButtonTextColor : 'transparent' %>">
                     <i class="fas fa-chevron-up text-md"></i>
                     <p class="text-sm font-medium sm:text-base" id="vote-count-<%= suggestion._id %>"
                        <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.voteButtonTextColor %>">
@@ -241,7 +243,7 @@
               
               // Add border if voted, remove if not voted
               if (data.voted) {
-                voteBtn.style.border = `2px solid ${voteButtonTextColor || '#374151'}`;
+                voteBtn.style.border = `2px solid ${voteButtonTextColor}`;
               } else {
                 voteBtn.style.border = '2px solid transparent';
               }

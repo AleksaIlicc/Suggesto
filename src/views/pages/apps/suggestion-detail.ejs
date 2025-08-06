@@ -87,7 +87,7 @@
                 onclick="toggleVote('<%= suggestion._id %>')"
                 id="vote-btn-<%= suggestion._id %>"
                 class="flex cursor-pointer items-center space-x-2 rounded-lg px-3 py-2 transition-all hover:opacity-90 active:scale-95"
-                <% /* eslint-disable css-propertyvalueexpected */ %> style="border: 1px solid <%= suggestion.hasUserVoted ? (app.design?.voteButtonTextColor || '#374151') : 'transparent' %>">
+                <% /* eslint-disable css-propertyvalueexpected */ %> style="border: 1px solid <%= suggestion.hasUserVoted ? app.design?.voteButtonTextColor : 'transparent' %>">
                 <i class="fas fa-chevron-up text-sm"></i>
                 <span
                   class="text-sm font-medium"
@@ -266,18 +266,14 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         // Apply custom app design
-        const backgroundColor =
-          '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const headerTextColor =
-          '<%= app.design?.headerTextColor || "#FFFFFF" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const backButtonColor =
-          '<%= app.design?.backButtonColor || "#6B7280" %>';
-        const cardBgColor =
-          '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
-        const textColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
-        const metaColor = '<%= app.design?.suggestionMetaColor || "#6B7280" %>';
+        const backgroundColor = '<%= app.design?.backgroundColor %>';
+        const headerColor = '<%= app.design?.headerColor %>';
+        const headerTextColor = '<%= app.design?.headerTextColor %>';
+        const buttonColor = '<%= app.design?.buttonColor %>';
+        const backButtonColor = '<%= app.design?.backButtonColor %>';
+        const cardBgColor = '<%= app.design?.suggestionCardBgColor %>';
+        const textColor = '<%= app.design?.suggestionTextColor %>';
+        const metaColor = '<%= app.design?.suggestionMetaColor %>';
 
         // Set header background
         const headerElement = document.getElementById('appHeader');
@@ -372,26 +368,14 @@
 
         // Create color variables from app design
         const designColors = {
-          voteButtonBg: '<%= app.design?.voteButtonBgColor || "" %>',
-          voteButtonText: '<%= app.design?.voteButtonTextColor || "" %>',
+          voteButtonBg: '<%= app.design?.voteButtonBgColor %>',
+          voteButtonText: '<%= app.design?.voteButtonTextColor %>',
         };
 
         // Default colors from Tailwind CSS classes
-        const defaultColors = {
-          voteButtonBg:
-            getComputedStyle(document.documentElement).getPropertyValue(
-              '--tw-color-gray-200'
-            ) || '#E5E7EB',
-          voteButtonText:
-            getComputedStyle(document.documentElement).getPropertyValue(
-              '--tw-color-gray-700'
-            ) || '#374151',
-        };
-
         const colors = {
-          voteButtonBg: designColors.voteButtonBg || defaultColors.voteButtonBg,
-          voteButtonText:
-            designColors.voteButtonText || defaultColors.voteButtonText,
+          voteButtonBg: designColors.voteButtonBg,
+          voteButtonText: designColors.voteButtonText,
         };
 
         // Always use the same colors regardless of vote status
@@ -441,8 +425,8 @@
 
             // Get design colors - only use basic colors
             const designColors = {
-              voteButtonBg: '<%= app.design?.voteButtonBgColor || "" %>',
-              voteButtonText: '<%= app.design?.voteButtonTextColor || "" %>',
+              voteButtonBg: '<%= app.design?.voteButtonBgColor %>',
+              voteButtonText: '<%= app.design?.voteButtonTextColor %>',
             };
 
             // Get colors from CSS custom properties as fallback
@@ -469,7 +453,7 @@
               
               // Add border if voted, remove if not voted
               if (data.voted) {
-                voteBtn.style.border = `2px solid ${voteButtonTextColor || '#374151'}`;
+                voteBtn.style.border = `2px solid ${voteButtonTextColor}`;
               } else {
                 voteBtn.style.border = '2px solid transparent';
               }
