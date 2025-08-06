@@ -6,16 +6,6 @@
     include('../../shared/includes/styles') %>
   </head>
   <body id="pageBody" class="bg-background">
-    <!-- Back Button -->
-    <div class="fixed left-8 top-8">
-      <a
-        href="/apps/<%= appId %>"
-        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md hover:opacity-90 transition-opacity">
-        <i class="fas fa-arrow-left text-gray-dark text-xl"></i>
-      </a>
-    </div>
-
-    <!-- App Header -->
     <div
       id="appHeader"
       class="flex justify-center p-6 shadow-sm sm:px-28 sm:py-14">
@@ -47,71 +37,79 @@
 
     <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
       <div class="w-full max-w-xl">
+        <!-- Back Button -->
+        <div class="mb-6 flex justify-start">
+          <a
+            href="/apps/<%= appId %>"
+            class="flex items-center text-gray-600 transition-colors hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to App
+          </a>
+        </div>
         <form
           action="/apps/<%= appId %>/add-suggestion"
           method="post"
           enctype="multipart/form-data"
           id="suggestionForm"
-          class="bg-primary w-full max-w-md space-y-6 rounded-xl p-10 mx-auto">
+          class="bg-primary w-full space-y-6 rounded-xl p-10">
           <h2 id="formTitle" class="text-center text-2xl">Add suggestion</h2>
-        <div class="space-y-4">
-          <div>
-            <label for="title" class="block text-sm font-medium text-gray-700"
-              >Title</label
-            >
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
-              autocomplete="false" />
+          <div class="space-y-4">
+            <div>
+              <label for="title" class="block text-sm font-medium text-gray-700"
+                >Title</label
+              >
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+                autocomplete="false" />
+            </div>
+            <div>
+              <label
+                for="description"
+                class="block text-sm font-medium text-gray-700"
+                >Description</label
+              >
+              <input
+                type="text"
+                id="description"
+                name="description"
+                required
+                class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+                autocomplete="false" />
+            </div>
+            <div>
+              <label
+                for="category"
+                class="block text-sm font-medium text-gray-700"
+                >Category</label
+              >
+              <select
+                id="category"
+                name="category[name]"
+                required
+                class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+                onchange="updateCategoryColor()">
+                <option value="">Select a category</option>
+                <% availableCategories.forEach(category => { %>
+                <option
+                  value="<%= category.name %>"
+                  data-color="<%= category.color %>">
+                  <%= category.name.charAt(0).toUpperCase() +
+                  category.name.slice(1) %>
+                </option>
+                <% }); %>
+              </select>
+              <input
+                type="hidden"
+                id="categoryColor"
+                name="category[color]"
+                value="" />
+            </div>
           </div>
           <div>
-            <label
-              for="description"
-              class="block text-sm font-medium text-gray-700"
-              >Description</label
-            >
-            <input
-              type="text"
-              id="description"
-              name="description"
-              required
-              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
-              autocomplete="false" />
-          </div>
-          <div>
-            <label
-              for="category"
-              class="block text-sm font-medium text-gray-700"
-              >Category</label
-            >
-            <select
-              id="category"
-              name="category[name]"
-              required
-              class="mt-1 block w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
-              onchange="updateCategoryColor()">
-              <option value="">Select a category</option>
-              <% availableCategories.forEach(category => { %>
-              <option
-                value="<%= category.name %>"
-                data-color="<%= category.color %>">
-                <%= category.name.charAt(0).toUpperCase() +
-                category.name.slice(1) %>
-              </option>
-              <% }); %>
-            </select>
-            <input
-              type="hidden"
-              id="categoryColor"
-              name="category[color]"
-              value="" />
-            <div class="mb-2 flex items-center space-x-2">
-          </div>
-        </div>
-        <div>
             <label class="block text-sm font-medium text-gray-700"
               >Media Files</label
             >
@@ -148,13 +146,13 @@
                 class="text-gray-dark mt-2 hidden text-sm"></p>
             </div>
           </div>
-        <button
-          id="submitButton"
-          type="submit"
-          class="bg-gray-dark hover:bg-gray-light w-full cursor-pointer rounded-xl py-2 text-white transition-colors duration-300 ease-in-out hover:text-white focus:ring-2 focus:ring-black focus:outline-none">
-          Add Suggestion
-        </button>
-      </form>
+          <button
+            id="submitButton"
+            type="submit"
+            class="bg-gray-dark hover:bg-gray-light w-full cursor-pointer rounded-xl py-2 text-white transition-colors duration-300 ease-in-out hover:text-white focus:ring-2 focus:ring-black focus:outline-none">
+            Add Suggestion
+          </button>
+        </form>
       </div>
     </main>
 
@@ -281,7 +279,7 @@
         const categorySelect = document.getElementById('category');
         const selectedOption =
           categorySelect.options[categorySelect.selectedIndex];
-        const color = selectedOption.getAttribute('data-color') || '#6b7280';
+        const color = selectedOption.getAttribute('data-color') || '';
 
         document.getElementById('categoryColor').value = color;
       }
@@ -289,17 +287,17 @@
       // Initialize category color on page load
       document.addEventListener('DOMContentLoaded', function () {
         updateCategoryColor();
-        
+
         // Apply custom app design
-        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
-        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
-        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
-        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
-        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
-        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
-        const cardBgColor = '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
-        const textColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
-        
+        const backgroundColor = '<%= app.design?.backgroundColor %>';
+        const headerColor = '<%= app.design?.headerColor %>';
+        const headerTextColor = '<%= app.design?.headerTextColor %>';
+        const buttonColor = '<%= app.design?.buttonColor %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor %>';
+        const backButtonColor = '<%= app.design?.backButtonColor %>';
+        const cardBgColor = '<%= app.design?.suggestionCardBgColor %>';
+        const textColor = '<%= app.design?.suggestionTextColor %>';
+
         // Set header background and text
         const headerElement = document.getElementById('appHeader');
         if (headerElement) {
@@ -307,52 +305,61 @@
           const headerTitle = headerElement.querySelector('h1');
           const headerDescription = headerElement.querySelector('p');
           if (headerTitle) headerTitle.style.color = headerTextColor;
-          if (headerDescription) headerDescription.style.color = headerTextColor;
+          if (headerDescription)
+            headerDescription.style.color = headerTextColor;
         }
-        
+
         // Apply back button color
         const backButton = document.querySelector('a[href*="/apps/"]');
         if (backButton) {
           backButton.style.color = backButtonColor;
+          // Override hover state to maintain custom color
+          backButton.style.setProperty('color', backButtonColor, 'important');
+          backButton.addEventListener('mouseenter', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
+          backButton.addEventListener('mouseleave', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
         }
-        
+
         // Set body background
         const bodyElement = document.getElementById('pageBody');
         if (bodyElement) {
           bodyElement.style.backgroundColor = backgroundColor;
         }
-        
+
         // Set main background
         const mainElement = document.querySelector('main');
         if (mainElement) {
           mainElement.style.backgroundColor = backgroundColor;
         }
-        
+
         // Set form background
         const formElement = document.getElementById('suggestionForm');
         if (formElement) {
           formElement.style.backgroundColor = cardBgColor;
         }
-        
+
         // Set form title color
         const titleElement = document.getElementById('formTitle');
         if (titleElement) {
           titleElement.style.color = textColor;
         }
-        
+
         // Set label colors
         const labels = document.querySelectorAll('label');
         labels.forEach(label => {
           label.style.color = textColor;
         });
-        
+
         // Set submit button background and text
         const submitButton = document.getElementById('submitButton');
         if (submitButton) {
           submitButton.style.backgroundColor = buttonColor;
           submitButton.style.color = buttonTextColor;
         }
-        
+
         // Update upload container text colors
         const uploadText = document.querySelectorAll('#uploadContainer p');
         uploadText.forEach(text => {

@@ -17,15 +17,6 @@
     </div>
     <% } %>
 
-    <!-- Back Button -->
-    <div class="fixed top-8 left-8">
-      <a
-        href="/apps/<%= app._id %>"
-        class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md transition-opacity hover:opacity-90">
-        <i class="fas fa-arrow-left text-gray-dark text-xl"></i>
-      </a>
-    </div>
-
     <!-- Header Section -->
     <div
       id="appHeader"
@@ -58,9 +49,18 @@
 
     <main class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
       <div class="w-full max-w-xl">
+        <!-- Back Button -->
+        <div class="mb-6 flex justify-start">
+          <a
+            href="/apps/<%= app._id %>"
+            class="flex items-center text-gray-600 transition-colors hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to App
+          </a>
+        </div>
         <!-- Add Item Button for Owners -->
         <% if (isOwner) { %>
-        <div class="mb-6 flex justify-end">
+        <div class="mb-6 flex justify-start">
           <a
             href="/apps/<%= app._id %>/roadmap/add"
             class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95"
@@ -82,7 +82,7 @@
                 <%= roadmapItems.planned.length %>
               </span>
             </div>
-            <div class="min-h-[100px] space-y-3">
+            <div class="min-h-[75px] space-y-3">
               <% roadmapItems.planned.forEach(item => { %> <%-
               include('../../shared/partials/roadmap-item', { item, isOwner })
               %> <% }) %>
@@ -144,13 +144,10 @@
         roadmapItems.completed.length === 0 && roadmapItems.cancelled.length ===
         0) { %>
         <div class="rounded-xl bg-white p-8 text-center shadow-sm">
-          <div class="mx-auto mb-4 h-16 w-16 text-gray-400">
-            <i class="fas fa-road text-4xl"></i>
-          </div>
           <h3 class="mb-2 text-lg font-medium text-gray-900">
             No roadmap items yet
           </h3>
-          <p class="mb-4 text-gray-500">
+          <p class="mb-8 text-gray-500">
             <% if (isOwner) { %> Get started by adding your first roadmap item
             to share your development plans. <% } else { %> The development team
             hasn't shared any roadmap items yet. <% } %>
@@ -177,7 +174,11 @@
         const backgroundColor =
           '<%= app.design?.backgroundColor || "#F3F4F6" %>';
         const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const headerTextColor =
+          '<%= app.design?.headerTextColor || "#FFFFFF" %>';
         const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const backButtonColor =
+          '<%= app.design?.backButtonColor || "#6B7280" %>';
         const cardBgColor =
           '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
 
@@ -185,6 +186,13 @@
         const headerElement = document.getElementById('appHeader');
         if (headerElement) {
           headerElement.style.backgroundColor = headerColor;
+
+          // Apply header text colors
+          const headerTitle = headerElement.querySelector('h1');
+          const headerDescription = headerElement.querySelector('p');
+          if (headerTitle) headerTitle.style.color = headerTextColor;
+          if (headerDescription)
+            headerDescription.style.color = headerTextColor;
         }
 
         // Set body background
@@ -208,6 +216,20 @@
         }
         if (addFirstButton) {
           addFirstButton.style.backgroundColor = buttonColor;
+        }
+
+        // Style back button
+        const backButton = document.querySelector('a[href*="/apps/"]');
+        if (backButton) {
+          backButton.style.color = backButtonColor;
+          // Override hover state to maintain custom color
+          backButton.style.setProperty('color', backButtonColor, 'important');
+          backButton.addEventListener('mouseenter', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
+          backButton.addEventListener('mouseleave', () => {
+            backButton.style.setProperty('color', backButtonColor, 'important');
+          });
         }
 
         // Style roadmap columns with custom card background

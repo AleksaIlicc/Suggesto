@@ -75,7 +75,7 @@
                       class="w-full rounded-xl border border-gray-300 px-4 py-3 transition-colors focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                       oninput="updatePreview()" />
                     <p class="mt-1 text-xs text-gray-500">
-                      This will be the main title of your feedback app
+                      Choose a clear, memorable name for your feedback app
                     </p>
                   </div>
 
@@ -92,11 +92,9 @@
                       rows="3"
                       placeholder="Brief description of what feedback you're collecting..."
                       class="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 transition-colors focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                      oninput="updatePreview()">
-                      <%= app.description %></textarea
-                    >
+                      oninput="updatePreview()"><%= app.description %></textarea>
                     <p class="mt-1 text-xs text-gray-500">
-                      Explain what kind of feedback or suggestions you want
+                      Clearly describe what kind of suggestions or feedback you want from users
                     </p>
                   </div>
                 </div>
@@ -165,7 +163,7 @@
                       </div>
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
-                      Upload a square image (recommended: 64x64px or larger)
+                      Upload a logo to personalize your app (JPG, PNG, GIF up to 2MB)
                     </p>
                   </div>
                 </div>
@@ -174,179 +172,219 @@
                 <div class="space-y-4">
                   <h3
                     class="border-b border-gray-200 pb-2 text-lg font-medium text-gray-900">
-                    Design & Colors
+                    Design & Appearance
                   </h3>
 
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        for="headerColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Header Background Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="headerColor"
-                          name="headerColor"
-                          value="<%= app.design?.headerColor || '#374151' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="headerColorText"
-                          value="<%= app.design?.headerColor || '#374151' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('header')" />
+                  <!-- Header Section Colors -->
+                  <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                    <h4 class="text-base font-medium text-gray-800">
+                      Header Section
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Customize the look of your app's header area where the title and description appear
+                    </p>
+                    
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          for="headerColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Header Background Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="headerColor"
+                            name="headerColor"
+                            value="<%= app.design?.headerColor || '#374151' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="headerColorText"
+                            value="<%= app.design?.headerColor || '#374151' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('header')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          The main background color for your app's header
+                        </p>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Background color for the header section
-                      </p>
-                    </div>
 
-                    <div>
-                      <label
-                        for="headerTextColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Header Text Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="headerTextColor"
-                          name="headerTextColor"
-                          value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="headerTextColorText"
-                          value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('headerText')" />
+                      <div>
+                        <label
+                          for="headerTextColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Header Text Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="headerTextColor"
+                            name="headerTextColor"
+                            value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="headerTextColorText"
+                            value="<%= app.design?.headerTextColor || '#FFFFFF' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('headerText')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for your app title and description text
+                        </p>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Text color for header title and description
-                      </p>
                     </div>
+                  </div>
 
-                    <div>
-                      <label
-                        for="buttonColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Button Background Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="buttonColor"
-                          name="buttonColor"
-                          value="<%= app.design?.buttonColor || '#111827' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="buttonColorText"
-                          value="<%= app.design?.buttonColor || '#111827' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('button')" />
+                  <!-- Action Buttons Colors -->
+                  <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                    <h4 class="text-base font-medium text-gray-800">
+                      Action Buttons
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Style the primary action buttons that users interact with
+                    </p>
+                    
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          for="buttonColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Primary Button Background
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="buttonColor"
+                            name="buttonColor"
+                            value="<%= app.design?.buttonColor || '#111827' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="buttonColorText"
+                            value="<%= app.design?.buttonColor || '#111827' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('button')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Main action buttons like "Add Suggestion"
+                        </p>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Background color for buttons and call-to-action elements
-                      </p>
+
+                      <div>
+                        <label
+                          for="buttonTextColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Primary Button Text
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="buttonTextColor"
+                            name="buttonTextColor"
+                            value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="buttonTextColorText"
+                            value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('buttonText')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Text color for primary buttons
+                        </p>
+                      </div>
                     </div>
-
-                    <div>
-                      <label
-                        for="buttonTextColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Button Text Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="buttonTextColor"
-                          name="buttonTextColor"
-                          value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="buttonTextColorText"
-                          value="<%= app.design?.buttonTextColor || '#FFFFFF' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('buttonText')" />
+                    
+                    <!-- Navigation Links in separate row -->
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          for="backButtonColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Navigation Links
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="backButtonColor"
+                            name="backButtonColor"
+                            value="<%= app.design?.backButtonColor || '#6B7280' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="backButtonColorText"
+                            value="<%= app.design?.backButtonColor || '#6B7280' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('backButton')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for back and navigation links
+                        </p>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Text color for buttons
-                      </p>
                     </div>
+                  </div>
 
-                    <div>
-                      <label
-                        for="backButtonColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Back Button Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="backButtonColor"
-                          name="backButtonColor"
-                          value="<%= app.design?.backButtonColor || '#6B7280' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="backButtonColorText"
-                          value="<%= app.design?.backButtonColor || '#6B7280' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('backButton')" />
+                  <!-- Layout & Background -->
+                  <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                    <h4 class="text-base font-medium text-gray-800">
+                      Background & Layout
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Set the overall background color of your feedback app
+                    </p>
+                    
+                    <div class="max-w-md">
+                      <div>
+                        <label
+                          for="backgroundColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Page Background Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="backgroundColor"
+                            name="backgroundColor"
+                            value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="backgroundColorText"
+                            value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('background')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Main background color behind all content
+                        </p>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Color for back/navigation buttons
-                      </p>
-                    </div>
-
-                    <div>
-                      <label
-                        for="backgroundColor"
-                        class="mb-2 block text-sm font-medium text-gray-700">
-                        Background Color
-                      </label>
-                      <div class="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          id="backgroundColor"
-                          name="backgroundColor"
-                          value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
-                          class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                          onchange="updatePreview()" />
-                        <input
-                          type="text"
-                          id="backgroundColorText"
-                          value="<%= app.design?.backgroundColor || '#F3F4F6' %>"
-                          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                          oninput="updateColorFromText('background')" />
-                      </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Background color for the main content area
-                      </p>
                     </div>
                   </div>
 
                   <!-- Suggestions Section Colors -->
-                  <div class="space-y-4 border-t border-gray-200 pt-4">
+                  <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
                     <h4 class="text-base font-medium text-gray-800">
-                      Suggestions Section Colors
+                      Suggestions & Feedback Area
                     </h4>
+                    <p class="text-sm text-gray-600">
+                      Customize how user suggestions and feedback appear in your app
+                    </p>
                     
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
                         <label
                           for="suggestionsHeaderColor"
                           class="mb-2 block text-sm font-medium text-gray-700">
-                          Suggestions Header Color
+                          Section Heading Color
                         </label>
                         <div class="flex items-center space-x-3">
                           <input
@@ -364,33 +402,7 @@
                             oninput="updateColorFromText('suggestionsHeader')" />
                         </div>
                         <p class="mt-1 text-xs text-gray-500">
-                          Color for "Recent Suggestions" heading
-                        </p>
-                      </div>
-
-                      <div>
-                        <label
-                          for="suggestionTextColor"
-                          class="mb-2 block text-sm font-medium text-gray-700">
-                          Suggestion Text Color
-                        </label>
-                        <div class="flex items-center space-x-3">
-                          <input
-                            type="color"
-                            id="suggestionTextColor"
-                            name="suggestionTextColor"
-                            value="<%= app.design?.suggestionTextColor || '#374151' %>"
-                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                            onchange="updatePreview()" />
-                          <input
-                            type="text"
-                            id="suggestionTextColorText"
-                            value="<%= app.design?.suggestionTextColor || '#374151' %>"
-                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                            oninput="updateColorFromText('suggestionText')" />
-                        </div>
-                        <p class="mt-1 text-xs text-gray-500">
-                          Color for suggestion titles and descriptions
+                          Color for "Recent Suggestions" and section headings
                         </p>
                       </div>
 
@@ -416,7 +428,59 @@
                             oninput="updateColorFromText('suggestionCardBg')" />
                         </div>
                         <p class="mt-1 text-xs text-gray-500">
-                          Background color for suggestion cards
+                          Background color for individual suggestion cards
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="suggestionTextColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Suggestion Text Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionTextColor"
+                            name="suggestionTextColor"
+                            value="<%= app.design?.suggestionTextColor || '#374151' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionTextColorText"
+                            value="<%= app.design?.suggestionTextColor || '#374151' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionText')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Main text color for suggestion titles and content
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          for="suggestionMetaColor"
+                          class="mb-2 block text-sm font-medium text-gray-700">
+                          Meta Information Color
+                        </label>
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            id="suggestionMetaColor"
+                            name="suggestionMetaColor"
+                            value="<%= app.design?.suggestionMetaColor || '#6B7280' %>"
+                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
+                            onchange="updatePreview()" />
+                          <input
+                            type="text"
+                            id="suggestionMetaColorText"
+                            value="<%= app.design?.suggestionMetaColor || '#6B7280' %>"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                            oninput="updateColorFromText('suggestionMeta')" />
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Color for author names, dates, and other metadata
                         </p>
                       </div>
 
@@ -442,7 +506,7 @@
                             oninput="updateColorFromText('voteButtonBg')" />
                         </div>
                         <p class="mt-1 text-xs text-gray-500">
-                          Background color for vote buttons
+                          Background color for voting buttons (upvote/downvote)
                         </p>
                       </div>
 
@@ -450,7 +514,7 @@
                         <label
                           for="voteButtonTextColor"
                           class="mb-2 block text-sm font-medium text-gray-700">
-                          Vote Button Text Color
+                          Vote Button Text & Icons
                         </label>
                         <div class="flex items-center space-x-3">
                           <input
@@ -468,72 +532,79 @@
                             oninput="updateColorFromText('voteButtonText')" />
                         </div>
                         <p class="mt-1 text-xs text-gray-500">
-                          Text color for vote buttons
-                        </p>
-                      </div>
-
-                      <div>
-                        <label
-                          for="suggestionMetaColor"
-                          class="mb-2 block text-sm font-medium text-gray-700">
-                          Suggestion Meta Text Color
-                        </label>
-                        <div class="flex items-center space-x-3">
-                          <input
-                            type="color"
-                            id="suggestionMetaColor"
-                            name="suggestionMetaColor"
-                            value="<%= app.design?.suggestionMetaColor || '#6B7280' %>"
-                            class="h-12 w-12 cursor-pointer rounded-lg border border-gray-300"
-                            onchange="updatePreview()" />
-                          <input
-                            type="text"
-                            id="suggestionMetaColorText"
-                            value="<%= app.design?.suggestionMetaColor || '#6B7280' %>"
-                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                            oninput="updateColorFromText('suggestionMeta')" />
-                        </div>
-                        <p class="mt-1 text-xs text-gray-500">
-                          Color for author, date, and vote count text
+                          Color for vote button text and vote count numbers
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <!-- Preset Color Themes -->
-                  <div>
-                    <label class="mb-3 block text-sm font-medium text-gray-700"
-                      >Quick Themes</label
-                    >
+                  <div class="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                    <h4 class="text-base font-medium text-gray-800">
+                      Pre-designed Themes
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Quick-start with professionally designed color combinations, or customize each color individually above
+                    </p>
+                    
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                       <button
                         type="button"
                         onclick="applyFullTheme('#374151', '#111827', '#F3F4F6', '#111827', '#374151', '#F9FAFB', '#E5E7EB', '#374151', '#6B7280')"
-                        class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
-                        <div class="h-4 w-4 rounded-full bg-gray-600"></div>
-                        <span class="text-xs">Default</span>
+                        class="flex flex-col items-center space-y-2 rounded-lg border border-gray-300 p-4 transition-all hover:border-gray-400 hover:bg-white">
+                        <div class="flex space-x-1">
+                          <div class="h-3 w-3 rounded-sm bg-gray-600"></div>
+                          <div class="h-3 w-3 rounded-sm bg-gray-800"></div>
+                          <div class="h-3 w-3 rounded-sm bg-gray-100"></div>
+                        </div>
+                        <span class="text-xs font-medium">Classic Gray</span>
+                        <span class="text-xs text-gray-500">Professional & clean</span>
                       </button>
+                      
                       <button
                         type="button"
                         onclick="applyFullTheme('#5E81AC', '#2E3440', '#ECEFF4', '#2E3440', '#4C566A', '#F9FBFF', '#D8DEE9', '#2E3440', '#8891A4')"
-                        class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
-                        <div class="h-4 w-4 rounded-full bg-[#5E81AC]"></div>
-                        <span class="text-xs">Ocean</span>
+                        class="flex flex-col items-center space-y-2 rounded-lg border border-gray-300 p-4 transition-all hover:border-gray-400 hover:bg-white">
+                        <div class="flex space-x-1">
+                          <div class="h-3 w-3 rounded-sm bg-[#5E81AC]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#2E3440]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#ECEFF4]"></div>
+                        </div>
+                        <span class="text-xs font-medium">Ocean Blue</span>
+                        <span class="text-xs text-gray-500">Calm & trustworthy</span>
                       </button>
+                      
                       <button
                         type="button"
                         onclick="applyFullTheme('#6DB56D', '#3E4E3E', '#F3F8F2', '#3E4E3E', '#5A6B5A', '#F8FBF8', '#E8F4E8', '#3E4E3E', '#9CA3AF')"
-                        class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
-                        <div class="h-4 w-4 rounded-full bg-[#6DB56D]"></div>
-                        <span class="text-xs">Meadow</span>
+                        class="flex flex-col items-center space-y-2 rounded-lg border border-gray-300 p-4 transition-all hover:border-gray-400 hover:bg-white">
+                        <div class="flex space-x-1">
+                          <div class="h-3 w-3 rounded-sm bg-[#6DB56D]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#3E4E3E]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#F3F8F2]"></div>
+                        </div>
+                        <span class="text-xs font-medium">Nature Green</span>
+                        <span class="text-xs text-gray-500">Organic & fresh</span>
                       </button>
+                      
                       <button
                         type="button"
                         onclick="applyFullTheme('#2d6da9', '#1f477e', '#e2e7e8', '#1f477e', '#4a6ba3', '#f0f4f7', '#d1dde6', '#1f477e', '#78909C')"
-                        class="flex items-center space-x-2 rounded-lg border border-gray-300 p-3 transition-colors hover:border-gray-400">
-                        <div class="h-4 w-4 rounded-full bg-[#2d6da9]"></div>
-                        <span class="text-xs">Sky</span>
+                        class="flex flex-col items-center space-y-2 rounded-lg border border-gray-300 p-4 transition-all hover:border-gray-400 hover:bg-white">
+                        <div class="flex space-x-1">
+                          <div class="h-3 w-3 rounded-sm bg-[#2d6da9]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#1f477e]"></div>
+                          <div class="h-3 w-3 rounded-sm bg-[#e2e7e8]"></div>
+                        </div>
+                        <span class="text-xs font-medium">Sky Blue</span>
+                        <span class="text-xs text-gray-500">Tech & modern</span>
                       </button>
+                    </div>
+                    
+                    <div class="text-center">
+                      <p class="text-xs text-gray-500">
+                        Click any theme to instantly apply all colors, then fine-tune individual colors above
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -582,12 +653,14 @@
                               placeholder="Category name"
                               value="<%= category.name %>"
                               class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-                              required />
+                              required 
+                              oninput="updateCategoriesPreview()" />
                             <input
                               type="color"
                               name="customCategories[<%= index %>][color]"
                               value="<%= category.color %>"
-                              class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300" />
+                              class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300"
+                              onchange="updateCategoriesPreview()" />
                             <button
                               type="button"
                               onclick="removeCustomCategory(this)"
@@ -683,7 +756,8 @@
                         name="enablePublicRoadmap"
                         value="true"
                         <%= app.enablePublicRoadmap === true ? 'checked' : '' %>
-                        class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500" />
+                        class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        onchange="toggleRoadmapPreview()" />
                       <label
                         for="enablePublicRoadmap"
                         class="text-sm font-medium text-gray-700">
@@ -726,17 +800,7 @@
                 <button
                   onclick="confirmDelete()"
                   class="inline-flex items-center rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:ring-2 focus:ring-red-200 focus:outline-none">
-                  <svg
-                    class="mr-2 h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
+                  <i class="fas fa-trash mr-2 h-4 w-4"></i>
                   Delete Application
                 </button>
               </div>
@@ -788,14 +852,14 @@
                         </div>
                         <h1
                           id="previewTitle"
-                          class="text-lg font-medium text-white sm:text-xl">
+                          class="text-lg font-medium sm:text-xl">
                           <%= app.name %>
                         </h1>
                       </div>
 
                       <p
                         id="previewDescription"
-                        class="max-w-2xl text-sm text-gray-100 sm:text-base">
+                        class="max-w-2xl text-sm sm:text-base">
                         <%= app.description %>
                       </p>
                     </div>
@@ -804,16 +868,17 @@
                   <!-- Main Content Section -->
                   <main id="previewMain" class="mx-auto flex justify-center p-6 sm:px-28 sm:py-8">
                     <div class="w-full max-w-xl">
-                      <div class="mb-4 w-full sm:mb-8">
+                      <div class="mb-4 w-full sm:mb-6">
                         <div class="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0">
                           <button
                             id="previewAddSuggestionBtn"
-                            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
+                            class="cursor-pointer rounded-xl px-6 py-3 text-base transition-all hover:opacity-90 active:scale-95">
                             Add Suggestion
                           </button>
                           <button
                             id="previewViewRoadmapBtn"
-                            class="cursor-pointer rounded-xl px-6 py-3 text-base text-white transition-all hover:opacity-90 active:scale-95">
+                            class="cursor-pointer rounded-xl px-6 py-3 text-base transition-all hover:opacity-90 active:scale-95"
+                            <% if (app.enablePublicRoadmap !== true) { %>style="display: none;"<% } %>>
                             View Roadmap
                           </button>
                         </div>
@@ -825,15 +890,25 @@
                           id="previewBackBtn"
                           class="flex items-center text-sm transition-colors hover:opacity-80">
                           <i class="fas fa-arrow-left mr-2"></i>
-                          Back to Add Suggestion
+                          Back Button (Preview)
                         </button>
+                      </div>
+
+                       <!-- Categories Preview -->
+                      <div class="mb-6">
+                        <div class="mb-3 flex items-center justify-between">
+                          <h3 class="text-sm font-medium text-gray-600">Available Categories (Preview)</h3>
+                        </div>
+                        <div id="previewCategoriesContainer" class="flex flex-wrap gap-2">
+                          <!-- Categories will be dynamically inserted here -->
+                        </div>
                       </div>
 
                       <!-- Suggestions Header with Dropdown -->
                       <div class="mb-6 flex items-center justify-between">
                         <h2 id="previewSuggestionsHeader" class="text-xl font-semibold flex items-center">
                           Showing 
-                          <select class="mx-2 px-3 py-1 rounded-md border-b border-gray-300 text-xl font-semibold cursor-pointer focus:outline-none">
+                          <select id="previewSelectDropdown" class="mx-2 px-3 py-1 rounded-md border-b border-gray-300 text-xl font-semibold cursor-pointer focus:outline-none">
                             <option value="top">Top</option>
                             <option value="trending">Trending</option>
                             <option value="new">New</option>
@@ -847,7 +922,7 @@
                         <div id="previewSuggestionCard1" class="rounded-xl p-4 shadow-sm sm:p-6">
                           <div class="mb-3 flex flex-wrap items-center gap-2">
                             <!-- Category Badge -->
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-blue-500">
+                            <span id="previewSuggestionCategory1" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-blue-500">
                               Feature
                             </span>
                             
@@ -868,11 +943,9 @@
                             
                             <div class="flex items-center justify-end space-x-3">
                               <!-- Vote Button -->
-                              <div class="flex items-center space-x-2">
-                                <button id="previewVoteButton1" class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                  </svg>
+                              <div class="flex space-x-2">
+                                <button id="previewVoteButton1" class="flex items-center cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
+                                  <i class="fas fa-chevron-up text-md"></i>
                                   <p id="previewVoteCount1" class="text-sm font-medium sm:text-base">23</p>
                                 </button>
                               </div>
@@ -883,7 +956,7 @@
                         <div id="previewSuggestionCard2" class="rounded-xl p-4 shadow-sm sm:p-6">
                           <div class="mb-3 flex flex-wrap items-center gap-2">
                             <!-- Category Badge -->
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-green-500">
+                            <span id="previewSuggestionCategory2" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white bg-green-500">
                               Improvement
                             </span>
                             
@@ -904,14 +977,15 @@
                             
                             <div class="flex items-center justify-end space-x-3">
                               <!-- Vote Button -->
-                              <div class="flex items-center space-x-2">
-                                <button id="previewVoteButton2" class="flex cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                  </svg>
+                              <div class="flex space-x-2">
+                                <button id="previewVoteButton2" class="flex items-center cursor-pointer space-x-2 rounded-lg p-2 transition-all hover:opacity-90 active:scale-95">
+                                  <i class="fas fa-chevron-up text-md"></i>
                                   <p id="previewVoteCount2" class="text-sm font-medium sm:text-base">15</p>
                                 </button>
                               </div>
+                            </div>
+                          </div>
+                        </div>
                             </div>
                           </div>
                         </div>
@@ -932,72 +1006,99 @@
       // Initialize preview on page load
       document.addEventListener('DOMContentLoaded', function () {
         // Set initial colors from server-side values
-        const headerColor = '<%= app.design?.headerColor %>';
-        const headerTextColor = '<%= app.design?.headerTextColor %>';
-        const buttonColor = '<%= app.design?.buttonColor %>';
-        const buttonTextColor = '<%= app.design?.buttonTextColor %>';
-        const backButtonColor = '<%= app.design?.backButtonColor %>';
-        const backgroundColor = '<%= app.design?.backgroundColor %>';
-        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor %>';
-        const suggestionTextColor = '<%= app.design?.suggestionTextColor %>';
-        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor %>';
-        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor %>';
-        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor %>';
-        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor %>';
+        const headerColor = '<%= app.design?.headerColor || "#374151" %>';
+        const headerTextColor = '<%= app.design?.headerTextColor || "#FFFFFF" %>';
+        const buttonColor = '<%= app.design?.buttonColor || "#111827" %>';
+        const buttonTextColor = '<%= app.design?.buttonTextColor || "#FFFFFF" %>';
+        const backButtonColor = '<%= app.design?.backButtonColor || "#6B7280" %>';
+        const backgroundColor = '<%= app.design?.backgroundColor || "#F3F4F6" %>';
+        const suggestionsHeaderColor = '<%= app.design?.suggestionsHeaderColor || "#111827" %>';
+        const suggestionTextColor = '<%= app.design?.suggestionTextColor || "#374151" %>';
+        const suggestionCardBgColor = '<%= app.design?.suggestionCardBgColor || "#FFFFFF" %>';
+        const voteButtonBgColor = '<%= app.design?.voteButtonBgColor || "#E5E7EB" %>';
+        const voteButtonTextColor = '<%= app.design?.voteButtonTextColor || "#374151" %>';
+        const suggestionMetaColor = '<%= app.design?.suggestionMetaColor || "#6B7280" %>';
 
-        // Helper function for safe style application
-        const safeApplyStyle = (id, property, value) => {
-          const element = document.getElementById(id);
-          if (element && value) {
-            element.style[property] = value;
-          }
-        };
+        // Apply initial colors to preview
+        const previewHeader = document.getElementById('previewHeader');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDescription = document.getElementById('previewDescription');
+        const previewMain = document.getElementById('previewMain');
+        const previewAddSuggestionBtn = document.getElementById('previewAddSuggestionBtn');
+        const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
+        const previewBackBtn = document.getElementById('previewBackBtn');
+        const previewSuggestionsHeader = document.getElementById('previewSuggestionsHeader');
+        const previewSelectDropdown = document.getElementById('previewSelectDropdown');
 
-        // Apply initial styles safely
-        safeApplyStyle('previewHeader', 'backgroundColor', headerColor);
-        
-        // Apply header text colors
-        safeApplyStyle('previewTitle', 'color', headerTextColor);
-        safeApplyStyle('previewDescription', 'color', headerTextColor);
-        
+        // Apply header colors
+        if (previewHeader) previewHeader.style.backgroundColor = headerColor;
+        if (previewTitle) previewTitle.style.color = headerTextColor;
+        if (previewDescription) previewDescription.style.color = headerTextColor;
+
         // Apply button colors
-        safeApplyStyle('previewAddSuggestionBtn', 'backgroundColor', buttonColor);
-        safeApplyStyle('previewAddSuggestionBtn', 'color', buttonTextColor);
-        safeApplyStyle('previewViewRoadmapBtn', 'backgroundColor', buttonColor);
-        safeApplyStyle('previewViewRoadmapBtn', 'color', buttonTextColor);
-        
-        // Apply back button color
-        safeApplyStyle('previewBackBtn', 'color', backButtonColor);
-        
-        // Apply main background
-        safeApplyStyle('previewMain', 'backgroundColor', backgroundColor);
-        
-        // Apply suggestions colors
-        safeApplyStyle('previewSuggestionsHeader', 'color', suggestionsHeaderColor);
-        
-        // Apply suggestion cards
-        safeApplyStyle('previewSuggestionCard1', 'backgroundColor', suggestionCardBgColor);
-        safeApplyStyle('previewSuggestionCard2', 'backgroundColor', suggestionCardBgColor);
-        
+        if (previewAddSuggestionBtn) {
+          previewAddSuggestionBtn.style.backgroundColor = buttonColor;
+          previewAddSuggestionBtn.style.color = buttonTextColor;
+        }
+        if (previewViewRoadmapBtn) {
+          previewViewRoadmapBtn.style.backgroundColor = buttonColor;
+          previewViewRoadmapBtn.style.color = buttonTextColor;
+        }
+
+        // Apply other colors
+        if (previewBackBtn) previewBackBtn.style.color = backButtonColor;
+        if (previewMain) previewMain.style.backgroundColor = backgroundColor;
+        if (previewSuggestionsHeader) previewSuggestionsHeader.style.color = suggestionsHeaderColor;
+        if (previewSelectDropdown) {
+          previewSelectDropdown.style.color = suggestionsHeaderColor;
+          previewSelectDropdown.style.backgroundColor = backgroundColor;
+        }
+
+        // Apply suggestion card colors
+        const previewSuggestionCard1 = document.getElementById('previewSuggestionCard1');
+        const previewSuggestionCard2 = document.getElementById('previewSuggestionCard2');
+        if (previewSuggestionCard1) previewSuggestionCard1.style.backgroundColor = suggestionCardBgColor;
+        if (previewSuggestionCard2) previewSuggestionCard2.style.backgroundColor = suggestionCardBgColor;
+
         // Apply suggestion text colors
-        safeApplyStyle('previewSuggestionTitle1', 'color', suggestionTextColor);
-        safeApplyStyle('previewSuggestionText1', 'color', suggestionTextColor);
-        safeApplyStyle('previewSuggestionTitle2', 'color', suggestionTextColor);
-        safeApplyStyle('previewSuggestionText2', 'color', suggestionTextColor);
+        const previewSuggestionTitle1 = document.getElementById('previewSuggestionTitle1');
+        const previewSuggestionText1 = document.getElementById('previewSuggestionText1');
+        const previewSuggestionTitle2 = document.getElementById('previewSuggestionTitle2');
+        const previewSuggestionText2 = document.getElementById('previewSuggestionText2');
         
-        // Apply vote buttons
-        safeApplyStyle('previewVoteButton1', 'backgroundColor', voteButtonBgColor);
-        safeApplyStyle('previewVoteButton1', 'color', voteButtonTextColor);
-        safeApplyStyle('previewVoteButton2', 'backgroundColor', voteButtonBgColor);
-        safeApplyStyle('previewVoteButton2', 'color', voteButtonTextColor);
+        if (previewSuggestionTitle1) previewSuggestionTitle1.style.color = suggestionTextColor;
+        if (previewSuggestionText1) previewSuggestionText1.style.color = suggestionTextColor;
+        if (previewSuggestionTitle2) previewSuggestionTitle2.style.color = suggestionTextColor;
+        if (previewSuggestionText2) previewSuggestionText2.style.color = suggestionTextColor;
 
         // Apply meta text colors
-        safeApplyStyle('previewSuggestionMeta1', 'color', suggestionMetaColor);
-        safeApplyStyle('previewSuggestionMeta2', 'color', suggestionMetaColor);
-        safeApplyStyle('previewVoteCount1', 'color', voteButtonTextColor);
-        safeApplyStyle('previewVoteCount2', 'color', voteButtonTextColor);
+        const previewSuggestionMeta1 = document.getElementById('previewSuggestionMeta1');
+        const previewSuggestionMeta2 = document.getElementById('previewSuggestionMeta2');
+        if (previewSuggestionMeta1) previewSuggestionMeta1.style.color = suggestionMetaColor;
+        if (previewSuggestionMeta2) previewSuggestionMeta2.style.color = suggestionMetaColor;
+
+        // Apply vote button colors
+        const previewVoteButton1 = document.getElementById('previewVoteButton1');
+        const previewVoteButton2 = document.getElementById('previewVoteButton2');
+        const previewVoteCount1 = document.getElementById('previewVoteCount1');
+        const previewVoteCount2 = document.getElementById('previewVoteCount2');
+        
+        if (previewVoteButton1) {
+          previewVoteButton1.style.backgroundColor = voteButtonBgColor;
+          previewVoteButton1.style.color = voteButtonTextColor;
+        }
+        if (previewVoteButton2) {
+          previewVoteButton2.style.backgroundColor = voteButtonBgColor;
+          previewVoteButton2.style.color = voteButtonTextColor;
+        }
+        if (previewVoteCount1) previewVoteCount1.style.color = voteButtonTextColor;
+        if (previewVoteCount2) previewVoteCount2.style.color = voteButtonTextColor;
 
         updatePreview();
+        // Initialize categories preview
+        updateCategoriesPreview();
+        // Initialize roadmap button visibility
+        toggleRoadmapPreview();
       });
 
       function updateColorFromText(type) {
@@ -1011,125 +1112,33 @@
         }
       }
 
+      function toggleRoadmapPreview() {
+        const enablePublicRoadmapCheckbox = document.getElementById('enablePublicRoadmap');
+        const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
+
+        if (enablePublicRoadmapCheckbox && previewViewRoadmapBtn) {
+          if (enablePublicRoadmapCheckbox.checked) {
+            previewViewRoadmapBtn.style.display = 'block';
+          } else {
+            previewViewRoadmapBtn.style.display = 'none';
+          }
+        }
+      }
+
       function updatePreview() {
-        // Safely get form values
+        // Update text content
         const nameEl = document.getElementById('name');
         const descEl = document.getElementById('description');
-        const headerColorEl = document.getElementById('headerColor');
-        const headerTextColorEl = document.getElementById('headerTextColor');
-        const buttonColorEl = document.getElementById('buttonColor');
-        const buttonTextColorEl = document.getElementById('buttonTextColor');
-        const backButtonColorEl = document.getElementById('backButtonColor');
-        const backgroundColorEl = document.getElementById('backgroundColor');
-        const suggestionsHeaderColorEl = document.getElementById('suggestionsHeaderColor');
-        const suggestionTextColorEl = document.getElementById('suggestionTextColor');
-        const suggestionCardBgColorEl = document.getElementById('suggestionCardBgColor');
-        const voteButtonBgColorEl = document.getElementById('voteButtonBgColor');
-        const voteButtonTextColorEl = document.getElementById('voteButtonTextColor');
-        const suggestionMetaColorEl = document.getElementById('suggestionMetaColor');
 
         const name = nameEl ? nameEl.value || '<%= app.name %>' : '<%= app.name %>';
         const description = descEl ? descEl.value || '<%= app.description %>' : '<%= app.description %>';
-        const headerColor = headerColorEl ? headerColorEl.value : '';
-        const headerTextColor = headerTextColorEl ? headerTextColorEl.value : '';
-        const buttonColor = buttonColorEl ? buttonColorEl.value : '';
-        const buttonTextColor = buttonTextColorEl ? buttonTextColorEl.value : '';
-        const backButtonColor = backButtonColorEl ? backButtonColorEl.value : '';
-        const backgroundColor = backgroundColorEl ? backgroundColorEl.value : '';
-        const suggestionsHeaderColor = suggestionsHeaderColorEl ? suggestionsHeaderColorEl.value : '';
-        const suggestionTextColor = suggestionTextColorEl ? suggestionTextColorEl.value : '';
-        const suggestionCardBgColor = suggestionCardBgColorEl ? suggestionCardBgColorEl.value : '';
-        const voteButtonBgColor = voteButtonBgColorEl ? voteButtonBgColorEl.value : '';
-        const voteButtonTextColor = voteButtonTextColorEl ? voteButtonTextColorEl.value : '';
-        const suggestionMetaColor = suggestionMetaColorEl ? suggestionMetaColorEl.value : '';
 
-        // Update preview elements safely
+        // Update preview text elements
         const previewTitle = document.getElementById('previewTitle');
         const previewDescription = document.getElementById('previewDescription');
-        const previewHeader = document.getElementById('previewHeader');
         
         if (previewTitle) previewTitle.textContent = name;
         if (previewDescription) previewDescription.textContent = description;
-        if (previewHeader) {
-          previewHeader.style.backgroundColor = headerColor;
-        }
-
-        // Update header text colors
-        if (previewTitle) previewTitle.style.color = headerTextColor;
-        if (previewDescription) previewDescription.style.color = headerTextColor;
-
-        // Update buttons safely
-        const previewAddSuggestionBtn = document.getElementById('previewAddSuggestionBtn');
-        const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
-        
-        if (previewAddSuggestionBtn) {
-          previewAddSuggestionBtn.style.backgroundColor = buttonColor;
-          previewAddSuggestionBtn.style.color = buttonTextColor;
-        }
-        if (previewViewRoadmapBtn) {
-          previewViewRoadmapBtn.style.backgroundColor = buttonColor;
-          previewViewRoadmapBtn.style.color = buttonTextColor;
-        }
-
-        // Update back button
-        const previewBackBtn = document.getElementById('previewBackBtn');
-        if (previewBackBtn) previewBackBtn.style.color = backButtonColor;
-
-        // Update main background
-        const previewMain = document.getElementById('previewMain');
-        if (previewMain) previewMain.style.backgroundColor = backgroundColor;
-
-        // Update suggestions section colors
-        const previewSuggestionsHeader = document.getElementById('previewSuggestionsHeader');
-        if (previewSuggestionsHeader) previewSuggestionsHeader.style.color = suggestionsHeaderColor;
-        
-        // Update suggestion cards
-        const previewSuggestionCard1 = document.getElementById('previewSuggestionCard1');
-        const previewSuggestionCard2 = document.getElementById('previewSuggestionCard2');
-        if (previewSuggestionCard1) previewSuggestionCard1.style.backgroundColor = suggestionCardBgColor;
-        if (previewSuggestionCard2) previewSuggestionCard2.style.backgroundColor = suggestionCardBgColor;
-        
-        // Update suggestion text colors
-        const previewSuggestionTitle1 = document.getElementById('previewSuggestionTitle1');
-        const previewSuggestionText1 = document.getElementById('previewSuggestionText1');
-        const previewSuggestionTitle2 = document.getElementById('previewSuggestionTitle2');
-        const previewSuggestionText2 = document.getElementById('previewSuggestionText2');
-        
-        if (previewSuggestionTitle1) previewSuggestionTitle1.style.color = suggestionTextColor;
-        if (previewSuggestionText1) previewSuggestionText1.style.color = suggestionTextColor;
-        if (previewSuggestionTitle2) previewSuggestionTitle2.style.color = suggestionTextColor;
-        if (previewSuggestionText2) previewSuggestionText2.style.color = suggestionTextColor;
-        
-        // Update vote buttons
-        const previewVoteButton1 = document.getElementById('previewVoteButton1');
-        const previewVoteButton2 = document.getElementById('previewVoteButton2');
-        if (previewVoteButton1) {
-          previewVoteButton1.style.backgroundColor = voteButtonBgColor;
-          previewVoteButton1.style.color = voteButtonTextColor;
-        }
-        if (previewVoteButton2) {
-          previewVoteButton2.style.backgroundColor = voteButtonBgColor;
-          previewVoteButton2.style.color = voteButtonTextColor;
-        }
-
-        // Update meta text colors
-        const previewSuggestionMeta1 = document.getElementById('previewSuggestionMeta1');
-        const previewSuggestionMeta2 = document.getElementById('previewSuggestionMeta2');
-        const previewVoteCount1 = document.getElementById('previewVoteCount1');
-        const previewVoteCount2 = document.getElementById('previewVoteCount2');
-        
-        if (previewSuggestionMeta1) previewSuggestionMeta1.style.color = suggestionMetaColor;
-        if (previewSuggestionMeta2) previewSuggestionMeta2.style.color = suggestionMetaColor;
-        if (previewVoteCount1) previewVoteCount1.style.color = voteButtonTextColor;
-        if (previewVoteCount2) previewVoteCount2.style.color = voteButtonTextColor;
-
-        // Update background colors (only in preview area)
-        const contentSections = document.querySelectorAll(
-          '#previewContent .bg-background'
-        );
-        contentSections.forEach(section => {
-          section.style.backgroundColor = backgroundColor;
-        });
 
         // Update icon if no logo
         const logoImg = document.getElementById('previewLogoImg');
@@ -1140,24 +1149,182 @@
           }
         }
 
-        // Update color text inputs safely
-        const safeUpdateTextInput = (id, value) => {
-          const element = document.getElementById(id);
-          if (element) element.value = value;
-        };
+        // Get current color values from form inputs
+        const headerColor = document.getElementById('headerColor')?.value;
+        const headerTextColor = document.getElementById('headerTextColor')?.value;
+        const buttonColor = document.getElementById('buttonColor')?.value;
+        const buttonTextColor = document.getElementById('buttonTextColor')?.value;
+        const backButtonColor = document.getElementById('backButtonColor')?.value;
+        const backgroundColor = document.getElementById('backgroundColor')?.value;
+        const suggestionsHeaderColor = document.getElementById('suggestionsHeaderColor')?.value;
+        const suggestionTextColor = document.getElementById('suggestionTextColor')?.value;
+        const suggestionCardBgColor = document.getElementById('suggestionCardBgColor')?.value;
+        const voteButtonBgColor = document.getElementById('voteButtonBgColor')?.value;
+        const voteButtonTextColor = document.getElementById('voteButtonTextColor')?.value;
+        const suggestionMetaColor = document.getElementById('suggestionMetaColor')?.value;
 
-        safeUpdateTextInput('headerColorText', headerColor);
-        safeUpdateTextInput('headerTextColorText', headerTextColor);
-        safeUpdateTextInput('buttonColorText', buttonColor);
-        safeUpdateTextInput('buttonTextColorText', buttonTextColor);
-        safeUpdateTextInput('backButtonColorText', backButtonColor);
-        safeUpdateTextInput('backgroundColorText', backgroundColor);
-        safeUpdateTextInput('suggestionsHeaderColorText', suggestionsHeaderColor);
-        safeUpdateTextInput('suggestionTextColorText', suggestionTextColor);
-        safeUpdateTextInput('suggestionCardBgColorText', suggestionCardBgColor);
-        safeUpdateTextInput('voteButtonBgColorText', voteButtonBgColor);
-        safeUpdateTextInput('voteButtonTextColorText', voteButtonTextColor);
-        safeUpdateTextInput('suggestionMetaColorText', suggestionMetaColor);
+        // Apply header colors
+        const previewHeader = document.getElementById('previewHeader');
+        if (previewHeader && headerColor) previewHeader.style.backgroundColor = headerColor;
+        if (previewTitle && headerTextColor) previewTitle.style.color = headerTextColor;
+        if (previewDescription && headerTextColor) previewDescription.style.color = headerTextColor;
+
+        // Apply button colors
+        const previewAddSuggestionBtn = document.getElementById('previewAddSuggestionBtn');
+        const previewViewRoadmapBtn = document.getElementById('previewViewRoadmapBtn');
+        if (previewAddSuggestionBtn && buttonColor) {
+          previewAddSuggestionBtn.style.backgroundColor = buttonColor;
+          previewAddSuggestionBtn.style.color = buttonTextColor || '#FFFFFF';
+        }
+        if (previewViewRoadmapBtn && buttonColor) {
+          previewViewRoadmapBtn.style.backgroundColor = buttonColor;
+          previewViewRoadmapBtn.style.color = buttonTextColor || '#FFFFFF';
+        }
+
+        // Apply back button color
+        const previewBackBtn = document.getElementById('previewBackBtn');
+        if (previewBackBtn && backButtonColor) previewBackBtn.style.color = backButtonColor;
+
+        // Apply main background
+        const previewMain = document.getElementById('previewMain');
+        if (previewMain && backgroundColor) previewMain.style.backgroundColor = backgroundColor;
+
+        // Apply suggestions header color
+        const previewSuggestionsHeader = document.getElementById('previewSuggestionsHeader');
+        const previewSelectDropdown = document.getElementById('previewSelectDropdown');
+        if (previewSuggestionsHeader && suggestionsHeaderColor) previewSuggestionsHeader.style.color = suggestionsHeaderColor;
+        if (previewSelectDropdown) {
+          if (suggestionsHeaderColor) previewSelectDropdown.style.color = suggestionsHeaderColor;
+          if (backgroundColor) previewSelectDropdown.style.backgroundColor = backgroundColor;
+        }
+
+        // Apply suggestion card colors
+        const previewSuggestionCard1 = document.getElementById('previewSuggestionCard1');
+        const previewSuggestionCard2 = document.getElementById('previewSuggestionCard2');
+        if (previewSuggestionCard1 && suggestionCardBgColor) previewSuggestionCard1.style.backgroundColor = suggestionCardBgColor;
+        if (previewSuggestionCard2 && suggestionCardBgColor) previewSuggestionCard2.style.backgroundColor = suggestionCardBgColor;
+
+        // Apply suggestion text colors
+        const previewSuggestionTitle1 = document.getElementById('previewSuggestionTitle1');
+        const previewSuggestionText1 = document.getElementById('previewSuggestionText1');
+        const previewSuggestionTitle2 = document.getElementById('previewSuggestionTitle2');
+        const previewSuggestionText2 = document.getElementById('previewSuggestionText2');
+        
+        if (previewSuggestionTitle1 && suggestionTextColor) previewSuggestionTitle1.style.color = suggestionTextColor;
+        if (previewSuggestionText1 && suggestionTextColor) previewSuggestionText1.style.color = suggestionTextColor;
+        if (previewSuggestionTitle2 && suggestionTextColor) previewSuggestionTitle2.style.color = suggestionTextColor;
+        if (previewSuggestionText2 && suggestionTextColor) previewSuggestionText2.style.color = suggestionTextColor;
+
+        // Apply meta text colors
+        const previewSuggestionMeta1 = document.getElementById('previewSuggestionMeta1');
+        const previewSuggestionMeta2 = document.getElementById('previewSuggestionMeta2');
+        if (previewSuggestionMeta1 && suggestionMetaColor) previewSuggestionMeta1.style.color = suggestionMetaColor;
+        if (previewSuggestionMeta2 && suggestionMetaColor) previewSuggestionMeta2.style.color = suggestionMetaColor;
+
+        // Apply vote button colors
+        const previewVoteButton1 = document.getElementById('previewVoteButton1');
+        const previewVoteButton2 = document.getElementById('previewVoteButton2');
+        const previewVoteCount1 = document.getElementById('previewVoteCount1');
+        const previewVoteCount2 = document.getElementById('previewVoteCount2');
+        
+        if (previewVoteButton1) {
+          if (voteButtonBgColor) previewVoteButton1.style.backgroundColor = voteButtonBgColor;
+          if (voteButtonTextColor) previewVoteButton1.style.color = voteButtonTextColor;
+        }
+        if (previewVoteButton2) {
+          if (voteButtonBgColor) previewVoteButton2.style.backgroundColor = voteButtonBgColor;
+          if (voteButtonTextColor) previewVoteButton2.style.color = voteButtonTextColor;
+        }
+        if (previewVoteCount1 && voteButtonTextColor) previewVoteCount1.style.color = voteButtonTextColor;
+        if (previewVoteCount2 && voteButtonTextColor) previewVoteCount2.style.color = voteButtonTextColor;
+
+        // Update categories preview
+        updateCategoriesPreview();
+      }
+
+      function updateCategoriesPreview() {
+        const container = document.getElementById('previewCategoriesContainer');
+        if (!container) return;
+
+        // Clear existing categories
+        container.innerHTML = '';
+
+        const isDefaultCategories = document.getElementById('defaultCategoriesEnabled')?.checked;
+        let availableCategories = [];
+
+        if (isDefaultCategories) {
+          // Show default categories
+          const defaultCategories = [
+            { name: 'Bug', color: '#EF4444' },
+            { name: 'Feature', color: '#3B82F6' },
+            { name: 'Improvement', color: '#10B981' },
+            { name: 'Other', color: '#6B7280' }
+          ];
+
+          availableCategories = defaultCategories;
+
+          defaultCategories.forEach(category => {
+            const badge = document.createElement('span');
+            badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white';
+            badge.style.backgroundColor = category.color;
+            badge.textContent = category.name;
+            container.appendChild(badge);
+          });
+        } else {
+          // Show custom categories
+          const customCategoryInputs = document.querySelectorAll('.custom-category-item');
+          
+          if (customCategoryInputs.length === 0) {
+            // Show placeholder if no custom categories
+            const placeholder = document.createElement('span');
+            placeholder.className = 'text-xs text-gray-400 italic';
+            placeholder.textContent = 'Add custom categories to see preview';
+            container.appendChild(placeholder);
+          } else {
+            customCategoryInputs.forEach(categoryItem => {
+              const nameInput = categoryItem.querySelector('input[type="text"]');
+              const colorInput = categoryItem.querySelector('input[type="color"]');
+              
+              if (nameInput && colorInput && nameInput.value.trim()) {
+                const category = { name: nameInput.value.trim(), color: colorInput.value };
+                availableCategories.push(category);
+
+                const badge = document.createElement('span');
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white';
+                badge.style.backgroundColor = category.color;
+                badge.textContent = category.name;
+                container.appendChild(badge);
+              }
+            });
+          }
+        }
+
+        // Update suggestion card categories
+        updateSuggestionCardCategories(availableCategories);
+      }
+
+      function updateSuggestionCardCategories(availableCategories) {
+        if (!availableCategories || availableCategories.length === 0) {
+          return;
+        }
+
+        // Update first suggestion card
+        const suggestionCard1Badge = document.getElementById('previewSuggestionCategory1');
+        if (suggestionCard1Badge && availableCategories[0]) {
+          suggestionCard1Badge.style.backgroundColor = availableCategories[0].color;
+          suggestionCard1Badge.textContent = availableCategories[0].name;
+        }
+
+        // Update second suggestion card  
+        const suggestionCard2Badge = document.getElementById('previewSuggestionCategory2');
+        if (suggestionCard2Badge && availableCategories.length > 1) {
+          suggestionCard2Badge.style.backgroundColor = availableCategories[1].color;
+          suggestionCard2Badge.textContent = availableCategories[1].name;
+        } else if (suggestionCard2Badge && availableCategories[0]) {
+          // Use first category if only one available
+          suggestionCard2Badge.style.backgroundColor = availableCategories[0].color;
+          suggestionCard2Badge.textContent = availableCategories[0].name;
+        }
       }
 
       function updateColorFromText(type) {
@@ -1401,6 +1568,9 @@
             addCustomCategory();
           }
         }
+
+        // Update categories preview
+        updateCategoriesPreview();
       }
 
       function addCustomCategory(name = '', color = '#6b7280') {
@@ -1416,12 +1586,14 @@
             placeholder="Category name"
             value="${name}"
             class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
-            required />
+            required 
+            oninput="updateCategoriesPreview()" />
           <input
             type="color"
             name="customCategories[${categoryCounter-1}][color]"
             value="${color}"
-            class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300" />
+            class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300"
+            onchange="updateCategoriesPreview()" />
           <button
             type="button"
             onclick="removeCustomCategory(this)"
@@ -1431,10 +1603,15 @@
         `;
         
         categoriesList.appendChild(categoryDiv);
+
+        // Update categories preview
+        updateCategoriesPreview();
       }
 
       function removeCustomCategory(button) {
         button.closest('.custom-category-item').remove();
+        // Update categories preview
+        updateCategoriesPreview();
       }
 
       // Form validation

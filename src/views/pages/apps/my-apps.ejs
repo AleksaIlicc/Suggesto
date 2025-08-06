@@ -34,18 +34,19 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <% if (apps.length > 0) { %> <% apps.forEach(app => { %>
           <div
-            class="group rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-gray-200 ">
+            class="group rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-gray-200">
             <!-- App Preview Header -->
             <div
               class="app-header relative h-28 overflow-hidden rounded-t-2xl p-4"
-              <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.headerColor || '#374151' %>">
+              style="background-color: <%= app.design?.headerColor %>">
               <div class="flex items-start justify-between text-white">
                 <div class="min-w-0 flex-1 pr-3">
                   <h3 class="mb-1 truncate text-lg font-semibold">
                     <%= app.name %>
                   </h3>
                   <p class="truncate text-sm opacity-75">
-                    <%= app.suggestions ? app.suggestions.length : 0 %> total suggestions
+                    <%= app.suggestions ? app.suggestions.length : 0 %> total
+                    suggestions
                   </p>
                   <p class="truncate text-sm opacity-75">
                     last opened <%= app.lastOpened ? new
@@ -71,20 +72,21 @@
 
             <!-- App Content -->
             <div class="p-5">
-              <p
-                class="mb-4 h-10 line-clamp-2 overflow-hidden text-sm leading-5 text-gray-600">
-                <%= app.description %>
-              </p>
+              <div class="mb-4 h-10 text-sm leading-5 text-gray-600">
+                <div class="line-clamp-2"><%= app.description %></div>
+              </div>
               <div class="mb-3 flex justify-center">
                 <a
                   href="/apps/<%= app._id %>"
                   class="w-full rounded-lg px-3 py-2.5 text-center text-sm font-medium text-white transition-colors hover:opacity-90"
-                  <% /* eslint-disable css-propertyvalueexpected */ %> style="background-color: <%= app.design?.buttonColor %>; color: <%= app.design?.buttonTextColor %>">
+                  style="
+                    background-color: <%= app.design?.buttonColor %>;
+                    color: <%= app.design?.buttonTextColor %>;
+                  ">
                   Public View
                 </a>
               </div>
 
-              <!-- Secondary Actions -->
               <div class="flex justify-center">
                 <div class="relative">
                   <button
@@ -97,7 +99,7 @@
                   <div
                     id="app-menu-<%= app._id %>"
                     class="absolute top-full left-1/2 z-50 mt-2 hidden w-40 -translate-x-1/2 transform rounded-lg border border-gray-200 bg-white shadow-xl">
-                    <div >
+                    <div>
                       <a
                         href="/apps/<%= app._id %>/edit"
                         class="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -106,14 +108,14 @@
                       </a>
                       <button
                         onclick="copyPublicLink('<%= app._id %>')"
-                        class="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="flex w-full cursor-pointer items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-copy h-4 w-4"></i>
                         <span>Copy Link</span>
                       </button>
                       <div class="border-t border-gray-100"></div>
                       <button
                         onclick="confirmDelete('<%= app._id %>', '<%= app.name %>')"
-                        class="flex w-full items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        class="flex w-full cursor-pointer items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                         <i class="fas fa-trash h-4 w-4"></i>
                         <span>Delete</span>
                       </button>
@@ -125,7 +127,6 @@
           </div>
           <% }) %>
 
-          <!-- Create New App Card -->
           <a
             href="/apps/add-app"
             class="group flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all duration-300 hover:border-gray-400 hover:bg-gray-100">
@@ -145,7 +146,6 @@
             </div>
           </a>
           <% } else { %>
-          <!-- Empty State -->
           <div class="col-span-full">
             <div class="py-16 text-center">
               <h3 class="mb-3 text-xl font-semibold text-gray-900">
@@ -162,20 +162,9 @@
       </main>
     </div>
 
-    <!-- Toast Notification -->
-    <div
-      id="toast"
-      class="fixed top-4 right-4 z-50 hidden rounded-lg bg-green-500 px-6 py-3 text-white shadow-lg">
-      <div class="flex items-center space-x-2">
-        <i class="fas fa-check-circle h-5 w-5"></i>
-        <span id="toast-message">Link copied to clipboard!</span>
-      </div>
-    </div>
-
     <%- include('../../shared/includes/scripts') %>
     <script>
-      // Helper function for safe element access
-      const safeGetElement = (id) => {
+      const safeGetElement = id => {
         const element = document.getElementById(id);
         return element;
       };
@@ -183,21 +172,18 @@
       function toggleAppMenu(appId) {
         const menu = safeGetElement(`app-menu-${appId}`);
         if (!menu) return;
-        
+
         const allMenus = document.querySelectorAll('[id^="app-menu-"]');
 
-        // Close all other menus
         allMenus.forEach(m => {
           if (m.id !== `app-menu-${appId}`) {
             m.classList.add('hidden');
           }
         });
 
-        // Toggle the current menu
         menu.classList.toggle('hidden');
       }
 
-      // Close menus when clicking outside
       document.addEventListener('click', function (event) {
         if (
           !event.target.closest('[onclick*="toggleAppMenu"]') &&
@@ -211,17 +197,15 @@
 
       function copyPublicLink(appId) {
         const url = `${window.location.origin}/apps/${appId}`;
-        navigator.clipboard
-          .writeText(url)
-          .catch(() => {
-            // Fallback for older browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = url;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-          });
+        navigator.clipboard.writeText(url).catch(() => {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = url;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        });
 
         // Close the menu safely
         const menu = safeGetElement(`app-menu-${appId}`);
@@ -233,10 +217,9 @@
       function confirmDelete(appId, appName) {
         if (
           confirm(
-            `Are you sure you want to delete "${appName}"?\n\nThis action cannot be undone and will remove all suggestions and votes associated with this app.`
+            `Are you sure you want to delete "${appName}"?\n\nThis action cannot be undone and will remove all associated data.`
           )
         ) {
-          // Create a form to submit DELETE request
           const form = document.createElement('form');
           form.method = 'POST';
           form.action = `/apps/${appId}?_method=DELETE`;
@@ -244,24 +227,9 @@
           form.submit();
         }
 
-        // Close the menu safely
         const menu = safeGetElement(`app-menu-${appId}`);
         if (menu) {
           menu.classList.add('hidden');
-        }
-      }
-
-      function showToast(message) {
-        const toast = safeGetElement('toast');
-        const toastMessage = safeGetElement('toast-message');
-        
-        if (toast && toastMessage) {
-          toastMessage.textContent = message;
-          toast.classList.remove('hidden');
-
-          setTimeout(() => {
-            toast.classList.add('hidden');
-          }, 3000);
         }
       }
     </script>
