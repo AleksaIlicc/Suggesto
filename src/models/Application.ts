@@ -10,6 +10,7 @@ export interface IApplication extends Document {
     title: string;
     description: string;
     voteCount?: number;
+    category?: { name: string; color: string };
   }[];
   design: {
     headerColor: string;
@@ -50,6 +51,10 @@ const ApplicationSchema: Schema = new Schema(
         title: { type: String },
         description: { type: String },
         voteCount: { type: Number, default: 0 },
+        category: {
+          name: { type: String },
+          color: { type: String },
+        },
       },
     ],
     design: {

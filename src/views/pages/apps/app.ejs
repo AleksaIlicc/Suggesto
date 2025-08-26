@@ -95,11 +95,6 @@
                   <%= suggestion.category.name.charAt(0).toUpperCase() + suggestion.category.name.slice(1) %>
                 </span>
               <% } %>
-
-              <span class="text-xs" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionMetaColor %>">
-                by <%= suggestion.userId ? `${suggestion.userId.firstName} ${suggestion.userId.lastName}` : 'Anonymous User' %> • 
-                <%= moment(suggestion.createdAt).format('MMM DD, YYYY') %>
-              </span>
             </div>
             
             <div
@@ -110,27 +105,19 @@
                 </h3>
                 <% 
                   // Truncate description to approximately 4 lines (roughly 200 characters)
-                  const truncatedDescription = suggestion.description.length > 200 
-                    ? suggestion.description.substring(0, 200) + '...' 
-                    : suggestion.description;
+                  const description = suggestion.description || '';
+                  const truncatedDescription = description.length > 200 
+                    ? description.substring(0, 200) + '...' 
+                    : description;
                 %>
                 <p class="text-sm sm:text-base mb-3" <% /* eslint-disable css-propertyvalueexpected */ %> style="color: <%= app.design?.suggestionTextColor %>">
                   <%= truncatedDescription %>
-                  <% if (suggestion.description.length > 200) { %>
+                  <% if (description.length > 200) { %>
                     <span class="underline" 
                       <% /* eslint-disable css-propertyvalueexpected */ %>
                       style="color: <%= app.design?.backButtonColor %>">Read more</span>
                   <% } %>
                 </p>
-                
-                <% if (suggestion.files && suggestion.files.length > 0) { %>
-                  <div class="mb-3">
-                    <div class="flex items-center text-sm text-gray-600">
-                      <i class="fas fa-paperclip mr-1"></i>
-                      <span><%= suggestion.files.length %> attachment<%= suggestion.files.length > 1 ? 's' : '' %></span>
-                    </div>
-                  </div>
-                <% } %>
               </div>
               
               <div class="flex items-center justify-end space-x-3">

@@ -23,24 +23,6 @@ const VoteSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Create a compound index that handles both authenticated and anonymous votes
-// For authenticated users: user + suggestion must be unique
-// For anonymous users: sessionId + suggestion must be unique
-VoteSchema.index(
-  { user: 1, suggestion: 1 },
-  {
-    unique: true,
-    partialFilterExpression: { user: { $exists: true, $ne: null } },
-  }
-);
-VoteSchema.index(
-  { sessionId: 1, suggestion: 1 },
-  {
-    unique: true,
-    partialFilterExpression: { sessionId: { $exists: true, $ne: null } },
-  }
-);
-
 const Vote = mongoose.model<IVote>('Vote', VoteSchema);
 
 export default Vote;

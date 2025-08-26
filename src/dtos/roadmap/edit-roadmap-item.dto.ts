@@ -3,10 +3,6 @@ import {
   IsOptional,
   IsEnum,
   IsDateString,
-  IsArray,
-  IsNumber,
-  Min,
-  Max,
   ValidateIf,
 } from 'class-validator';
 
@@ -40,32 +36,4 @@ export class EditRoadmapItemDto {
   )
   @IsDateString()
   estimatedReleaseDate?: string;
-
-  @ValidateIf(
-    o => o.actualReleaseDate !== '' && o.actualReleaseDate !== undefined
-  )
-  @IsDateString()
-  actualReleaseDate?: string;
-
-  @ValidateIf(o => o.tags !== undefined && o.tags.length > 0)
-  @IsArray()
-  tags?: string[];
-
-  @ValidateIf(o => o.assignedTo !== '' && o.assignedTo !== undefined)
-  @IsString()
-  assignedTo?: string; // User ID
-
-  @ValidateIf(o => o.progress !== undefined)
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  progress?: number;
-
-  @ValidateIf(o => o.changelogNotes !== '' && o.changelogNotes !== undefined)
-  @IsString()
-  changelogNotes?: string;
-
-  @ValidateIf(o => o.order !== undefined)
-  @IsNumber()
-  order?: number;
 }

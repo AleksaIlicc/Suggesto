@@ -67,6 +67,11 @@ router.put(
 );
 
 // DELETE methods - authenticated
+router.delete(
+  '/:appId/suggestions/:suggestionId',
+  requireAuth,
+  appController.deleteSuggestion
+);
 router.delete('/:id', requireAuth, appController.deleteApp);
 
 export default router;

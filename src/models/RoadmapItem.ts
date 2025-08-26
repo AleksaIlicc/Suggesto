@@ -52,13 +52,6 @@ const RoadmapItemSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-RoadmapItemSchema.index({
-  applicationId: 1,
-  status: 1,
-  estimatedReleaseDate: 1,
-});
-RoadmapItemSchema.index({ applicationId: 1, createdAt: -1 });
-
 const RoadmapItem = mongoose.model<IRoadmapItem>(
   'RoadmapItem',
   RoadmapItemSchema

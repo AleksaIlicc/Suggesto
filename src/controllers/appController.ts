@@ -6,7 +6,9 @@ import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
+import RoadmapItem from '../models/RoadmapItem';
 import { getDefaultCategories } from '../utils/defaultCategories';
+import moment from 'moment-timezone';
 
 const getApp = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -23,22 +25,38 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/');
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
       return res.status(403).redirect('/');
     }
 
-    // Determine sorting criteria based on sortType
     let suggestions;
 
-    if (sortType === 'trending') {
-      // Trending: most votes in last 2 weeks
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    if (sortType === 'new') {
+      suggestions = [...(app.suggestions || [])].reverse().map(s => ({
+        _id: s._id,
+        title: s.title,
+        description: s.description,
+        voteCount: s.voteCount || 0,
+        category: s.category,
+        hasUserVoted: false,
+      }));
+    } else if (sortType === 'top') {
+      suggestions = [...(app.suggestions || [])]
+        .sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
+        .map(s => ({
+          _id: s._id,
+          title: s.title,
+          description: s.description,
+          voteCount: s.voteCount || 0,
+          category: s.category,
+          hasUserVoted: false,
+        }));
+    } else if (sortType === 'trending') {
+      const twoWeeksAgo = moment().subtract(14, 'days');
 
-      suggestions = await Suggestion.aggregate([
+      const trendingSuggestions = await Suggestion.aggregate([
         { $match: { applicationId: app._id } },
         {
           $lookup: {
@@ -55,36 +73,40 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
                   },
                 },
               },
+              { $count: 'count' },
             ],
             as: 'recentVotes',
           },
         },
-        { $addFields: { recentVoteCount: { $size: '$recentVotes' } } },
-        { $sort: { recentVoteCount: -1, createdAt: -1 } },
         {
-          $lookup: {
-            from: 'users',
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'userDetails',
+          $addFields: {
+            recentVoteCount: {
+              $ifNull: [{ $arrayElemAt: ['$recentVotes.count', 0] }, 0],
+            },
           },
         },
-        { $addFields: { userId: { $arrayElemAt: ['$userDetails', 0] } } },
-        { $project: { userDetails: 0 } },
+        { $sort: { recentVoteCount: -1, createdAt: -1 } },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            description: 1,
+            category: 1,
+            voteCount: 1,
+          },
+        },
       ]);
-    } else if (sortType === 'top') {
-      // Top: most votes overall
-      suggestions = await Suggestion.find({ applicationId: app._id })
-        .populate('userId', 'firstName lastName username')
-        .sort({ voteCount: -1, createdAt: -1 });
-    } else {
-      // New: most recent
-      suggestions = await Suggestion.find({ applicationId: app._id })
-        .populate('userId', 'firstName lastName username')
-        .sort({ createdAt: -1 });
+
+      suggestions = trendingSuggestions.map(s => ({
+        _id: s._id,
+        title: s.title,
+        description: s.description,
+        voteCount: s.voteCount || 0,
+        category: s.category,
+        hasUserVoted: false,
+      }));
     }
 
-    // Check which suggestions the current user/session has voted for
     let userVotes: string[] = [];
     if (user) {
       const votes = await Vote.find({
@@ -101,11 +123,10 @@ const getApp = async (req: Request, res: Response): Promise<void> => {
     }
 
     const enhancedSuggestions = suggestions.map(suggestion => ({
-      ...(suggestion.toObject ? suggestion.toObject() : suggestion),
+      ...suggestion,
       hasUserVoted: userVotes.includes(suggestion._id.toString()),
     }));
 
-    // Update lastOpened timestamp if the current user is the app owner
     const isOwner = user && user._id.toString() === app.user._id.toString();
     if (isOwner) {
       await Application.findByIdAndUpdate(app._id, { lastOpened: new Date() });
@@ -170,11 +191,11 @@ const postAddApp = async (
       customCategories: req.body.customCategories || [],
       defaultCategoriesEnabled: req.body.defaultCategoriesEnabled === 'true',
       // Privacy settings (default to public and allow all)
-      isPublic: req.body.isPublic !== 'false', // Default true unless explicitly set to false
+      isPublic: req.body.isPublic !== 'false',
       allowAnonymousVotes: req.body.allowAnonymousVotes !== 'false',
       allowPublicSubmissions: req.body.allowPublicSubmissions !== 'false',
       // Roadmap settings
-      enablePublicRoadmap: req.body.enablePublicRoadmap === 'true', // Default false unless explicitly enabled
+      enablePublicRoadmap: req.body.enablePublicRoadmap === 'true',
       user: user._id,
     });
 
@@ -201,20 +222,17 @@ const getAddSuggestion = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/');
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
       return res.status(403).redirect('/');
     }
 
-    // Check if public submissions are allowed
     if (!user && !app.allowPublicSubmissions) {
       req.flash('error', 'Please sign in to submit suggestions.');
       return res.status(403).redirect('/auth/login');
     }
 
-    // Get available categories based on app settings
     const availableCategories = app.defaultCategoriesEnabled
       ? getDefaultCategories()
       : app.customCategories;
@@ -240,7 +258,6 @@ const getSuggestionDetail = async (
     const sessionId = req.sessionID;
     const { id: appId, suggestionId } = req.params;
 
-    // Find the application
     const app = await Application.findOne({ _id: appId }).populate('user');
 
     if (!app) {
@@ -248,14 +265,12 @@ const getSuggestionDetail = async (
       return res.status(404).redirect('/');
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
       return res.status(403).redirect('/');
     }
 
-    // Find the specific suggestion
     const suggestion = await Suggestion.findOne({
       _id: suggestionId,
       applicationId: appId,
@@ -268,7 +283,6 @@ const getSuggestionDetail = async (
       return res.status(404).redirect(`/apps/${appId}`);
     }
 
-    // Check if current user/session has voted for this suggestion
     let hasUserVoted = false;
     if (user) {
       const existingVote = await Vote.findOne({
@@ -317,20 +331,17 @@ const postAddSuggestion = async (
       return res.status(404).redirect('/apps');
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
       return res.status(403).redirect('/');
     }
 
-    // Check if public submissions are allowed
     if (!user && !app.allowPublicSubmissions) {
       req.flash('error', 'Please sign in to submit suggestions.');
       return res.status(403).redirect('/auth/login');
     }
 
-    // Process uploaded files
     const processedFiles = files
       ? files.map((file: any) => ({
           originalName: file.originalname,
@@ -341,14 +352,12 @@ const postAddSuggestion = async (
         }))
       : [];
 
-    // Handle category selection
     let selectedCategory = req.body.category;
     if (
       !selectedCategory ||
       !selectedCategory.name ||
       !selectedCategory.color
     ) {
-      // Default to first available category if none selected or invalid
       const availableCategories = app.defaultCategoriesEnabled
         ? getDefaultCategories()
         : app.customCategories;
@@ -366,7 +375,7 @@ const postAddSuggestion = async (
       description: req.body.description,
       category: selectedCategory,
       applicationId: req.params.id,
-      userId: user ? user._id : null, // Support anonymous submissions
+      userId: user ? user._id : null,
       files: processedFiles,
       voteCount: 0,
     });
@@ -378,6 +387,7 @@ const postAddSuggestion = async (
       title: req.body.title,
       description: req.body.description,
       voteCount: 0,
+      category: selectedCategory,
     });
 
     await app.save();
@@ -389,8 +399,6 @@ const postAddSuggestion = async (
     return res.status(500).redirect(`/apps/${req.params.id}/add-suggestion`);
   }
 };
-
-// New functions for additional features
 
 const getEditApp = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -440,7 +448,6 @@ const putEditApp = async (
       return res.status(404).redirect('/apps');
     }
 
-    // Update application fields
     app.name = req.body.name;
     app.description = req.body.description;
     app.design = {
@@ -459,20 +466,16 @@ const putEditApp = async (
       logo: req.body.logo || app.design?.logo || '',
     };
 
-    // Update category-related fields
     if (req.body.customCategories !== undefined) {
       app.customCategories = req.body.customCategories;
     }
 
-    // Handle checkbox: if not present in request body, it means unchecked (false)
     app.defaultCategoriesEnabled = req.body.defaultCategoriesEnabled === 'true';
 
-    // Handle privacy settings
     app.isPublic = req.body.isPublic === 'true';
     app.allowAnonymousVotes = req.body.allowAnonymousVotes === 'true';
     app.allowPublicSubmissions = req.body.allowPublicSubmissions === 'true';
 
-    // Handle roadmap settings
     app.enablePublicRoadmap = req.body.enablePublicRoadmap === 'true';
 
     await app.save();
@@ -502,17 +505,15 @@ const deleteApp = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/apps');
     }
 
-    // Delete all related suggestions and votes
     const suggestions = await Suggestion.find({ applicationId: app._id });
     const suggestionIds = suggestions.map(s => s._id);
 
-    // Delete all votes for these suggestions
     await Vote.deleteMany({ suggestion: { $in: suggestionIds } });
 
-    // Delete all suggestions
     await Suggestion.deleteMany({ applicationId: app._id });
 
-    // Delete the application
+    await RoadmapItem.deleteMany({ applicationId: app._id });
+
     await Application.findByIdAndDelete(app._id);
 
     req.flash(
@@ -525,7 +526,6 @@ const deleteApp = async (req: Request, res: Response): Promise<void> => {
     return res.status(500).redirect('/apps');
   }
 };
-
 const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user as IUser | undefined;
@@ -538,7 +538,6 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Get the application to check permissions
     const app = await Application.findById(suggestion.applicationId);
     if (!app) {
       res
@@ -547,7 +546,6 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check if app is private and user has permission to view/vote
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       res
@@ -556,7 +554,6 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check if anonymous votes are allowed
     if (!user && !app.allowAnonymousVotes) {
       res
         .status(403)
@@ -564,7 +561,6 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check if user has already voted (for both logged-in and anonymous users)
     let existingVote;
     if (user) {
       existingVote = await Vote.findOne({
@@ -575,22 +571,20 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       existingVote = await Vote.findOne({
         sessionId: sessionId,
         suggestion: suggestionId,
+        user: { $exists: false },
       });
     }
 
     if (existingVote) {
-      // Remove vote (toggle off)
       await Vote.findByIdAndDelete(existingVote._id);
       const newVoteCount = Math.max(0, suggestion.voteCount - 1);
 
-      // Update vote count directly without full validation
       await Suggestion.findByIdAndUpdate(
         suggestionId,
         { voteCount: newVoteCount },
         { runValidators: false }
       );
 
-      // Update application's suggestions array
       const app = await Application.findById(suggestion.applicationId);
       if (app) {
         const suggestionInApp = app.suggestions.find(
@@ -598,8 +592,8 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
         );
         if (suggestionInApp) {
           suggestionInApp.voteCount = newVoteCount;
+          await app.save();
         }
-        await app.save();
       }
 
       res.json({
@@ -609,33 +603,29 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     } else {
-      // Add vote
       let newVote;
       if (user) {
-        // Authenticated user vote
         newVote = new Vote({
           user: user._id,
           suggestion: suggestionId,
         });
       } else {
-        // Anonymous vote
         newVote = new Vote({
           sessionId: sessionId,
           suggestion: suggestionId,
         });
       }
+
       await newVote.save();
 
       const newVoteCount = suggestion.voteCount + 1;
 
-      // Update vote count directly without full validation
       await Suggestion.findByIdAndUpdate(
         suggestionId,
         { voteCount: newVoteCount },
         { runValidators: false }
       );
 
-      // Update application's suggestions array
       const app = await Application.findById(suggestion.applicationId);
       if (app) {
         const suggestionInApp = app.suggestions.find(
@@ -643,50 +633,36 @@ const voteOnSuggestion = async (req: Request, res: Response): Promise<void> => {
         );
         if (suggestionInApp) {
           suggestionInApp.voteCount = newVoteCount;
+          await app.save();
         }
-        await app.save();
       }
 
       res.json({ success: true, voted: true, voteCount: newVoteCount });
       return;
     }
   } catch (error: unknown) {
-    console.log('Error processing vote:', error);
+    console.error('Error processing vote:', error);
     res.status(500).json({ success: false, message: 'Failed to process vote' });
   }
 };
 
-// Logo upload/remove methods
 const uploadLogo = async (req: Request, res: Response): Promise<void> => {
   try {
     const logoFile = req.file;
-    const appId = req.body.appId; // Get app ID from request body
+    const appId = req.body.appId;
     const user = req.user as IUser;
-
-    console.log('=== UPLOAD LOGO REQUEST START ===');
-    console.log('App ID from body:', appId);
-    console.log('User ID:', user?._id);
 
     if (!logoFile) {
       res.status(400).json({ success: false, message: 'No file uploaded' });
       return;
     }
 
-    // Return the relative path to the uploaded file
     const logoPath = `/uploads/${logoFile.filename}`;
-    console.log('Logo uploaded successfully:', logoFile.originalname);
-    console.log('Logo path:', logoPath);
 
-    // If appId is provided, update the app's design in database
     if (appId && appId !== 'temp') {
-      console.log('Updating app design with new logo...');
-
-      // Find the application and verify ownership
       const app = await Application.findOne({ _id: appId, user: user._id });
 
       if (app) {
-        console.log('App found, updating logo in database...');
-        // Remove old logo file if it exists
         if (
           app.design?.logo &&
           app.design.logo.startsWith('/uploads/') &&
@@ -710,19 +686,12 @@ const uploadLogo = async (req: Request, res: Response): Promise<void> => {
           }
         }
 
-        // Update app design with new logo
         app.design = { ...app.design, logo: logoPath };
 
         await app.save();
-        console.log('✅ App design updated with new logo');
-      } else {
-        console.log('⚠️ App not found or permission denied');
       }
-    } else {
-      console.log('No app ID provided - treating as temporary upload');
     }
 
-    console.log('=== UPLOAD LOGO REQUEST END ===');
     res.json({
       success: true,
       logoPath: logoPath,
@@ -736,24 +705,14 @@ const uploadLogo = async (req: Request, res: Response): Promise<void> => {
 
 const removeLogo = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('=== REMOVE LOGO REQUEST START ===');
     const user = req.user as IUser;
     const appId = req.params.appId;
 
-    console.log('User ID:', user?._id);
-    console.log('App ID from params:', appId);
-
-    // Handle temporary logo cleanup (from add-app.ejs)
     if (appId === 'temp') {
-      console.log('Handling temporary logo cleanup...');
       const { logoPath } = req.body;
-      console.log('Logo path to delete:', logoPath);
-
       if (logoPath && logoPath.startsWith('/uploads/')) {
         const fs = require('fs');
         const path = require('path');
-
-        console.log('__dirname:', __dirname);
 
         const filePath = path.join(
           __dirname,
@@ -761,27 +720,17 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
           path.basename(logoPath)
         );
 
-        console.log('Constructed file path:', filePath);
-
         const fileExists = fs.existsSync(filePath);
-        console.log('File exists on filesystem:', fileExists);
 
         if (fileExists) {
           try {
             fs.unlinkSync(filePath);
-            console.log(
-              '✅ Temporary logo file deleted successfully:',
-              filePath
-            );
           } catch (deleteError) {
             console.error('❌ Error deleting temporary file:', deleteError);
           }
-        } else {
-          console.log('⚠️ Temporary logo file not found at path:', filePath);
         }
       }
 
-      console.log('=== TEMPORARY LOGO CLEANUP END ===');
       res.json({
         success: true,
         message: 'Temporary logo removed successfully',
@@ -789,10 +738,6 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Handle permanent logo removal (from edit-app.ejs)
-    console.log('Handling permanent logo removal...');
-
-    // Find the application and verify ownership
     const app = await Application.findOne({ _id: appId, user: user._id });
 
     console.log('Found app:', !!app);
@@ -809,7 +754,6 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Remove logo from filesystem if it exists
     if (app.design?.logo && app.design.logo.startsWith('/uploads/')) {
       console.log('Logo exists in database, proceeding with file deletion...');
       const fs = require('fs');
@@ -837,8 +781,6 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
           console.error('❌ Error deleting file:', deleteError);
         }
       } else {
-        console.log('⚠️ Logo file not found at path:', logoPath);
-        // List files in uploads directory for debugging
         try {
           const uploadsDir = path.join(__dirname, '../uploads');
           const files = fs.readdirSync(uploadsDir);
@@ -851,7 +793,6 @@ const removeLogo = async (req: Request, res: Response): Promise<void> => {
       console.log('No logo to delete or logo path invalid:', app.design?.logo);
     }
 
-    // Update application to remove logo
     console.log('Updating database to remove logo path...');
     app.design = { ...app.design, logo: '' };
 
@@ -897,9 +838,8 @@ const addComment = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Add the new comment with proper typing
     const newComment = {
-      user: user._id as any, // Cast to any since Mongoose will handle the ObjectId reference
+      user: user._id as any,
       text: text.trim(),
       createdAt: new Date(),
     };
@@ -921,6 +861,74 @@ const addComment = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const deleteSuggestion = async (
+  req: Request,
+  res: Response
+): Promise<void | Response> => {
+  try {
+    const { appId, suggestionId } = req.params;
+    const user = req.user as IUser;
+
+    const app = await Application.findOne({ _id: appId, user: user._id });
+
+    if (!app) {
+      req.flash(
+        'error',
+        'Application not found or you do not have permission to manage it.'
+      );
+
+      if (req.headers.accept?.includes('application/json')) {
+        return res.status(404).json({
+          error:
+            'Application not found or you do not have permission to manage it.',
+        });
+      }
+      return res.status(404).redirect('/apps');
+    }
+
+    const suggestion = await Suggestion.findOne({
+      _id: suggestionId,
+      applicationId: appId,
+    });
+
+    if (!suggestion) {
+      req.flash('error', 'Suggestion not found.');
+      if (req.headers.accept?.includes('application/json')) {
+        return res.status(404).json({ error: 'Suggestion not found.' });
+      }
+      return res.status(404).redirect(`/apps/${appId}`);
+    }
+
+    await Vote.deleteMany({ suggestion: suggestionId });
+
+    await Suggestion.findByIdAndDelete(suggestionId);
+
+    await Application.findByIdAndUpdate(appId, {
+      $pull: { suggestions: { _id: suggestionId } },
+    });
+
+    req.flash('success', 'Suggestion deleted successfully.');
+    if (req.headers.accept?.includes('application/json')) {
+      return res
+        .status(200)
+        .json({ message: 'Suggestion deleted successfully.' });
+    }
+    return res.status(200).redirect(`/apps/${appId}`);
+  } catch (err: unknown) {
+    console.error('❌ Error in deleteSuggestion:', err);
+    req.flash('error', 'Failed to delete suggestion. Please try again.');
+    if (
+      req.headers.accept?.includes('application/json') ||
+      req.headers['content-type']?.includes('application/json')
+    ) {
+      return res
+        .status(500)
+        .json({ error: 'Failed to delete suggestion. Please try again.' });
+    }
+    return res.status(500).redirect(`/apps/${req.params.appId}`);
+  }
+};
+
 export default {
   getApp,
   getApps,
@@ -936,4 +944,5 @@ export default {
   uploadLogo,
   removeLogo,
   addComment,
+  deleteSuggestion,
 };

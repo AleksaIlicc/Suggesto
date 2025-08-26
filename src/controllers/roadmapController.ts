@@ -18,13 +18,11 @@ const getRoadmap = async (req: Request, res: Response): Promise<void> => {
       return res.status(404).redirect('/');
     }
 
-    // Check if roadmap is enabled
     if (!app.enablePublicRoadmap) {
       req.flash('error', 'Public roadmap is not enabled for this application.');
       return res.status(403).redirect(`/apps/${appId}`);
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
@@ -32,9 +30,10 @@ const getRoadmap = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Get roadmap items grouped by status
-    const roadmapItems = await RoadmapItem.find({ applicationId: appId })
-      .populate('suggestion', 'title description')
-      .sort({ estimatedReleaseDate: 1, createdAt: -1 });
+    const roadmapItems = await RoadmapItem.find({ applicationId: appId }).sort({
+      estimatedReleaseDate: 1,
+      createdAt: -1,
+    });
 
     // Group items by status
     const groupedItems = {
@@ -72,20 +71,17 @@ const getRoadmapItemDetail = async (
       return res.status(404).redirect('/');
     }
 
-    // Check if roadmap is enabled
     if (!app.enablePublicRoadmap) {
       req.flash('error', 'Public roadmap is not enabled for this application.');
       return res.status(403).redirect(`/apps/${appId}`);
     }
 
-    // Check if app is private and user has permission to view
     const isAppOwner = user && user._id.toString() === app.user._id.toString();
     if (!app.isPublic && !isAppOwner) {
       req.flash('error', 'This application is private.');
       return res.status(403).redirect('/');
     }
 
-    // Get the specific roadmap item with all related data populated
     const roadmapItem = await RoadmapItem.findOne({
       _id: itemId,
       applicationId: appId,
@@ -137,7 +133,6 @@ const getAddRoadmapItem = async (
       return res.status(404).redirect('/apps');
     }
 
-    // Get all suggestions for this app to allow linking
     const suggestions = await Suggestion.find({ applicationId: appId })
       .select('title description category voteCount')
       .sort({ voteCount: -1, createdAt: -1 });
@@ -178,7 +173,6 @@ const postAddRoadmapItem = async (
       status: req.body.status,
     };
 
-    // Add optional fields only if they have valid values
     if (req.body.priority && req.body.priority !== '') {
       newRoadmapItemData.priority = req.body.priority;
     }
@@ -235,7 +229,6 @@ const getEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    // Get all suggestions for this app to allow linking
     const suggestions = await Suggestion.find({ applicationId: appId })
       .select('title description category voteCount')
       .sort({ voteCount: -1, createdAt: -1 });
@@ -284,14 +277,12 @@ const putEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    // Update required fields if provided
     if (req.body.title !== undefined) roadmapItem.title = req.body.title;
     if (req.body.description !== undefined)
       roadmapItem.description = req.body.description;
     if (req.body.status !== undefined)
       roadmapItem.status = req.body.status as any;
 
-    // Handle optional fields - only update if explicitly provided
     if (req.body.priority !== undefined) {
       roadmapItem.priority =
         req.body.priority && req.body.priority !== ''
@@ -345,7 +336,7 @@ const deleteRoadmapItem = async (
         'error',
         'Application not found or you do not have permission to manage it.'
       );
-      // Check if it's an AJAX request
+
       if (req.headers.accept?.includes('application/json')) {
         return res.status(404).json({
           error:
@@ -362,7 +353,6 @@ const deleteRoadmapItem = async (
 
     if (!roadmapItem) {
       req.flash('error', 'Roadmap item not found.');
-      // Check if it's an AJAX request
       if (req.headers.accept?.includes('application/json')) {
         return res.status(404).json({ error: 'Roadmap item not found.' });
       }
@@ -370,7 +360,6 @@ const deleteRoadmapItem = async (
     }
 
     req.flash('success', 'Roadmap item deleted successfully.');
-    // Check if it's an AJAX request
     if (req.headers.accept?.includes('application/json')) {
       return res
         .status(200)
@@ -380,7 +369,6 @@ const deleteRoadmapItem = async (
   } catch (err: unknown) {
     console.error('❌ Error in deleteRoadmapItem:', err);
     req.flash('error', 'Failed to delete roadmap item. Please try again.');
-    // Check if it's an AJAX request
     if (
       req.headers.accept?.includes('application/json') ||
       req.headers['content-type']?.includes('application/json')
