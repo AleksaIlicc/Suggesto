@@ -4,8 +4,8 @@ import { ISuggestion } from './Suggestion';
 
 export interface IVote extends Document {
   _id: string;
-  user?: IUser; // Optional for anonymous votes
-  sessionId?: string; // For anonymous voting
+  user?: IUser;
+  sessionId?: string;
   suggestion: ISuggestion;
   createdAt: Date;
 }
@@ -13,7 +13,7 @@ export interface IVote extends Document {
 const VoteSchema: Schema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: false },
-    sessionId: { type: String, required: false }, // For anonymous voting
+    sessionId: { type: String, required: false },
     suggestion: {
       type: Schema.Types.ObjectId,
       ref: 'Suggestion',

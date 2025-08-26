@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import RoadmapItem, { IRoadmapItem } from '../models/RoadmapItem';
+import RoadmapItem from '../models/RoadmapItem';
 import Application from '../models/Application';
 import Suggestion from '../models/Suggestion';
 import { IUser } from '../models/User';

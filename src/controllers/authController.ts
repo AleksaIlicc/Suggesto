@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { CreateUserDto } from '../dtos/auth/create-user.dto';
 import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '../dtos/auth/reset-password.dto';
-import User, { IUser } from '../models/User';
+import User from '../models/User';
 import bcrypt from 'bcrypt';
 import { LoginUserDto } from '../dtos/auth/login-user.dto';
 import passport from 'passport';
@@ -149,19 +149,15 @@ const postForgotPassword = async (
       return res.status(404).redirect('/auth/forgot-password');
     }
 
-    // Generate reset token
     const resetToken = generateResetToken();
     const hashedToken = hashToken(resetToken);
 
-    // Set token and expiry (1 hour from now)
     user.resetToken = hashedToken;
-    user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
+    user.resetTokenExpiry = new Date(Date.now() + 3600000);
     await user.save();
 
-    // Create reset URL
     const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}&userId=${user._id}`;
 
-    // Email HTML template
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Password Reset Request</h2>
@@ -184,7 +180,6 @@ const postForgotPassword = async (
       </div>
     `;
 
-    // Send email
     await sendEmail({
       to: user.email,
       subject: 'Reset Your Password - Suggesto',
@@ -212,7 +207,6 @@ const getResetPassword = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Verify the token and user
     const hashedToken = hashToken(token as string);
     const user = await User.findOne({
       _id: userId,
@@ -240,7 +234,6 @@ const postResetPassword = async (
   try {
     const { token, userId, password } = req.body;
 
-    // Verify the token and user
     const hashedToken = hashToken(token);
     const user = await User.findOne({
       _id: userId,
@@ -253,17 +246,14 @@ const postResetPassword = async (
       return res.status(400).redirect('/auth/login');
     }
 
-    // Hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Update user password and clear reset token
     user.password = hashedPassword;
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
     await user.save();
 
-    // Send confirmation email
     const confirmationHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Password Reset Successful</h2>

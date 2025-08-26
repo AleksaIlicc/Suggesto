@@ -52,7 +52,6 @@ const RoadmapItemSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Index for efficient queries
 RoadmapItemSchema.index({
   applicationId: 1,
   status: 1,

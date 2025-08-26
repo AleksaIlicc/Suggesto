@@ -19,7 +19,7 @@ export interface ISuggestion extends Document {
   createdAt: Date;
   updatedAt: Date;
   applicationId: IApplication;
-  userId: IUser | null; // Allow anonymous submissions
+  userId: IUser | null;
 }
 
 const SuggestionSchema: Schema = new Schema(

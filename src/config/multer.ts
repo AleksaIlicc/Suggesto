@@ -14,26 +14,25 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req: Request, file: any, cb: any) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const fileExtension = file.originalname.split('.').pop();
     cb(null, file.fieldname + '-' + uniqueSuffix + '.' + fileExtension);
-  }
+  },
 });
 
 const fileFilter = function (req: Request, file: any, cb: any) {
-  // Accept images, PDFs, and text files
   const allowedMimes = [
     'image/jpeg',
-    'image/jpg', 
+    'image/jpg',
     'image/png',
     'image/gif',
     'image/webp',
     'application/pdf',
     'text/plain',
     'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ];
-  
+
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -45,9 +44,9 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 3 // Maximum 3 files per suggestion
-  }
+    fileSize: 5 * 1024 * 1024,
+    files: 3,
+  },
 });
 
 export default upload;

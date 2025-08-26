@@ -6,10 +6,7 @@ import { AddSuggestionDto } from '../dtos/app/add-suggestion.dto';
 import { EditAppDto } from '../dtos/app/edit-app.dto';
 import Suggestion from '../models/Suggestion';
 import Vote from '../models/Vote';
-import {
-  getDefaultCategories,
-  getCategoryByName,
-} from '../utils/defaultCategories';
+import { getDefaultCategories } from '../utils/defaultCategories';
 
 const getApp = async (req: Request, res: Response): Promise<void> => {
   try {

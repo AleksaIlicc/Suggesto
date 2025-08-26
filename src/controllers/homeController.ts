@@ -7,7 +7,6 @@ const getHome = async (req: Request, res: Response): Promise<void> => {
     let hasApplications = false;
     const user = req.user as IUser;
 
-    // Check if authenticated user has any applications
     if (user) {
       const appCount = await Application.countDocuments({ user: user._id });
       hasApplications = appCount > 0;
