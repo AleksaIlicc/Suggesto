@@ -17,15 +17,15 @@ export class EditRoadmapItemDto {
 
   @IsEnum(['planned', 'in-progress', 'completed', 'cancelled'])
   @IsOptional()
-  status?: string;
+  status?: 'planned' | 'in-progress' | 'completed' | 'cancelled';
 
   @ValidateIf(o => o.priority !== '' && o.priority !== undefined)
   @IsEnum(['low', 'medium', 'high'])
-  priority?: string;
+  priority?: 'low' | 'medium' | 'high';
 
   @ValidateIf(o => o.type !== '' && o.type !== undefined)
   @IsEnum(['feature', 'improvement', 'bug-fix', 'announcement'])
-  type?: string;
+  type?: 'feature' | 'improvement' | 'bug-fix' | 'announcement';
 
   @ValidateIf(o => o.suggestion !== '' && o.suggestion !== undefined)
   @IsString()

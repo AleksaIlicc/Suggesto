@@ -156,40 +156,27 @@ const postForgotPassword = async (
     user.resetTokenExpiry = new Date(Date.now() + 3600000);
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}&userId=${user._id}`;
+    const resetUrl = `${process.env.BASE_URL}/auth/reset-password?token=${resetToken}&userId=${user._id}`;
 
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Password Reset Request</h2>
-        <p>Hello ${user.firstName},</p>
-        <p>You have requested to reset your password for your Suggesto account.</p>
-        <p>Click the button below to reset your password:</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" 
-             style="background-color: #374151; color: white; padding: 12px 24px; 
-                    text-decoration: none; border-radius: 8px; display: inline-block;">
-            Reset Password
-          </a>
-        </div>
-        <p>If the button doesn't work, copy and paste this link into your browser:</p>
-        <p style="word-break: break-all; color: #666;">${resetUrl}</p>
-        <p><strong>This link will expire in 1 hour.</strong></p>
-        <p>If you did not request a password reset, please ignore this email.</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-        <p style="color: #666; font-size: 12px;">This is an automated message from Suggesto.</p>
-      </div>
-    `;
+    const sendResult = await sendEmail.sendForgotPassword(
+      user.email,
+      resetUrl,
+      user.firstName
+    );
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Reset Your Password - Suggesto',
-      html: emailHtml,
-    });
+    if (!sendResult.success) {
+      req.flash(
+        'error',
+        'Failed to send password reset email. Please try again.'
+      );
+      return res.status(500).redirect('/auth/forgot-password');
+    }
 
     req.flash(
       'success',
       'Password reset instructions have been sent to your email.'
     );
+
     return res.status(200).redirect('/auth/login');
   } catch (error: unknown) {
     console.error('Forgot password error:', error);
@@ -254,35 +241,24 @@ const postResetPassword = async (
     user.resetTokenExpiry = undefined;
     await user.save();
 
-    const confirmationHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Password Reset Successful</h2>
-        <p>Hello ${user.firstName},</p>
-        <p>Your password has been successfully reset for your Suggesto account.</p>
-        <p>You can now log in with your new password.</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.CLIENT_URL}/auth/login" 
-             style="background-color: #374151; color: white; padding: 12px 24px; 
-                    text-decoration: none; border-radius: 8px; display: inline-block;">
-            Login Now
-          </a>
-        </div>
-        <p>If you did not make this change, please contact support immediately.</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-        <p style="color: #666; font-size: 12px;">This is an automated message from Suggesto.</p>
-      </div>
-    `;
+    const sendResult = await sendEmail.sendResetConfirmation(
+      user.email,
+      user.firstName
+    );
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset Successful - Suggesto',
-      html: confirmationHtml,
-    });
+    if (!sendResult.success) {
+      req.flash(
+        'error',
+        'Failed to send confirmation email. Please try again.'
+      );
+      return res.status(500).redirect('/auth/reset-password');
+    }
 
     req.flash(
       'success',
       'Your password has been reset successfully. You can now log in.'
     );
+
     return res.status(200).redirect('/auth/login');
   } catch (error: unknown) {
     console.error('Reset password error:', error);

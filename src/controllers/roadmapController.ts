@@ -5,6 +5,7 @@ import Suggestion from '../models/Suggestion';
 import { IUser } from '../models/User';
 import { AddRoadmapItemDto } from '../dtos/roadmap/add-roadmap-item.dto';
 import { EditRoadmapItemDto } from '../dtos/roadmap/edit-roadmap-item.dto';
+import moment from 'moment-timezone';
 
 const getRoadmap = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -173,20 +174,12 @@ const postAddRoadmapItem = async (
       status: req.body.status,
     };
 
-    if (req.body.priority && req.body.priority !== '') {
-      newRoadmapItemData.priority = req.body.priority;
-    }
-    if (req.body.type && req.body.type !== '') {
-      newRoadmapItemData.type = req.body.type;
-    }
-    if (req.body.suggestion && req.body.suggestion !== '') {
-      newRoadmapItemData.suggestion = req.body.suggestion;
-    }
-    if (req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== '') {
-      newRoadmapItemData.estimatedReleaseDate = new Date(
-        req.body.estimatedReleaseDate
-      );
-    }
+    newRoadmapItemData.priority = req.body.priority || undefined;
+    newRoadmapItemData.type = req.body.type || undefined;
+    newRoadmapItemData.suggestion = req.body.suggestion || undefined;
+    newRoadmapItemData.estimatedReleaseDate = req.body.estimatedReleaseDate
+      ? moment.utc(req.body.estimatedReleaseDate).toDate()
+      : undefined;
 
     const newRoadmapItem = new RoadmapItem(newRoadmapItemData);
 
@@ -277,36 +270,15 @@ const putEditRoadmapItem = async (
       return res.status(404).redirect(`/apps/${appId}/roadmap`);
     }
 
-    if (req.body.title !== undefined) roadmapItem.title = req.body.title;
-    if (req.body.description !== undefined)
-      roadmapItem.description = req.body.description;
-    if (req.body.status !== undefined)
-      roadmapItem.status = req.body.status as any;
-
-    if (req.body.priority !== undefined) {
-      roadmapItem.priority =
-        req.body.priority && req.body.priority !== ''
-          ? (req.body.priority as any)
-          : undefined;
-    }
-    if (req.body.type !== undefined) {
-      roadmapItem.type =
-        req.body.type && req.body.type !== ''
-          ? (req.body.type as any)
-          : undefined;
-    }
-    if (req.body.suggestion !== undefined) {
-      roadmapItem.suggestion =
-        req.body.suggestion && req.body.suggestion !== ''
-          ? (req.body.suggestion as any)
-          : undefined;
-    }
-    if (req.body.estimatedReleaseDate !== undefined) {
-      roadmapItem.estimatedReleaseDate =
-        req.body.estimatedReleaseDate && req.body.estimatedReleaseDate !== ''
-          ? new Date(req.body.estimatedReleaseDate)
-          : undefined;
-    }
+    roadmapItem.title = req.body.title || undefined;
+    roadmapItem.description = req.body.description || undefined;
+    roadmapItem.status = req.body.status || 'planned';
+    roadmapItem.priority = req.body.priority || 'medium';
+    roadmapItem.type = req.body.type || 'feature';
+    roadmapItem.suggestion = (req.body.suggestion as any) || undefined;
+    roadmapItem.estimatedReleaseDate = req.body.estimatedReleaseDate
+      ? moment.utc(req.body.estimatedReleaseDate).toDate()
+      : undefined;
 
     await roadmapItem.save();
 
